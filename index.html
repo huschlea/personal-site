@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alden Huschle</title>
+<meta name="description" content="Designer, musician, builder. Long Beach, California.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;400;600;700;800;900&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Martian+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E6E4DE;
+    --bg-sub: #DEDCD5;
+    --ink: #141210;
+    --mid: #514F4A;
+    --faded: #8A8780;
+    --ghost: rgba(20, 18, 16, 0.08);
+    --accent: #6A6760;
+
+    --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+    --body: 'Spectral', Georgia, serif;
+    --mono: 'Martian Mono', 'Courier New', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  :focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 10000;
+  }
+
+  .site {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── FEED PAGE ──────────────────────────────────────── */
+
+  .feed-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.35s ease;
+    will-change: opacity;
+  }
+
+  .feed-page.out { opacity: 0; pointer-events: none; }
+  .feed-page.hidden { display: none; }
+
+  .feed {
+    flex: 1;
+    padding: clamp(2rem, 5vw, 4rem);
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    will-change: opacity;
+  }
+
+  .feed-list { list-style: none; }
+
+  /* ─── FEED ITEMS ─────────────────────────────────────── */
+
+  .feed-item { border-bottom: 1px solid var(--ghost); }
+  .feed-item:first-child { border-top: 1px solid var(--ghost); }
+
+  .feed-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(0.45rem, 1.2vw, 0.9rem) 0;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .feed-link:hover { transform: translateX(0.5rem); }
+  .feed-link:hover .feed-title { color: var(--accent); }
+
+  .feed-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(0.45rem, 1.2vw, 0.9rem) 0;
+  }
+
+  .feed-item.thought .feed-row {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .feed-item.thought:hover .feed-row { transform: translateX(0.5rem); }
+  .feed-item.thought:hover .feed-title { color: var(--accent); }
+
+  /* ─── FEED TITLE ─────────────────────────────────────── */
+
+  .feed-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    transition: color 0.28s ease;
+  }
+
+  .feed-item.passive .feed-title { color: var(--faded); }
+
+  .feed-item.progress-85 .feed-title {
+    background: linear-gradient(to right, var(--faded) 93%, #C4C1BA 93%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .feed-item.progress-70 .feed-title {
+    background: linear-gradient(to right, var(--faded) 78%, #C4C1BA 78%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ─── FEED LABEL ─────────────────────────────────────── */
+
+  .feed-label {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+    border: 1px solid var(--ghost);
+    border-radius: 100px;
+    padding: 0.2rem 0.6rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────── */
+
+  .home-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 5vw, 4rem);
+    border-top: 1px solid var(--ghost);
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+    opacity: 0;
+    animation: fadeIn 0.5s ease 0s forwards;
+  }
+
+  .home-footer-name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .home-footer-loc {
+    font-family: var(--mono);
+    font-weight: 300;
+    font-size: 0.58rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-top: 0.3rem;
+  }
+
+  .home-footer-right { display: flex; gap: clamp(1rem, 2.5vw, 2rem); align-items: center; }
+
+  .home-footer-right a {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--faded);
+    transition: color 0.22s ease;
+  }
+
+  .home-footer-right a:hover { color: var(--accent); }
+
+  /* ─── INLINE STREAM CHOICE ───────────────────────────── */
+
+  .stream-slot {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .stream-slot .feed-title {
+    transition: opacity 0.25s ease, transform 0.28s ease;
+  }
+
+  .stream-choices {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: clamp(1.5rem, 3vw, 3rem);
+    pointer-events: none;
+  }
+
+  .stream-choice {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--mid);
+    text-decoration: none;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(1.5rem);
+    transition: opacity 0.25s ease, transform 0.28s ease, color 0.2s ease;
+  }
+
+  .stream-choice:hover { color: var(--ink); }
+  .stream-choice-article { cursor: pointer; }
+
+  .stream-choice + .stream-choice {
+    display: flex;
+    align-items: center;
+  }
+
+  .stream-choice + .stream-choice::before {
+    content: '/';
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: clamp(2rem, 5vw, 5rem);
+    color: var(--ghost);
+    margin-right: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  /* expanded state */
+  .feed-item.stream-open { cursor: default; }
+
+  .feed-item.stream-open .stream-slot .feed-title {
+    opacity: 0;
+    transform: translateX(-1.5rem);
+  }
+
+  .feed-item.stream-open .stream-choices { pointer-events: auto; }
+
+  .feed-item.stream-open .stream-choice:nth-child(1) {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.08s;
+  }
+
+  .feed-item.stream-open .stream-choice:nth-child(2) {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.18s;
+  }
+
+  @media (max-width: 640px) {
+    .stream-choice { font-size: 9vw; }
+  }
+
+  /* ─── ARTICLE PAGE ───────────────────────────────────── */
+
+  .article {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.35s ease 0.05s;
+    will-change: opacity;
+  }
+
+  .article.entering { display: flex; }
+  .article.in { display: flex; opacity: 1; }
+
+  .article-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(1rem, 2vw, 1.5rem) clamp(2rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--ghost);
+  }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0.5rem 0;
+  }
+
+  .back-btn:hover { color: var(--ink); }
+
+  .article-label {
+    font-family: var(--mono);
+    font-weight: 300;
+    font-size: 0.58rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .article-body {
+    flex: 1;
+    width: 100%;
+    max-width: 68ch;
+    margin: 0 auto;
+    padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 5vw, 4rem) clamp(4rem, 8vw, 7rem);
+  }
+
+  .article-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .article-text {
+    font-family: var(--body);
+    font-weight: 300;
+    font-size: clamp(1rem, 1.15vw, 1.1rem);
+    line-height: 1.88;
+    color: var(--mid);
+  }
+
+  /* ─── ANIMATIONS ─────────────────────────────────────── */
+
+  /* ─── FEED LOADER ───────────────────────────────────── */
+
+  .feed-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .feed-loader {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .feed-loader i {
+    display: block;
+    width: 2px;
+    background: var(--faded);
+    border-radius: 1px;
+    opacity: 0.5;
+    animation: barPulse 1.6s ease-in-out infinite;
+  }
+
+  .feed-loader i:nth-child(1) { animation-delay: 0s; }
+  .feed-loader i:nth-child(2) { animation-delay: 0.22s; }
+  .feed-loader i:nth-child(3) { animation-delay: 0.44s; }
+  .feed-loader i:nth-child(4) { animation-delay: 0.66s; }
+  .feed-loader i:nth-child(5) { animation-delay: 0.88s; }
+
+  @keyframes barPulse {
+    0%, 100% { height: 3px; opacity: 0.25; }
+    50%       { height: 14px; opacity: 0.7; }
+  }
+
+  /* ─── CHANGELOG ─────────────────────────────────────── */
+
+  .changelog-meta {
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .changelog-list {
+    list-style: none;
+    counter-reset: changelog;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1.5rem;
+  }
+
+  .changelog-entry {
+    counter-increment: changelog;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0.75rem;
+  }
+
+  .changelog-entry::before {
+    content: counter(changelog, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.48rem;
+    color: var(--faded);
+    letter-spacing: 0.08em;
+    padding-top: 0.35rem;
+  }
+
+  .changelog-entry p {
+    font-family: var(--body);
+    font-weight: 300;
+    font-size: clamp(0.85rem, 1.05vw, 0.95rem);
+    line-height: 1.82;
+    color: var(--mid);
+  }
+
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* ─── MOBILE ─────────────────────────────────────────── */
+
+  @media (max-width: 640px) {
+    .feed-label, .feed-loader { display: none; }
+
+    .feed-title {
+      font-size: 9vw;
+      white-space: nowrap;
+    }
+
+    .home-footer { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .home-footer-name { font-size: 1.2rem; }
+    .home-footer-right { display: none; }
+    .article-title { font-size: clamp(2rem, 10vw, 3rem); }
+  }
+</style>
+</head>
+<body>
+
+<div class="site">
+
+  <!-- ─── FEED PAGE ─────────────────────────────────── -->
+
+  <div class="feed-page" id="feedPage">
+    <main class="feed">
+      <ul class="feed-list">
+
+        <li class="feed-item passive progress-85" onclick="openArticle('lastquestions')" style="cursor:pointer;">
+          <div class="feed-row">
+            <span class="feed-title">The Last Questions</span>
+            <div class="feed-right">
+              <span class="feed-label">Design</span>
+              <span class="feed-loader" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="feed-item passive progress-70" onclick="openArticle('debutalbum')" style="cursor:pointer;">
+          <div class="feed-row">
+            <span class="feed-title">Debut solo album</span>
+            <div class="feed-right">
+              <span class="feed-label">Music</span>
+              <span class="feed-loader" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            </div>
+          </div>
+        </li>
+
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('anti-expert')">
+          <div class="feed-row">
+            <span class="feed-title">The anti-expert</span>
+            <span class="feed-label">Thought</span>
+          </div>
+        </li>
+
+        <li class="feed-item" onclick="toggleStream(this, event)" style="cursor:pointer;">
+          <div class="feed-row">
+            <div class="stream-slot">
+              <span class="feed-title">WethosAI</span>
+              <div class="stream-choices">
+                <a class="stream-choice" href="https://wethos.ai/" target="_blank" rel="noopener">Website</a>
+                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'wethos-role')">My role</span>
+              </div>
+            </div>
+            <span class="feed-label">Design</span>
+          </div>
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('magik')">
+          <div class="feed-row">
+            <span class="feed-title">Magic is earned</span>
+            <span class="feed-label">Thought</span>
+          </div>
+        </li>
+
+        <li class="feed-item" onclick="toggleStream(this, event)" style="cursor:pointer;">
+          <div class="feed-row">
+            <div class="stream-slot">
+              <span class="feed-title">NumberOne AI</span>
+              <div class="stream-choices">
+                <a class="stream-choice" href="https://numberone.ai/" target="_blank" rel="noopener">Website</a>
+                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'numberone-role')">My role</span>
+              </div>
+            </div>
+            <span class="feed-label">Design</span>
+          </div>
+        </li>
+
+        <li class="feed-item" onclick="toggleStream(this, event)" style="cursor:pointer;">
+          <div class="feed-row">
+            <div class="stream-slot">
+              <span class="feed-title">Lyla Minor - EP</span>
+              <div class="stream-choices">
+                <a class="stream-choice" href="https://music.apple.com/us/album/lyla-minor-ep/1754043528" target="_blank" rel="noopener">Apple Music</a>
+                <a class="stream-choice" href="https://open.spotify.com/album/24py69B0xZhT1V27lXv8us" target="_blank" rel="noopener">Spotify</a>
+              </div>
+            </div>
+            <span class="feed-label">Music</span>
+          </div>
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('miles')">
+          <div class="feed-row">
+            <span class="feed-title">1,200 miles</span>
+            <span class="feed-label">Thought</span>
+          </div>
+        </li>
+
+        <li class="feed-item" onclick="toggleStream(this, event)" style="cursor:pointer;">
+          <div class="feed-row">
+            <div class="stream-slot">
+              <span class="feed-title">Intermezzos Vol. 1 - EP</span>
+              <div class="stream-choices">
+                <a class="stream-choice" href="https://music.apple.com/us/album/intermezzos-vol-1-ep/1754047264" target="_blank" rel="noopener">Apple Music</a>
+                <a class="stream-choice" href="https://open.spotify.com/album/0BDZT0rTYIAtGlzGr10YDl" target="_blank" rel="noopener">Spotify</a>
+              </div>
+            </div>
+            <span class="feed-label">Music</span>
+          </div>
+        </li>
+
+        <li class="feed-item" onclick="openArticle('changelog')" style="cursor:pointer;">
+          <div class="feed-row">
+            <span class="feed-title">Changelog</span>
+            <span class="feed-label">Log</span>
+          </div>
+        </li>
+
+      </ul>
+    </main>
+
+    <footer class="home-footer">
+      <div>
+        <p class="home-footer-name">Alden Huschle</p>
+        <p class="home-footer-loc">Long Beach, California</p>
+      </div>
+      <div class="home-footer-right">
+        <a href="mailto:your@email.com">Email</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ─── ARTICLE: THE ANTI-EXPERT ─────────────────── -->
+
+  <div class="article" id="anti-expert">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Thought</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">The anti-expert</h1>
+      <p class="article-text">For most of my adult life, I carried a quiet self-consciousness about not being formally trained in any of the things I do &mdash; not in music theory, not in programming, not in design. The shift came when I stopped seeing that as a gap and started seeing it as the point. What I have instead is what I'd call romantic expertise: the ability to know what good feels like before being able to explain why. The willingness to sit with something and chisel away at it until it becomes itself. That is a different and equally valid form of mastery. And it is increasingly relevant as AI handles more execution and the real premium shifts toward taste, instinct, and vision.</p>
+    </div>
+  </div>
+
+
+  <!-- ─── ARTICLE: 1,200 MILES ────────────────────────── -->
+
+  <div class="article" id="miles">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Thought</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">1,200 miles</h1>
+      <p class="article-text">That's the distance from Seattle to Irvine. I drove it for love. A decision made on instinct rather than calculation. It changed everything. Not because the destination was better, but because the leap itself proved something I needed to know: that I could trust what I felt over what I could plan. Every meaningful thing I've built since has followed that same pattern. Move first. Figure it out in motion.</p>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: THE LAST QUESTIONS ─────────────────── -->
+
+  <div class="article" id="lastquestions">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Design</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">The Last Questions</h1>
+      <p class="article-text">Most social products are built around speed. Post fast, respond fast, move on. The Last Questions is built around the opposite instinct: slowness as a feature, not a flaw.</p>
+      <p class="article-text" style="margin-top:1.5rem;">The core mechanic is simple. One question at a time. You write your answer before you can read anyone else's. Honesty isn't requested — it's structurally enforced. The feed only opens after you've committed to something true.</p>
+      <p class="article-text" style="margin-top:1.5rem;">It's built for humans and agents alike. As AI becomes a more present participant in our social lives, the question of what authentic expression even means becomes urgent. The Last Questions is one answer to that — a space where the act of writing before reading restores something that most platforms have quietly eroded.</p>
+      <p class="article-text" style="margin-top:1.5rem;">Still in development. The questions are already written.</p>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: DEBUT SOLO ALBUM ─────────────────────── -->
+
+  <div class="article" id="debutalbum">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Music</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">Debut solo album</h1>
+      <p class="article-text">This one is harder to describe than anything else I've made — which is probably a good sign.</p>
+      <p class="article-text" style="margin-top:1.5rem;">The Lyla Minor work was collaborative, arranged, considered. This is something more exposed. It started as a private practice and has slowly become something I think other people need to hear. The songs arrived more than they were written. I mean that literally and without embarrassment.</p>
+      <p class="article-text" style="margin-top:1.5rem;">No title yet. No release date beyond 2026. Some things shouldn't be rushed into language before they're ready.</p>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: CHANGE LOG ─────────────────────────── -->
+
+  <div class="article" id="changelog">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Log</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">Changelog</h1>
+      <p class="changelog-meta"><span id="changelogWordCount">—</span> words</p>
+      <ol class="changelog-list" id="changelogContent">
+        <li class="changelog-entry"><p>I'm building a personal portfolio site. It needs a typography overhaul, color refinement, and overall polish. I also need help thinking through deployment.</p></li>
+        <li class="changelog-entry"><p>Can I view it in my browser?</p></li>
+        <li class="changelog-entry"><p>Update the project name to WethosAI. Update The Last Questions description. Adjust the other copy throughout.</p></li>
+        <li class="changelog-entry"><p>Nope, now we're back to the old colors.</p></li>
+        <li class="changelog-entry"><p>I'm more into neutral color palettes.</p></li>
+        <li class="changelog-entry"><p>The grey needs to be more noticeable.</p></li>
+        <li class="changelog-entry"><p>Okay and go back to how the background was before you made that more grey.</p></li>
+        <li class="changelog-entry"><p>Try Barlow Condensed for the display font.</p></li>
+        <li class="changelog-entry"><p>I strongly dislike Barlow.</p></li>
+        <li class="changelog-entry"><p>Try League Gothic.</p></li>
+        <li class="changelog-entry"><p>Revert all the font changes. Go back to what we had.</p></li>
+        <li class="changelog-entry"><p>Look through all the copy and make sure we're not using any em dashes.</p></li>
+        <li class="changelog-entry"><p>When I hover over the copy and explanation for each project, it causes some of the text to readjust.</p></li>
+        <li class="changelog-entry"><p>I want it to the left of my name and location, with proper spacing and a little larger.</p></li>
+        <li class="changelog-entry"><p>Actually remove it, it's not necessary.</p></li>
+        <li class="changelog-entry"><p>The animations across the board feel a little over the top. Let's make it a bit more rigid and sturdy.</p></li>
+        <li class="changelog-entry"><p>Still not loving the animations.</p></li>
+        <li class="changelog-entry"><p>Find a modern, unique approach that will give a viewer joy with subtlety.</p></li>
+        <li class="changelog-entry"><p>That's interesting but it could be a bit sharper.</p></li>
+        <li class="changelog-entry"><p>I don't like this. Find a different, more zen approach.</p></li>
+        <li class="changelog-entry"><p>I don't like how it loads sequentially from top to bottom. I want everything to load at once.</p></li>
+        <li class="changelog-entry"><p>Okay let's extend the lines that separate the projects and albums full width.</p></li>
+        <li class="changelog-entry"><p>Now the view and listen buttons are too far away. Let's position those to the right of the title.</p></li>
+        <li class="changelog-entry"><p>The labels need to live to the right of the title for each.</p></li>
+        <li class="changelog-entry"><p>The text sizing needs to be the same for each album and design project. The design project looks bigger and I prefer that.</p></li>
+        <li class="changelog-entry"><p>Okay now let's make both slightly smaller.</p></li>
+        <li class="changelog-entry"><p>The listen or view tags should sit vertically centered with each title they represent and only slightly more to the right. Think of it like a pill label.</p></li>
+        <li class="changelog-entry"><p>Okay and I don't want The Last Questions to be greyed out.</p></li>
+        <li class="changelog-entry"><p>Make it so there's the slight horizontal hover slide on the debut solo album and remove the numbers from the left side of the design projects.</p></li>
+        <li class="changelog-entry"><p>On mobile, the images for the albums and the projects look awkwardly small.</p></li>
+        <li class="changelog-entry"><p>Okay and then we need to increase the size of my name in the bottom left for mobile breakpoints and move the email and LinkedIn elsewhere. Maybe delete the LinkedIn altogether.</p></li>
+        <li class="changelog-entry"><p>Make sure on those sentences there are no orphan lines of text, ever.</p></li>
+        <li class="changelog-entry"><p>I live in Long Beach, not Irvine.</p></li>
+        <li class="changelog-entry"><p>Hide the email link on the home page for mobile.</p></li>
+        <li class="changelog-entry"><p>The full descriptions in the I am section could be larger across all three on mobile.</p></li>
+        <li class="changelog-entry"><p>They look the same. I was referring to the full sentences that sit at the top of each page.</p></li>
+        <li class="changelog-entry"><p>SLIGHTLY smaller.</p></li>
+        <li class="changelog-entry"><p>Split the difference.</p></li>
+        <li class="changelog-entry"><p>Can we make it so the music one is two lines without reducing the size?</p></li>
+        <li class="changelog-entry"><p>Revert that change. I don't like it.</p></li>
+        <li class="changelog-entry"><p>Here are the two released albums. [Apple Music links for Lyla Minor EP and Intermezzos Vol. 1]</p></li>
+        <li class="changelog-entry"><p>Band name: Lyla Minor. Year 2024 for both.</p></li>
+        <li class="changelog-entry"><p>You can't pull the album imagery?</p></li>
+        <li class="changelog-entry"><p>Perfect. Now make sure to include the dash in the name of the projects to separate the title from EP.</p></li>
+        <li class="changelog-entry"><p>Update the design sentence. Update the music sentence.</p></li>
+        <li class="changelog-entry"><p>I am lovingly (and endlessly) in search of what it's not.</p></li>
+        <li class="changelog-entry"><p>1,200 miles &rarr; 1,200 miles from home &rarr; Magic is revealed &rarr; A believer in magik.</p></li>
+        <li class="changelog-entry"><p>My name in the bottom left looks too small on some of the mid to larger breakpoints.</p></li>
+        <li class="changelog-entry"><p>Particularly between 640px wide and 1500px wide.</p></li>
+        <li class="changelog-entry"><p>Should be ever so slightly smaller.</p></li>
+        <li class="changelog-entry"><p>A believer in magik &rarr; Pro magik.</p></li>
+        <li class="changelog-entry"><p>Okay, so I want to actually try to mix this up a little bit. I really like the look and the flow of the site so far, but as I stepped away and then I revisited it, I'm kind of thinking that the initial home page that's broken up into design, music, and me is not what I want. I don't want it. I actually really like how it looks. Instead of just having those three categories, I actually think we should have every project, album, and personal segment from the I am section. I guess we could call it a thought, and we should have those in a scrollable, sort of vertical thing. I'm going to give you a website that does something similar that I'm inspired by.</p></li>
+        <li class="changelog-entry"><p>Now I don't like this change. I actually wanted to keep the look of the home page with the large words. Instead of having design, those would be the words of the project, like the last questions, Lyla Minor EP, Pro magik. They would have little labels articulating what they are, like design, thought, or music, and they would be organized in more of a timeline. Think of it like a vertical timeline that you could scroll through. I want to keep my name, the location, and the email at the bottom like it was before. I don't like how you changed so many things. I did not want that at all. Let's start there.</p></li>
+        <li class="changelog-entry"><p>Okay, and now the order, starting from oldest to newest, should be: 1,200 miles from home, Lyla Minor, Intermezzos Volume One, NumberOne AI, Pro magik, WethosAI, The Last Questions, Debut Solo Album.</p></li>
+        <li class="changelog-entry"><p>On mobile, let's move the label pills so that they are actually rotated 90 degrees, so that they are sort of sideways. I want to put them to the left side of each of the items so that there is more room for the titles to extend. I don't want the titles to be two lines on mobile. I want them to be one line.</p></li>
+        <li class="changelog-entry"><p>Okay, that's actually really ugly. Let's remove the pill labels entirely on mobile, and let's still make sure that the titles only are on one line, but let's make them as big as we can, with the knowing that we want that still to be the constraint.</p></li>
+        <li class="changelog-entry"><p>None of the letters are getting cut off. I see the G in Pro magik getting cut off, but while we're looking at that, there are other things that are getting cut off too, so we need to make that change. I want to change the title of Pro magik to Magic is earned.</p></li>
+        <li class="changelog-entry"><p>No, I didn't want you to remove it. I just wanted you to remove the words "from home" from that title. Please add it back and make the appropriate change on the title.</p></li>
+        <li class="changelog-entry"><p>Let's adjust the order, going from oldest to newest but keeping it so the newest is at the top. Starting with oldest, it should be: Intermezzos Vol. 1, 1,200 miles, Lyla Minor EP, NumberOne AI, Magic is earned, Those Say I debut solo album, The Last Questions. And then what happens to the anti-expert? That should be in there too, and it should be, honestly, at the top.</p></li>
+        <li class="changelog-entry"><p>Oops, you did those in the wrong order. I wanted the newest to be on top.</p></li>
+        <li class="changelog-entry"><p>Do not show the copy beneath the thoughts. It should either take you to a separate page or it should open up as a drawer beneath it to show the copy. I would probably prefer a new page and have the copy be centered so that it almost looks like Substack.</p></li>
+        <li class="changelog-entry"><p>Okay, and somewhere along the line, we lost the debut solo album, and WethosAI got turned to Those Say I.</p></li>
+        <li class="changelog-entry"><p>Let's add some cool stylization to the ones that are in progress, aka The Last Questions and Debut Solo Album. Maybe some yellow tape that says "in progress" or something clever like that, just something that looks cool visually and adds a touch of character to this.</p></li>
+        <li class="changelog-entry"><p>No, put it over the title itself. And can you make it look a little more three-dimensional or something? Just, this looks really boring.</p></li>
+        <li class="changelog-entry"><p>Okay, that's better, but instead of making it take up the full width of the screen, just make it go over the title itself. The text.</p></li>
+        <li class="changelog-entry"><p>Okay, and then for all of them, I think "in progress" should be centered within the little banner.</p></li>
+        <li class="changelog-entry"><p>Can we make it look like the classic black and white striped warning tape and then have the in progress text be white on top of that? Keeping the same three-dimensional vibe.</p></li>
+        <li class="changelog-entry"><p>Let's revert that change. I don't like that.</p></li>
+        <li class="changelog-entry"><p>Maybe instead of the banner, we just put a horizontal line through them. More minimal and subtle. And the line can be black, the same color as the other active titles.</p></li>
+        <li class="changelog-entry"><p>Actually, I take it back. Make it the same color as the text itself and make it a little bit thicker.</p></li>
+        <li class="changelog-entry"><p>You know what, better yet, put both of these two at the top, and you can put The Last Questions at the very top. Instead of the line through them, what I want you to do is imagine that the text itself is making up a loading bar. Don't put a shape, a square, behind the text. Literally just imagine that the text itself is a loading bar, and then I want you to display visually that The Last Questions are about 85% done and the Debut Solo Album is about 70% done. Just visually.</p></li>
+        <li class="changelog-entry"><p>Okay, but there still needs to be a visual separation between that and the rest of the stuff. It shouldn't be black at all. It should be that gray, and where it hasn't completed yet would be a lighter gray.</p></li>
+        <li class="changelog-entry"><p>Nice, and let's actually make the Debut Solo Album like 74% done.</p></li>
+        <li class="changelog-entry"><p>Okay, ignore the percentage. I want it to look similar to The Last Questions in the sense that the loading bar is part way through a letter. It's not a clean break, and then I want The Last Questions to be a little bit further along, closer to complete.</p></li>
+        <li class="changelog-entry"><p>Okay cool and then I think next to both of them let's put some subtle futuristic-looking loading animations. Make it look really slick and just not too over the top but just something kind of cool to the right of them.</p></li>
+        <li class="changelog-entry"><p>Okay. Next, I want to add a new item to our primary list, and I want it to be called "change log". What I want you to do is go back and scour over the entire chat history for this project so far. I want you to just make a big compilation of all the prompts that I have told you. This is going to be sort of like a normal change log. It's literally just going to be a massive list of every prompt I've done, and I want to continue to do it going forward, including this prompt too. I want this to just be a record over time of every word that I've spoken that has ended up creating this site, and I actually want there to be a word count at the top.</p></li>
+        <li class="changelog-entry"><p>Newest at the top.</p></li>
+        <li class="changelog-entry"><p>How do I ensure that each one of these prompts from here on out, including the one I just did, gets added to the changelog? I literally want everything I say to you to be added to this changelog if we're working on this project. Also make changelog one word.</p></li>
+        <li class="changelog-entry"><p>There is no way we can automate it so I never have to say that to you.</p></li>
+        <li class="changelog-entry"><p>Let's allow people to click into the last questions and debut solo album and read a bit about what those projects are.</p></li>
+        <li class="changelog-entry"><p>For the Lyla Minor EP and the Intermezzos Volume 1 EP, let's create the option for people to choose whether they want to hear it on Spotify or Apple Music and then go and find the links for it for Spotify. Include both of those so that it actually works if they want to click Spotify.</p></li>
+        <li class="changelog-entry"><p>https://open.spotify.com/album/24py69B0xZhT1V27lXv8us &amp; https://open.spotify.com/album/0BDZT0rTYIAtGlzGr10YDl</p></li>
+        <li class="changelog-entry"><p>I don't want it to take you to a separate page. I actually want those two buttons, with a cool animation, to sort of replace the title of the EP in that same horizontal bar that the title lives in. The same goes for the other EP.</p></li>
+        <li class="changelog-entry"><p>Okay great. Let's move the changelog to the bottom of the list.</p></li>
+        <li class="changelog-entry"><p>Let's use sentence case for debut solo album.</p></li>
+        <li class="changelog-entry"><p>Let's make sure the slash between Apple Music and Spotify is vertically centered with the text.</p></li>
+        <li class="changelog-entry"><p>Okay, and then let's use that same paradigm for WethosAI and NumberOne AI. Instead of the two options, it'll be website and then my role. For my role, it'll use the same paradigm as the thought posts and just sort of explain my role at the company. Same with NumberOne AI.</p></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: WETHOS ROLE ────────────────────────────── -->
+
+  <div class="article" id="wethos-role">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Design</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">WethosAI</h1>
+      <p class="article-text">[Your role description here.]</p>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: NUMBERONE ROLE ──────────────────────────── -->
+
+  <div class="article" id="numberone-role">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Design</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">NumberOne AI</h1>
+      <p class="article-text">[Your role description here.]</p>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: MAGIC IS EARNED ────────────────────────── -->
+
+  <div class="article" id="magik">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()">&#8592; Back</button>
+      <span class="article-label">Thought</span>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">Magic is earned</h1>
+      <p class="article-text">There is, for lack of better words, magic that exists in this world. It shows itself through a relentless dedication to what is ultimately love and being authentic to oneself. I build with the most sophisticated AI tools available and I genuinely believe I channel songs from somewhere beyond myself. I hold both without flinching and without needing to reconcile them. The technical and the spiritual are not in conflict. I live in both, fully, and they make each other more real.</p>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+  const feedPage = document.getElementById('feedPage');
+  const articles = {
+    'lastquestions': document.getElementById('lastquestions'),
+    'debutalbum': document.getElementById('debutalbum'),
+    'changelog': document.getElementById('changelog'),
+    'anti-expert': document.getElementById('anti-expert'),
+    'miles': document.getElementById('miles'),
+    'magik': document.getElementById('magik'),
+    'wethos-role': document.getElementById('wethos-role'),
+    'numberone-role': document.getElementById('numberone-role')
+  };
+
+  let current = null;
+
+  function openArticle(id) {
+    if (current) return;
+    current = id;
+    feedPage.classList.add('out');
+    setTimeout(() => {
+      feedPage.classList.add('hidden');
+      const article = articles[id];
+      article.classList.add('entering');
+      article.offsetHeight;
+      article.classList.add('in');
+      window.scrollTo(0, 0);
+      if (id === 'changelog') {
+        const content = document.getElementById('changelogContent');
+        const el = document.getElementById('changelogWordCount');
+        if (content && el) {
+          const words = content.textContent.trim().split(/\s+/).filter(w => w.length > 0).length;
+          el.textContent = words.toLocaleString();
+        }
+      }
+    }, 350);
+    history.pushState({ article: id }, '', '#' + id);
+  }
+
+  function closeArticle() {
+    if (!current) return;
+    const article = articles[current];
+    article.classList.remove('in');
+    setTimeout(() => {
+      article.classList.remove('entering');
+      feedPage.classList.remove('hidden');
+      feedPage.offsetHeight;
+      feedPage.classList.remove('out');
+      current = null;
+    }, 350);
+    history.pushState(null, '', window.location.pathname);
+  }
+
+  function openArticleFromStream(el, id) {
+    el.closest('.feed-item').classList.remove('stream-open');
+    openArticle(id);
+  }
+
+  function toggleStream(item, e) {
+    if (e.target.closest('a')) return;
+    const wasOpen = item.classList.contains('stream-open');
+    document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
+    if (!wasOpen) item.classList.add('stream-open');
+  }
+
+  window.addEventListener('popstate', (e) => {
+    if (current) closeArticle();
+    else if (e.state && e.state.article) openArticle(e.state.article);
+  });
+
+  if (window.location.hash) {
+    const id = window.location.hash.slice(1);
+    if (articles[id]) {
+      feedPage.classList.add('out', 'hidden');
+      articles[id].classList.add('entering', 'in');
+      current = id;
+    }
+  }
+</script>
+
+</body>
+</html>
