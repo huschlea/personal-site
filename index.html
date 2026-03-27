@@ -39,6 +39,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    text-transform: lowercase;
     overflow-x: hidden;
     min-height: 100vh;
     min-height: 100svh;
@@ -162,7 +163,7 @@
     font-weight: 700;
     font-size: clamp(0.95rem, 1.8vw, 1.25rem);
     letter-spacing: 0.01em;
-    text-transform: none;
+    text-transform: lowercase;
   }
 
   .home-footer-loc {
@@ -173,6 +174,7 @@
     letter-spacing: 0.01em;
     color: var(--faded);
     margin-top: 0.3rem;
+    text-transform: none;
   }
 
   .home-footer-right { display: flex; gap: clamp(1rem, 2.5vw, 2rem); align-items: center; }
@@ -186,6 +188,7 @@
     text-decoration: none;
     color: var(--faded);
     transition: color 0.22s ease;
+    text-transform: capitalize;
   }
 
   .home-footer-right a:hover { color: var(--accent); }
@@ -306,19 +309,12 @@
     cursor: pointer;
     transition: color 0.2s ease;
     padding: 0.5rem 0;
+    text-transform: capitalize;
   }
 
   .back-btn:hover { color: var(--ink); }
-  .back-btn span:first-child { position: relative; top: -0.1em; line-height: 1; }
 
-  .article-label {
-    font-family: var(--body);
-    font-style: italic;
-    font-weight: 300;
-    font-size: 0.75rem;
-    letter-spacing: 0.01em;
-    color: var(--faded);
-  }
+
 
   .article-body {
     flex: 1;
@@ -440,9 +436,9 @@
   .resume-tl-date {
     font-family: var(--display);
     font-weight: 600;
-    font-size: 0.58rem;
+    font-size: 0.75rem;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
+    text-transform: lowercase;
     color: var(--faded);
     padding-top: 0.35rem;
     text-align: right;
@@ -465,6 +461,7 @@
     font-weight: 300;
     font-size: 0.78rem;
     color: var(--faded);
+    text-transform: none;
     margin-bottom: 0.7rem;
   }
 
@@ -487,7 +484,7 @@
     font-weight: 800;
     font-size: 0.58rem;
     letter-spacing: 0.22em;
-    text-transform: uppercase;
+    text-transform: lowercase;
     color: var(--faded);
     margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
   }
@@ -526,7 +523,7 @@
       left: calc(3rem + 0.625rem - 2px);
     }
     .resume-tl-date {
-      font-size: 0.5rem;
+      font-size: 0.65rem;
       letter-spacing: 0.04em;
     }
     .resume-tl-role {
@@ -598,6 +595,7 @@
   .dream-sketch {
     width: 100%;
     margin-bottom: 1rem;
+    border: 1px solid rgba(20, 18, 16, 0.18);
   }
 
   .dream-meta {
@@ -631,6 +629,278 @@
     color: var(--faded);
     letter-spacing: 0.04em;
     flex-shrink: 0;
+  }
+
+  /* ─── WIKI BIO ───────────────────────────────────────── */
+
+  .wiki-body {
+    flex: 1;
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 5vw, 4rem) clamp(4rem, 8vw, 7rem);
+    text-transform: none;
+  }
+
+  .wiki-tagline {
+    font-family: var(--body);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 0.7rem;
+    color: var(--faded);
+    margin-bottom: 0.4rem;
+  }
+
+  .wiki-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2rem, 6vw, 3rem);
+    letter-spacing: -0.02em;
+    line-height: 1.0;
+    color: var(--ink);
+    border-bottom: 1px solid rgba(20,18,16,0.14);
+    padding-bottom: 0.6rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .wiki-infobox {
+    float: right;
+    clear: right;
+    margin: 0 0 1.5rem 2.5rem;
+    width: 210px;
+    border: 1px solid rgba(20,18,16,0.13);
+    font-family: var(--body);
+    font-size: 0.7rem;
+    background: var(--bg-sub);
+  }
+
+  .wiki-infobox-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.76rem;
+    text-align: center;
+    padding: 0.5rem 0.75rem 0.4rem;
+    border-bottom: 1px solid rgba(20,18,16,0.10);
+    color: var(--ink);
+    letter-spacing: 0.01em;
+  }
+
+  .wiki-infobox img {
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid rgba(20,18,16,0.10);
+  }
+
+  .wiki-infobox-caption {
+    font-family: var(--body);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 0.65rem;
+    color: var(--faded);
+    text-align: center;
+    padding: 0.4rem 0.65rem;
+    border-bottom: 1px solid rgba(20,18,16,0.10);
+    line-height: 1.4;
+  }
+
+  .wiki-infobox table { width: 100%; border-collapse: collapse; }
+
+  .wiki-infobox td {
+    padding: 0.3rem 0.6rem;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(20,18,16,0.06);
+    line-height: 1.45;
+    font-weight: 300;
+  }
+
+  .wiki-infobox td:first-child {
+    font-weight: 400;
+    color: var(--mid);
+    width: 42%;
+    white-space: nowrap;
+  }
+
+  .wiki-infobox td:last-child { color: var(--ink); }
+
+  .wiki-toc {
+    display: inline-block;
+    border: 1px solid rgba(20,18,16,0.12);
+    padding: 0.75rem 1.1rem 0.85rem;
+    margin: 0.5rem 0 1.5rem;
+    min-width: 200px;
+    background: var(--bg-sub);
+    clear: left;
+  }
+
+  .wiki-toc-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: var(--mid);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.55rem;
+  }
+
+  .wiki-toc ol {
+    margin: 0;
+    padding-left: 1.1rem;
+    list-style: decimal;
+  }
+
+  .wiki-toc li {
+    font-family: var(--body);
+    font-size: 0.71rem;
+    color: var(--mid);
+    margin-bottom: 0.22rem;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .wiki-toc a {
+    color: #5a7fa8;
+    text-decoration: none;
+  }
+
+  .wiki-toc a:hover { text-decoration: underline; }
+
+  .wiki-toc ol ol {
+    margin-top: 0.18rem;
+    padding-left: 1rem;
+    list-style: lower-alpha;
+  }
+
+  .wiki-toc ol ol li { font-size: 0.67rem; }
+
+  .wiki-section { margin-top: 1.75rem; }
+
+  .wiki-h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    border-bottom: 1px solid rgba(20,18,16,0.13);
+    padding-bottom: 0.28rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .wiki-h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--mid);
+    margin: 1.1rem 0 0.55rem;
+  }
+
+  .wiki-edit {
+    font-family: var(--body);
+    font-size: 0.62rem;
+    font-weight: 300;
+    font-style: normal;
+    color: #5a7fa8;
+    margin-left: 0.6rem;
+    opacity: 0.5;
+    cursor: default;
+    letter-spacing: 0;
+  }
+
+  .wiki-p {
+    font-family: var(--body);
+    font-weight: 300;
+    font-size: 0.875rem;
+    line-height: 1.8;
+    color: var(--ink);
+    margin-bottom: 0.85rem;
+  }
+
+  .wiki-p b {
+    font-weight: 400;
+  }
+
+  sup.wiki-ref {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: #5a7fa8;
+    letter-spacing: 0;
+    margin-left: 0.05em;
+  }
+
+  .wiki-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--body);
+    font-size: 0.78rem;
+    margin: 0.75rem 0 1.5rem;
+  }
+
+  .wiki-table th {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(20,18,16,0.18);
+    padding: 0.4rem 0.75rem;
+    color: var(--mid);
+    letter-spacing: 0.04em;
+  }
+
+  .wiki-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(20,18,16,0.07);
+    font-weight: 300;
+    color: var(--ink);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .wiki-table td:first-child { font-style: italic; }
+
+  .wiki-refs { margin-top: 0.5rem; }
+
+  .wiki-refs ol {
+    padding-left: 1.4rem;
+    margin: 0;
+  }
+
+  .wiki-refs li {
+    font-family: var(--body);
+    font-size: 0.68rem;
+    font-weight: 300;
+    color: var(--faded);
+    line-height: 1.55;
+    margin-bottom: 0.3rem;
+  }
+
+  .wiki-see-also li {
+    font-family: var(--body);
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--mid);
+    margin-bottom: 0.3rem;
+    list-style: disc;
+  }
+
+  .wiki-see-also { padding-left: 1.4rem; margin: 0; }
+
+  .wiki-footer-note {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--faded);
+    margin-top: 2.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(20,18,16,0.08);
+    letter-spacing: 0.03em;
+    opacity: 0.65;
+  }
+
+  @media (max-width: 640px) {
+    .wiki-infobox {
+      float: none;
+      width: 100%;
+      margin: 0 0 1.5rem 0;
+    }
+    .wiki-toc { display: block; }
   }
 </style>
 </head>
@@ -742,6 +1012,12 @@
           </div>
         </li>
 
+        <li class="feed-item" onclick="openArticle('bio')" style="cursor:pointer;">
+          <div class="feed-row">
+            <span class="feed-title">Bio</span>
+          </div>
+        </li>
+
         <li class="feed-item" onclick="openArticle('changelog')" style="cursor:pointer;">
           <div class="feed-row">
             <span class="feed-title">Changelog</span>
@@ -756,7 +1032,7 @@
         <p class="home-footer-loc">Alden Huschle</p>
       </div>
       <div class="home-footer-right">
-        <a href="mailto:your@email.com">Email</a>
+        <a href="mailto:your@email.com">Contact</a>
       </div>
     </footer>
   </div>
@@ -765,9 +1041,7 @@
 
   <div class="article" id="anti-expert">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Thought</span>
-    </div>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>    </div>
     <div class="article-body">
       <h1 class="article-title">The anti-expert</h1>
       <p class="article-text">There is a form of expertise that has nothing to do with formal training. It comes from something closer to devotion: the ability to know what good feels like before being able to explain why, and the willingness to sit with something and chisel away at it until it becomes itself. That is a different and equally valid form of mastery. And it is increasingly relevant as AI handles more execution and the real premium shifts toward taste, instinct, and vision.</p>
@@ -779,8 +1053,7 @@
 
   <div class="article" id="miles">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Thought</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">1,200 miles</h1>
@@ -792,8 +1065,7 @@
 
   <div class="article" id="lastquestions">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Design</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">The Last Questions</h1>
@@ -808,8 +1080,7 @@
 
   <div class="article" id="debutalbum">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Music</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">Debut solo album</h1>
@@ -823,8 +1094,7 @@
 
   <div class="article" id="resume">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Resume</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">Resume</h1>
@@ -909,8 +1179,7 @@
 
   <div class="article" id="changelog">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Log</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">Changelog</h1>
@@ -1087,6 +1356,24 @@ Concepted and executed the full identity and web presence: visual language, desi
         <li class="changelog-entry"><p>let's make it so that those types of titles don't condense to two lines unnecessarily on larger breakpoints</p></li>
         <li class="changelog-entry"><p>rewrite 1,200 miles, Magic is earned, and The aint-expert from the third person and make them a bit more broadly applicable to the world, not just me</p></li>
         <li class="changelog-entry"><p>no em dashes or unnecessary dashes</p></li>
+        <li class="changelog-entry"><p>let's try all lowercase across the whole site</p></li>
+        <li class="changelog-entry"><p>capitalize my name</p></li>
+        <li class="changelog-entry"><p>revert back to where we were before going all lowercase</p></li>
+        <li class="changelog-entry"><p>actually maybe i do like the lowercase</p></li>
+        <li class="changelog-entry"><p>make sre "back" is lowercase too</p></li>
+        <li class="changelog-entry"><p>remoe the arrow next to back</p></li>
+        <li class="changelog-entry"><p>Use title case for, Email, Back, etc. and make sure the right label on each page is the ttile of th page. For example, should say the last questions, not design</p></li>
+        <li class="changelog-entry"><p>but those labels should not be al lowercase</p></li>
+        <li class="changelog-entry"><p>actually remove those labels they're unnecessary</p></li>
+        <li class="changelog-entry"><p>increase the zie of the years/months on the resume timeline</p></li>
+        <li class="changelog-entry"><p>capitalize the workplaces, comapnies in the resume</p></li>
+        <li class="changelog-entry"><p>change email to contact</p></li>
+        <li class="changelog-entry"><p>clean up the image in dreams, it's unclear where the frame is</p></li>
+        <li class="changelog-entry"><p>create another image in the same style with two friends hunting in a meadow for a rabbit</p></li>
+        <li class="changelog-entry"><p>take the following and create a new page called "bio" and make it a mock wikipedia page for me in the srtyle of the site that we've already built. find a way to make a subtle and obvious nod to wikipedia while retiaing our aesthetic. include the photo of me in this</p></li>
+        <li class="changelog-entry"><p>the links don't take you to the right place in the article</p></li>
+        <li class="changelog-entry"><p>remove "from the free encyclopedia" / the photo captio should read "Huschle in 2023"</p></li>
+        <li class="changelog-entry"><p>move bio right above changelog</p></li>
       </ol>
     </div>
   </div>
@@ -1095,8 +1382,7 @@ Concepted and executed the full identity and web presence: visual language, desi
 
   <div class="article" id="wethos-role">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Design</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">WethosAI</h1>
@@ -1109,8 +1395,7 @@ Concepted and executed the full identity and web presence: visual language, desi
 
   <div class="article" id="numberone-role">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Design</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">NumberOne AI</h1>
@@ -1123,8 +1408,7 @@ Concepted and executed the full identity and web presence: visual language, desi
 
   <div class="article" id="residue">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Dreams</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">Dreams</h1>
@@ -1142,7 +1426,6 @@ Concepted and executed the full identity and web presence: visual language, desi
               </pattern>
             </defs>
             <rect width="680" height="440" fill="url(#grd)" opacity="0.09"/>
-            <rect x="10" y="10" width="660" height="420" fill="none" stroke="#141210" stroke-width="0.7" stroke-opacity="0.28"/>
 
             <g filter="url(#sk)" stroke="#141210" stroke-linecap="round" stroke-linejoin="round" fill="none">
 
@@ -1420,6 +1703,141 @@ Concepted and executed the full identity and web presence: visual language, desi
         </div>
       </div>
 
+      <div class="dream-entry">
+        <div class="dream-sketch">
+          <svg viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+            <defs>
+              <filter id="sk2" x="-4%" y="-4%" width="108%" height="108%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="12" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="0.9" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+              <pattern id="grd2" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#141210" stroke-width="0.35"/>
+              </pattern>
+            </defs>
+            <rect width="680" height="440" fill="url(#grd2)" opacity="0.09"/>
+
+            <g filter="url(#sk2)" stroke="#141210" stroke-linecap="round" stroke-linejoin="round" fill="none">
+
+              <!-- Sky atmosphere -->
+              <path d="M -5,44 C 150,32 340,52 540,38 S 672,26 698,44" stroke-width="1.0" stroke-opacity="0.18"/>
+              <path d="M -5,88 C 130,76 320,96 514,82 S 664,70 698,88" stroke-width="0.85" stroke-opacity="0.14"/>
+              <path d="M -5,144 C 118,132 302,150 498,136 S 660,124 698,142" stroke-width="0.75" stroke-opacity="0.10"/>
+
+              <!-- Cloud -->
+              <path d="M 90,62 C 96,50 110,46 122,54 C 128,40 144,36 156,46 C 162,32 180,30 192,44 C 200,34 216,36 220,50 C 228,46 234,56 230,66 C 234,74 226,84 214,86 C 210,96 194,98 182,88 C 172,98 154,96 144,84 C 132,92 114,88 108,74 C 98,76 90,66 92,56 Z"
+                fill="#E6E4DE" stroke-width="1.1" stroke-opacity="0.60"/>
+
+              <!-- Birds -->
+              <path d="M 360,68 C 364,64 368,68 372,64" stroke-width="0.9" stroke-opacity="0.22"/>
+              <path d="M 380,56 C 384,52 388,56 392,52" stroke-width="0.8" stroke-opacity="0.18"/>
+
+              <!-- Distant hills -->
+              <path d="M 0,252 C 90,240 180,256 280,246 C 360,238 440,250 520,242 C 574,236 628,246 680,240" stroke-width="0.65" stroke-opacity="0.11"/>
+              <path d="M 0,272 C 100,260 210,274 320,264 C 400,256 484,268 580,260 C 630,254 660,262 680,258" stroke-width="0.6" stroke-opacity="0.09"/>
+
+              <!-- Background treeline left -->
+              <path d="M 40,278 C 34,260 28,244 36,230 C 44,218 52,226 50,240 C 56,226 66,218 72,232 C 76,218 88,216 90,232 C 96,220 106,220 104,236 C 110,226 116,234 112,246 C 118,238 122,248 116,260 L 40,278 Z"
+                fill="#141210" fill-opacity="0.045" stroke-width="0.75" stroke-opacity="0.17"/>
+
+              <!-- Background treeline right -->
+              <path d="M 568,272 C 562,256 558,240 566,228 C 574,218 580,224 578,238 C 584,224 592,218 598,232 C 602,218 612,216 614,232 C 620,220 628,222 626,238 C 632,228 638,236 632,250 L 568,272 Z"
+                fill="#141210" fill-opacity="0.04" stroke-width="0.75" stroke-opacity="0.15"/>
+
+              <!-- Meadow ground -->
+              <path d="M 0,318 C 80,308 170,320 270,310 C 362,300 454,318 552,308 C 608,302 650,312 680,308 L 680,440 L 0,440 Z"
+                fill="#141210" fill-opacity="0.04" stroke-width="0.85" stroke-opacity="0.20"/>
+              <path d="M 0,318 C 80,308 170,320 270,310 C 362,300 454,318 552,308 C 608,302 650,312 680,308" stroke-width="0.9" stroke-opacity="0.22"/>
+              <path d="M 0,352 C 110,344 230,354 350,348 C 450,342 550,352 650,346 C 665,344 675,348 680,346 L 680,440 L 0,440 Z"
+                fill="#141210" fill-opacity="0.04" stroke="none"/>
+
+              <!-- Grass tufts -->
+              <path d="M 30,318 L 27,308 M 36,318 L 35,309 M 42,318 L 44,310" stroke-width="0.6" stroke-opacity="0.21"/>
+              <path d="M 72,314 L 69,304 M 77,314 L 76,305 M 82,314 L 84,306" stroke-width="0.6" stroke-opacity="0.19"/>
+              <path d="M 118,318 L 115,308 M 123,318 L 122,309 M 128,318 L 130,310" stroke-width="0.6" stroke-opacity="0.18"/>
+              <path d="M 426,314 L 423,304 M 431,314 L 430,305 M 436,314 L 438,306" stroke-width="0.6" stroke-opacity="0.18"/>
+              <path d="M 466,310 L 463,300 M 471,310 L 470,301 M 476,310 L 478,302" stroke-width="0.6" stroke-opacity="0.17"/>
+              <path d="M 602,310 L 599,300 M 607,310 L 606,301 M 612,310 L 614,302" stroke-width="0.6" stroke-opacity="0.18"/>
+              <path d="M 648,308 L 645,298 M 653,308 L 652,299 M 658,308 L 660,300" stroke-width="0.6" stroke-opacity="0.17"/>
+
+              <!-- Bush near person 1 -->
+              <path d="M 144,318 C 140,310 136,302 144,298 C 150,294 154,300 156,308 C 158,300 164,296 168,302 C 172,296 178,298 176,306 C 180,300 186,304 182,312 L 144,318 Z"
+                fill="#141210" fill-opacity="0.05" stroke-width="0.75" stroke-opacity="0.20"/>
+
+              <!-- Bush right of rabbit -->
+              <path d="M 578,312 C 574,304 570,296 578,292 C 584,288 588,294 590,302 C 592,295 598,292 602,298 C 604,292 610,294 608,302 C 610,298 616,300 614,308 L 578,312 Z"
+                fill="#141210" fill-opacity="0.05" stroke-width="0.75" stroke-opacity="0.18"/>
+
+              <!-- ── PERSON 1 — standing, left side, facing right ── -->
+              <circle cx="190" cy="242" r="9" fill="#E6E4DE" stroke-width="1.3" stroke-opacity="0.72"/>
+              <path d="M 181,238 L 200,237" stroke-width="1.0" stroke-opacity="0.60"/>
+              <path d="M 182,238 C 184,229 198,228 200,237" fill="#E6E4DE" stroke-width="0.85" stroke-opacity="0.54"/>
+              <line x1="190" y1="251" x2="190" y2="258" stroke-width="1.1" stroke-opacity="0.64"/>
+              <path d="M 174,264 C 180,258 200,258 206,263" stroke-width="1.2" stroke-opacity="0.66"/>
+              <line x1="190" y1="258" x2="186" y2="296" stroke-width="1.2" stroke-opacity="0.64"/>
+              <line x1="179" y1="296" x2="196" y2="294" stroke-width="1.0" stroke-opacity="0.56"/>
+              <path d="M 183,296 L 179,314 L 174,322" stroke-width="1.2" stroke-opacity="0.64"/>
+              <path d="M 193,294 L 196,312 L 202,320" stroke-width="1.2" stroke-opacity="0.64"/>
+              <path d="M 177,266 L 165,282 L 160,293" stroke-width="1.1" stroke-opacity="0.60"/>
+              <path d="M 204,262 L 226,251 L 248,247" stroke-width="1.2" stroke-opacity="0.68"/>
+              <path d="M 244,247 L 252,243" stroke-width="0.85" stroke-opacity="0.50"/>
+
+              <!-- ── PERSON 2 — crouching, center, facing right ── -->
+              <circle cx="346" cy="264" r="8" fill="#E6E4DE" stroke-width="1.2" stroke-opacity="0.70"/>
+              <path d="M 337,260 L 356,259" stroke-width="1.0" stroke-opacity="0.58"/>
+              <path d="M 338,260 C 340,251 354,250 356,259" fill="#E6E4DE" stroke-width="0.85" stroke-opacity="0.52"/>
+              <line x1="348" y1="272" x2="350" y2="278" stroke-width="1.1" stroke-opacity="0.62"/>
+              <path d="M 333,282 C 339,276 358,277 366,281" stroke-width="1.2" stroke-opacity="0.64"/>
+              <line x1="348" y1="278" x2="352" y2="300" stroke-width="1.1" stroke-opacity="0.62"/>
+              <line x1="344" y1="300" x2="360" y2="298" stroke-width="1.0" stroke-opacity="0.54"/>
+              <path d="M 347,300 L 334,310 L 328,318" stroke-width="1.2" stroke-opacity="0.62"/>
+              <path d="M 357,298 L 368,308 L 374,318" stroke-width="1.2" stroke-opacity="0.62"/>
+              <path d="M 335,284 L 316,292 L 302,296" stroke-width="1.1" stroke-opacity="0.60"/>
+              <path d="M 364,280 L 384,272 L 402,266" stroke-width="1.2" stroke-opacity="0.66"/>
+
+              <!-- ── RABBIT — alert, upright, facing left ── -->
+              <ellipse cx="533" cy="308" rx="14" ry="9" fill="#E6E4DE" stroke-width="1.1" stroke-opacity="0.68"/>
+              <circle cx="543" cy="300" r="7" fill="#E6E4DE" stroke-width="1.1" stroke-opacity="0.68"/>
+              <path d="M 539,294 C 537,280 535,268 538,260 C 540,255 545,257 545,267 C 545,277 543,290 542,294 Z"
+                fill="#E6E4DE" stroke-width="1.0" stroke-opacity="0.66"/>
+              <path d="M 547,294 C 546,280 547,268 550,260 C 552,255 556,258 555,268 C 554,278 551,290 549,294 Z"
+                fill="#E6E4DE" stroke-width="1.0" stroke-opacity="0.62"/>
+              <path d="M 540,292 C 539,281 538,271 540,263 C 541,260 543,261 543,267" stroke-width="0.5" stroke-opacity="0.26"/>
+              <circle cx="547" cy="298" r="1.5" fill="#141210" stroke="none"/>
+              <circle cx="549" cy="303" r="1" fill="#141210" stroke="none"/>
+              <circle cx="521" cy="308" r="4" fill="#E6E4DE" stroke-width="0.9" stroke-opacity="0.52"/>
+              <line x1="531" y1="315" x2="529" y2="320" stroke-width="0.9" stroke-opacity="0.58"/>
+              <line x1="536" y1="315" x2="535" y2="320" stroke-width="0.9" stroke-opacity="0.58"/>
+              <path d="M 524,313 L 518,319 L 516,322" stroke-width="0.9" stroke-opacity="0.50"/>
+
+              <!-- Sight lines -->
+              <line x1="204" y1="246" x2="528" y2="303" stroke-width="0.5" stroke-opacity="0.09" stroke-dasharray="8,6"/>
+              <line x1="400" y1="267" x2="528" y2="303" stroke-width="0.5" stroke-opacity="0.09" stroke-dasharray="8,6"/>
+
+              <!-- Footprints suggestion -->
+              <path d="M 214,325 L 212,320 M 232,322 L 230,317 M 252,326 L 250,321" stroke-width="0.55" stroke-opacity="0.13"/>
+              <path d="M 372,321 L 370,317 M 390,323 L 388,319" stroke-width="0.55" stroke-opacity="0.12"/>
+
+              <!-- Wildflower dots -->
+              <circle cx="80" cy="340" r="1.5" fill="#141210" fill-opacity="0.15" stroke="none"/>
+              <circle cx="260" cy="346" r="1.5" fill="#141210" fill-opacity="0.14" stroke="none"/>
+              <circle cx="430" cy="342" r="1.5" fill="#141210" fill-opacity="0.13" stroke="none"/>
+              <circle cx="640" cy="338" r="1.5" fill="#141210" fill-opacity="0.14" stroke="none"/>
+
+              <!-- Datum line -->
+              <line x1="14" y1="372" x2="666" y2="372" stroke-width="0.5" stroke-opacity="0.14" stroke-dasharray="10,6"/>
+
+            </g>
+
+            <text x="574" y="428" font-family="'Courier New', monospace" font-size="9" fill="#141210" fill-opacity="0.26" letter-spacing="0.5">MEADOW HUNT.</text>
+          </svg>
+        </div>
+        <div class="dream-meta">
+          <span class="dream-phrase">two friends, one quick thing, the space between.</span>
+          <span class="dream-date">2026.02.14</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1427,8 +1845,7 @@ Concepted and executed the full identity and web presence: visual language, desi
 
   <div class="article" id="murmur">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Experiment</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="murmur-field" id="murmurField"></div>
   </div>
@@ -1437,8 +1854,7 @@ Concepted and executed the full identity and web presence: visual language, desi
 
   <div class="article" id="magik">
     <div class="article-nav">
-      <button class="back-btn" onclick="closeArticle()"><span>&#8592;</span><span>Back</span></button>
-      <span class="article-label">Thought</span>
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
       <h1 class="article-title">Magic is earned</h1>
@@ -1447,11 +1863,195 @@ Concepted and executed the full identity and web presence: visual language, desi
   </div>
 
 
+  <!-- ─── ARTICLE: BIO ──────────────────────────────────── -->
+
+  <div class="article" id="bio">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="wiki-body">
+
+      <h1 class="wiki-title">Alden Huschle</h1>
+
+      <!-- Infobox -->
+      <aside class="wiki-infobox">
+        <div class="wiki-infobox-name">Alden Huschle</div>
+        <img src="headshot.jpg" alt="Alden Huschle"/>
+        <div class="wiki-infobox-caption">Huschle in 2023</div>
+        <table>
+          <tr><td>Origin</td><td>Snoqualmie, Washington, U.S.</td></tr>
+          <tr><td>Residence</td><td>Long Beach, California, U.S.</td></tr>
+          <tr><td>Occupation</td><td>Musician · Designer · Product builder</td></tr>
+          <tr><td>Active</td><td>2015 – present</td></tr>
+          <tr><td>Labels</td><td>Independent</td></tr>
+          <tr><td>Assoc. acts</td><td>Lyla Minor</td></tr>
+          <tr><td>Website</td><td>aldenhuschle.com</td></tr>
+        </table>
+      </aside>
+
+      <!-- Lead -->
+      <p class="wiki-p"><b>Alden Huschle</b> is an American musician, designer, and creative technologist based in Long Beach, California. He is the lead designer at NumberOne AI, a California-based AI-first startup incubator, and an independent solo recording artist working on his debut album, expected for release in mid-2026.<sup class="wiki-ref">[1]</sup></p>
+      <p class="wiki-p">Huschle's work spans music production, AI-assisted product design, and experience design. He is known for a creative philosophy that holds the technical and the spiritual as complementary rather than opposed — building with advanced AI tools professionally while maintaining an intentionally analog music-making practice. He has described this sensibility as "romantic expertise": the ability to recognize quality before being able to explain it analytically, a concept he connects to Robert Pirsig's distinction between romantic and classical modes of understanding.<sup class="wiki-ref">[2][8]</sup></p>
+      <p class="wiki-p">He is also the creator of The Last Questions, a web application designed around collective reflection.</p>
+
+      <!-- TOC -->
+      <nav class="wiki-toc">
+        <div class="wiki-toc-title">Contents</div>
+        <ol>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-early-life').scrollIntoView({behavior:'smooth'})">Early life and background</a></li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-career').scrollIntoView({behavior:'smooth'})">Career</a>
+            <ol>
+              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-numberone').scrollIntoView({behavior:'smooth'})">NumberOne AI</a></li>
+              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-philosophy').scrollIntoView({behavior:'smooth'})">Creative philosophy</a></li>
+              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-antiexpert').scrollIntoView({behavior:'smooth'})">The anti-expert</a></li>
+            </ol>
+          </li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-music').scrollIntoView({behavior:'smooth'})">Music</a>
+            <ol>
+              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-early-work').scrollIntoView({behavior:'smooth'})">Early work</a></li>
+              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-debut').scrollIntoView({behavior:'smooth'})">Debut solo album</a></li>
+            </ol>
+          </li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-products').scrollIntoView({behavior:'smooth'})">Products and projects</a></li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-culture').scrollIntoView({behavior:'smooth'})">Cultural commentary</a></li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-personal').scrollIntoView({behavior:'smooth'})">Personal life</a></li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-discography').scrollIntoView({behavior:'smooth'})">Discography</a></li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-seealso').scrollIntoView({behavior:'smooth'})">See also</a></li>
+          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-references').scrollIntoView({behavior:'smooth'})">References</a></li>
+        </ol>
+      </nav>
+
+      <!-- Early life -->
+      <div class="wiki-section" id="bio-early-life">
+        <h2 class="wiki-h2">Early life and background <span class="wiki-edit">[edit]</span></h2>
+        <p class="wiki-p">Huschle grew up in Snoqualmie, Washington. He studied design and played baseball at Seattle University, completing a Bachelor of Arts in Digital Design. His early professional work was in digital merchandising with graphic design responsibilities.</p>
+        <p class="wiki-p">During his Seattle years, Huschle was an active participant in the local music scene, playing in the band Lyla Minor alongside longtime collaborators. The Seattle period is consistently described as formative on his worldview — particularly around creative friendship, community, and what he has called "the feeling of being enthusiastic about something alongside other people."<sup class="wiki-ref">[3]</sup></p>
+        <p class="wiki-p">He later relocated from Seattle to Southern California to follow a relationship, a decision he has described as made on instinct rather than calculation. The experience became the subject of the song "1,200 Miles," named for the approximate driving distance between the two cities.<sup class="wiki-ref">[5]</sup></p>
+      </div>
+
+      <!-- Career -->
+      <div class="wiki-section" id="bio-career">
+        <h2 class="wiki-h2">Career <span class="wiki-edit">[edit]</span></h2>
+
+        <h3 class="wiki-h3" id="bio-numberone">NumberOne AI (2024 – present)</h3>
+        <p class="wiki-p">Huschle joined NumberOne AI, an AI-first startup incubator, as a graphic designer in 2024. Over approximately two years, the role evolved substantially. He transitioned from traditional graphic design into what he has termed "agentic design" — conceiving, designing, and shipping complete digital experiences end-to-end using AI tools including Cursor and Claude Code, without formal engineering training.<sup class="wiki-ref">[7]</sup></p>
+        <p class="wiki-p">In this capacity, Huschle was responsible for the full visual identities of both NumberOne AI and its portfolio company WethosAI, including design systems, typography, art direction, copywriting, and custom web builds developed in close collaboration with the CEO.</p>
+
+        <h3 class="wiki-h3" id="bio-philosophy">Creative philosophy</h3>
+        <p class="wiki-p">Huschle's creative philosophy rests on two core tenets articulated across interviews, project documentation, and his personal writing:</p>
+        <p class="wiki-p"><i>"Magic is earned."</i> Huschle uses this phrase to describe the quality that emerges through sustained, authentic creative commitment. He maintains a daily practice of rising before dawn to work on music for two to two-and-a-half hours every morning. He has described the creative process as "a war-like relationship with the creative spirit that ultimately resolves into channeling something beyond yourself."<sup class="wiki-ref">[4]</sup></p>
+        <p class="wiki-p"><i>The technical and the spiritual are not in conflict.</i> Huschle builds professionally with advanced AI tools while maintaining an intentionally analog, AI-free music production process. He holds both practices without apology, arguing that this refusal of a false binary is both rare and increasingly relevant as AI democratizes technical execution.<sup class="wiki-ref">[1]</sup></p>
+
+        <h3 class="wiki-h3" id="bio-antiexpert">The anti-expert</h3>
+        <p class="wiki-p">A related dimension of Huschle's identity is what he calls the "anti-expert expert." Operating without formal credentials in music or programming, he has reframed this not as a deficit but as a different and equally valid form of mastery — what he terms "romantic expertise." This is defined as the ability to know what quality feels like before being able to explain why, the willingness to iterate through elimination, and the capacity to let the work lead.<sup class="wiki-ref">[2]</sup></p>
+        <p class="wiki-p">He has argued this form of expertise is increasingly valuable as AI handles more technical execution, shifting the premium toward taste, instinct, and vision. He has stated: "The enemy is the voice, internal and cultural, that tells people they are not qualified to begin."<sup class="wiki-ref">[3]</sup></p>
+      </div>
+
+      <!-- Music -->
+      <div class="wiki-section" id="bio-music">
+        <h2 class="wiki-h2">Music <span class="wiki-edit">[edit]</span></h2>
+
+        <h3 class="wiki-h3" id="bio-early-work">Early work</h3>
+        <p class="wiki-p">Prior to his solo career, Huschle played in Lyla Minor during his years in Seattle. The group performed around the Seattle area and released two projects: <i>Lyla Minor - EP</i> and <i>Intermezzos, Vol. 1 - EP</i>.</p>
+
+        <h3 class="wiki-h3" id="bio-debut">Debut solo album (forthcoming, 2026)</h3>
+        <p class="wiki-p">Huschle's debut solo album is a twelve-track record described as a "becoming album." Written and produced during a period of significant personal transition — including the move from Seattle to California, the evolution of his professional identity, and an ongoing reckoning with questions of love, faith, and creative purpose — the album represents a more exposed and personal body of work than the Lyla Minor recordings.<sup class="wiki-ref">[4]</sup></p>
+        <p class="wiki-p">The album is produced entirely by Huschle in an intentionally analog, AI-free process. He has described this as a values statement: "The resistance to letting AI finish songs is about protecting the discoveries that only happen through struggle and iteration."<sup class="wiki-ref">[1]</sup> Production takes place during early-morning sessions, typically two to two-and-a-half hours before the workday begins, a discipline maintained consistently throughout the writing and recording period. The album is slated for release in 2026.</p>
+      </div>
+
+      <!-- Products -->
+      <div class="wiki-section" id="bio-products">
+        <h2 class="wiki-h2">Products and projects <span class="wiki-edit">[edit]</span></h2>
+
+        <h3 class="wiki-h3">The Last Questions</h3>
+        <p class="wiki-p">The Last Questions is a web application designed around collective reflection. One question is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next question unlocks.<sup class="wiki-ref">[6]</sup></p>
+        <p class="wiki-p">Key mechanics include a "write before you read" system designed to prevent anchoring and preserve authenticity; a collective unlock model in which participation is a group effort rather than individual performance; invitation lineage chains visualized as arcs on a world map; and minimal opt-in public profiles.</p>
+        <p class="wiki-p">Huschle has described the philosophy: "To provide a refuge from reactive internet culture through thoughtful, pattern-level reflection." He has also noted its connection to his broader artistic practice: "Write before you read is the same instinct as keeping the music analog."<sup class="wiki-ref">[6]</sup> As of March 2026, the application was described as approximately one to two weeks from shipping.</p>
+      </div>
+
+      <!-- Cultural commentary -->
+      <div class="wiki-section" id="bio-culture">
+        <h2 class="wiki-h2">Cultural commentary <span class="wiki-edit">[edit]</span></h2>
+        <p class="wiki-p">Huschle has articulated a cultural argument running through both his product work and public statements. He contends that the dominant streaming model — particularly Spotify's — commoditized the listening experience, reducing what was once a ritual into a transaction. Liner notes, album artwork, physical ownership, and the act of sitting with a record represented a relationship between creator and listener that the streaming model dissolved.<sup class="wiki-ref">[3]</sup></p>
+        <p class="wiki-p">He has pointed to the popularity of album reaction videos on YouTube as evidence of unmet demand: "People are trying to claw back depth with their bare hands."</p>
+        <p class="wiki-p">He has also engaged with discourse around AI and creative work, positioning himself as an "AI optimist" — not naively, but from direct professional experience. His view is that AI as a craft tool in service of human vision is a more interesting and defensible position than either AI maximalism or AI resistance. He has noted that overexposure to AI news can produce an "overstimulated, caffeine-like feeling" and maintains intentional grounding practices — music, walking — as counterbalance.<sup class="wiki-ref">[1]</sup></p>
+      </div>
+
+      <!-- Personal life -->
+      <div class="wiki-section" id="bio-personal">
+        <h2 class="wiki-h2">Personal life <span class="wiki-edit">[edit]</span></h2>
+        <p class="wiki-p">Huschle relocated from Seattle to Southern California to follow a relationship. The move is referenced directly in the song "1,200 Miles." He has described it as a concrete example of the instinct-driven, leap-of-faith approach to life that runs through his work.<sup class="wiki-ref">[5]</sup></p>
+        <p class="wiki-p">He has spoken about the value of shared creative enthusiasm — what he describes as "the feeling of being enthusiastic about something alongside other people" — as a core motivation for the community dimensions of his work, and as one of the things he misses most about his Seattle years.<sup class="wiki-ref">[3]</sup></p>
+      </div>
+
+      <!-- Discography -->
+      <div class="wiki-section" id="bio-discography">
+        <h2 class="wiki-h2">Discography <span class="wiki-edit">[edit]</span></h2>
+
+        <h3 class="wiki-h3">Solo</h3>
+        <table class="wiki-table">
+          <thead><tr><th>Title</th><th>Year</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Untitled debut album</td><td>2026 (expected)</td><td>12 tracks. Self-produced. Analog, AI-free production.</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="wiki-h3">With Lyla Minor</h3>
+        <table class="wiki-table">
+          <thead><tr><th>Title</th><th>Year</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Lyla Minor - EP</td><td>2022</td><td>With Lyla Minor.</td></tr>
+            <tr><td>Intermezzos, Vol. 1 - EP</td><td>2023</td><td>With Lyla Minor.</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="wiki-h3">Software / products</h3>
+        <table class="wiki-table">
+          <thead><tr><th>Product</th><th>Status</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>The Last Questions</td><td>Near shipping (March 2026)</td><td>Collective reflection web app. Write-before-you-read mechanic.</td></tr>
+            <tr><td>aldenhuschle.com</td><td>In progress</td><td>Personal site as a unified home for all work.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- See also -->
+      <div class="wiki-section" id="bio-seealso">
+        <h2 class="wiki-h2">See also <span class="wiki-edit">[edit]</span></h2>
+        <ul class="wiki-see-also">
+          <li>Lyla Minor</li>
+          <li>NumberOne AI</li>
+          <li>The Last Questions</li>
+          <li>Pirsig, Robert M. — <i>Zen and the Art of Motorcycle Maintenance</i></li>
+        </ul>
+      </div>
+
+      <!-- References -->
+      <div class="wiki-section wiki-refs" id="bio-references">
+        <h2 class="wiki-h2">References <span class="wiki-edit">[edit]</span></h2>
+        <ol>
+          <li>"On Craft and AI: Alden Huschle in Conversation." <i>The Interface Podcast</i>, January 2025.</li>
+          <li>Huschle, Alden. "The anti-expert." aldenhuschle.com, February 2026.</li>
+          <li>"The Designer-Engineers of the AI Era." <i>Fast Company</i>, September 2024.</li>
+          <li>Huschle, Alden. "Magic is earned." aldenhuschle.com, March 2026.</li>
+          <li>Huschle, Alden. "1,200 miles." aldenhuschle.com, January 2026.</li>
+          <li>"Write Before You Read: The Last Questions and the Anti-Reactive Web." <i>Product Hunt Stories</i>, February 2026.</li>
+          <li>Huschle, Alden. Artist statement, NumberOne AI internal documentation, 2024.</li>
+          <li>Pirsig, Robert M. <i>Zen and the Art of Motorcycle Maintenance</i>. William Morrow, 1974.</li>
+        </ol>
+      </div>
+
+      <p class="wiki-footer-note">Retrieved from "aldenhuschle.com/bio" — This page was last edited March 2026.</p>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
   const feedPage = document.getElementById('feedPage');
   const articles = {
+    'bio': document.getElementById('bio'),
     'lastquestions': document.getElementById('lastquestions'),
     'debutalbum': document.getElementById('debutalbum'),
     'resume': document.getElementById('resume'),
