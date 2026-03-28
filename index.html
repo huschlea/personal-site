@@ -88,6 +88,20 @@
 
   .feed-list { list-style: none; }
 
+  .feed-section {
+    list-style: none;
+    padding: clamp(1.5rem, 3vw, 2.5rem) 0 0.25rem;
+    font-family: var(--body);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    color: var(--faded);
+    text-transform: capitalize;
+  }
+
+  .feed-section:first-child { padding-top: 0; }
+
   /* ─── FEED ITEMS ─────────────────────────────────────── */
 
   .feed-item { border-bottom: 1px solid var(--ghost); }
@@ -145,19 +159,6 @@
 
   /* ─── FEED LABEL ─────────────────────────────────────── */
 
-  .feed-section {
-    list-style: none;
-    padding: clamp(1.5rem, 3vw, 2.5rem) 0 0.25rem;
-    font-family: var(--body);
-    font-style: italic;
-    font-weight: 300;
-    font-size: 0.8rem;
-    letter-spacing: 0.01em;
-    color: var(--faded);
-    text-transform: capitalize;
-  }
-
-  .feed-section:first-child { padding-top: 0; }
 
   /* ─── FOOTER ─────────────────────────────────────────── */
 
@@ -166,7 +167,6 @@
     justify-content: space-between;
     align-items: flex-end;
     padding: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 5vw, 4rem);
-    border-top: 1px solid var(--ghost);
     margin-top: clamp(1.5rem, 3vw, 2.5rem);
     opacity: 0;
     animation: fadeIn 0.5s ease 0s forwards;
@@ -551,10 +551,7 @@
   /* ─── MOBILE ─────────────────────────────────────────── */
 
   @media (max-width: 640px) {
-    .feed-title {
-      font-size: 9vw;
-      white-space: nowrap;
-    }
+    .feed-title { font-size: 9vw; }
 
     .home-footer { flex-direction: row; align-items: flex-end; }
     .home-footer-name { font-size: 1.2rem; }
@@ -690,8 +687,9 @@
   }
 
   .wiki-infobox-name {
-    font-family: var(--display);
-    font-weight: 700;
+    font-family: var(--body);
+    font-weight: 300;
+    font-style: italic;
     font-size: 0.76rem;
     text-align: center;
     padding: 0.5rem 0.75rem 0.4rem;
@@ -1013,7 +1011,7 @@
 
         <li class="feed-item thought" onclick="openArticle('miles')">
           <div class="feed-row">
-            <span class="feed-title">1,200 miles</span>
+            <span class="feed-title">Move first</span>
           </div>
         </li>
 
@@ -1083,8 +1081,8 @@
       <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
-      <h1 class="article-title">1,200 miles</h1>
-      <p class="article-text">Some distances aren't really about miles. They're about the decision behind them, made on instinct rather than calculation, where the act of moving proves something that planning never could: that feeling can be trusted as much as logic. Not because the destination is necessarily better, but because the leap itself reveals a capacity for self-trust that most people never test. Every meaningful thing ever built has followed some version of that pattern. Move first. Figure it out in motion.</p>
+      <h1 class="article-title">Move first</h1>
+      <p class="article-text">Some distances aren't really about miles. They're about the decision behind them, made on instinct rather than calculation, where the act of taking action proves something that planning never could: that feeling can be trusted as much as logic. Not because the destination or the outcome is necessarily better, but because the leap itself reveals a capacity for self-trust that most people never test. Every meaningful thing ever built has followed some version of that pattern. Move first. Figure it out in motion.</p>
     </div>
   </div>
 
@@ -1432,6 +1430,29 @@ Concepted and executed the full identity and web presence: visual language, desi
         <li class="changelog-entry"><p>Make contact lowercase and then make my name title case.</p></li>
         <li class="changelog-entry"><p>Let's actually make all the category names title case as well as the back button.</p></li>
         <li class="changelog-entry"><p>And what about the category names? Design, music, thoughts, about, and other. Those should be title case as well.</p></li>
+        <li class="changelog-entry"><p>Okay, let's push these changes.</p></li>
+        <li class="changelog-entry"><p>Okay, great. I'm struggling because I like the separation of the sections. It's almost necessary for someone that's visiting this that isn't me. But there was something nice about having all the main elements in a row without any separation. So I'm wondering if we could do something that satisfies both. We could use those funky brackets that would sit to the left, and then the titles would be rotated 90 degrees, so they're perpendicular to the main titles and labeled that way. It might not work, but I think it's worth trying.</p></li>
+        <li class="changelog-entry"><p>Okay, that's actually not terrible. I kind of like it, but let's make it like the category titles. They're moving downwards when they should be up. We want to flip them so that they start moving upwards on the screen, reading from bottom to top, not top to bottom.</p></li>
+        <li class="changelog-entry"><p>Actually no, that doesn't look as good. Let's revert back to what you just had, and then instead of the brackets living on the left side of the screen, let's allow them to live on the right side of the screen. This will allow us to have the left side of each item title all the way to the left of the margin, which looked better in the first place anyways.</p></li>
+        <li class="changelog-entry"><p>I actually want to revert back to when the labels were separated in the section normally. I think it's a better experience for the user. The category labels.</p></li>
+        <li class="changelog-entry"><p>Give 1200 miles the thought piece a different name based on the copy itself.</p></li>
+        <li class="changelog-entry"><p>In the copy, change the first "moving to taking action" so it would be "the act of taking action", and then change "not because the destination" to "not because the destination or the outcome is necessarily".</p></li>
+        <li class="changelog-entry"><p>Get rid of the little bracketed numbers and the word "edit" in the bio section. I get that they're supposed to make it look more like Wikipedia, but I just don't like how they look.</p></li>
+        <li class="changelog-entry"><p>And get rid of the references section as well as the see also section.</p></li>
+        <li class="changelog-entry"><p>Remove the software/products from the discography section.</p></li>
+        <li class="changelog-entry"><p>Remove the discography section entirely.</p></li>
+        <li class="changelog-entry"><p>remove Retrieved from "aldenhuschle.com/bio" — This page was last edited March 2026.</p></li>
+        <li class="changelog-entry"><p>Sift through all the copy on the bio page and make sure there are no em dashes or unnecessary dashes used anywhere.</p></li>
+        <li class="changelog-entry"><p>Remove the "AI insisted" part before "product design" in the second paragraph. Also include brand design in that list for that sentence.</p></li>
+        <li class="changelog-entry"><p>text changes...  romantic expertise -> instinctive mastery / anti-expert expert -> anti-expert</p></li>
+        <li class="changelog-entry"><p>usea different font for the placement of my name that sits small above thr profile picture</p></li>
+        <li class="changelog-entry"><p>I feel like we could go bigger with the text size for the primary titles for each project on the home page at the mobile breakpoint. They look good on other breakpoints, but on mobile they look small and there's definitely space for them to be a little bigger. Let's try it out.</p></li>
+        <li class="changelog-entry"><p>Okay, but now the EP in Intermezzo's Volume One EP is not visible. We gotta make it so it's big enough where nothing gets cut off.</p></li>
+        <li class="changelog-entry"><p>No, no, no, not on a separate line, never on a separate line.</p></li>
+        <li class="changelog-entry"><p>I don't want the right side of any of the titles to go past the subtle line that lives beneath them. That sort of is what's acting as the margins of the page right now.</p></li>
+        <li class="changelog-entry"><p>Let's revert back to what we had before I asked for the sizing change on mobile. I think it was better.</p></li>
+        <li class="changelog-entry"><p>We need to access the history of the chat and revert back to what we had before I asked to increase the text size for the project titles on mobile breakpoints. I don't like the changes to be made after that.</p></li>
+        <li class="changelog-entry"><p>Remove the line at the top of the footer.</p></li>
       </ol>
     </div>
   </div>
@@ -1948,8 +1969,8 @@ Concepted and executed the full identity and web presence: visual language, desi
       </aside>
 
       <!-- Lead -->
-      <p class="wiki-p"><b>Alden Huschle</b> is an American musician, designer, and creative technologist based in Long Beach, California. He is the lead designer at NumberOne AI, a California-based AI-first startup incubator, and an independent solo recording artist working on his debut album, expected for release in mid-2026.<sup class="wiki-ref">[1]</sup></p>
-      <p class="wiki-p">Huschle's work spans music production, AI-assisted product design, and experience design. He is known for a creative philosophy that holds the technical and the spiritual as complementary rather than opposed — building with advanced AI tools professionally while maintaining an intentionally analog music-making practice. He has described this sensibility as "romantic expertise": the ability to recognize quality before being able to explain it analytically, a concept he connects to Robert Pirsig's distinction between romantic and classical modes of understanding.<sup class="wiki-ref">[2][8]</sup></p>
+      <p class="wiki-p"><b>Alden Huschle</b> is an American musician, designer, and creative technologist based in Long Beach, California. He is the lead designer at NumberOne AI, a California-based AI-first startup incubator, and an independent solo recording artist working on his debut album, expected for release in mid-2026.</p>
+      <p class="wiki-p">Huschle's work spans music production, product design, brand design, and experience design. He is known for a creative philosophy that holds the technical and the spiritual as complementary rather than opposed — building with advanced AI tools professionally while maintaining an intentionally analog music-making practice. He has described this sensibility as "instinctive mastery": the ability to recognize quality before being able to explain it analytically, a concept he connects to Robert Pirsig's distinction between romantic and classical modes of understanding.</p>
       <p class="wiki-p">He is also the creator of The Last Questions, a web application designed around collective reflection.</p>
 
       <!-- TOC -->
@@ -1973,133 +1994,74 @@ Concepted and executed the full identity and web presence: visual language, desi
           <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-products').scrollIntoView({behavior:'smooth'})">Products and projects</a></li>
           <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-culture').scrollIntoView({behavior:'smooth'})">Cultural commentary</a></li>
           <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-personal').scrollIntoView({behavior:'smooth'})">Personal life</a></li>
-          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-discography').scrollIntoView({behavior:'smooth'})">Discography</a></li>
-          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-seealso').scrollIntoView({behavior:'smooth'})">See also</a></li>
-          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-references').scrollIntoView({behavior:'smooth'})">References</a></li>
         </ol>
       </nav>
 
       <!-- Early life -->
       <div class="wiki-section" id="bio-early-life">
-        <h2 class="wiki-h2">Early life and background <span class="wiki-edit">[edit]</span></h2>
+        <h2 class="wiki-h2">Early life and background</h2>
         <p class="wiki-p">Huschle grew up in Snoqualmie, Washington. He studied design and played baseball at Seattle University, completing a Bachelor of Arts in Digital Design. His early professional work was in digital merchandising with graphic design responsibilities.</p>
-        <p class="wiki-p">During his Seattle years, Huschle was an active participant in the local music scene, playing in the band Lyla Minor alongside longtime collaborators. The Seattle period is consistently described as formative on his worldview — particularly around creative friendship, community, and what he has called "the feeling of being enthusiastic about something alongside other people."<sup class="wiki-ref">[3]</sup></p>
-        <p class="wiki-p">He later relocated from Seattle to Southern California to follow a relationship, a decision he has described as made on instinct rather than calculation. The experience became the subject of the song "1,200 Miles," named for the approximate driving distance between the two cities.<sup class="wiki-ref">[5]</sup></p>
+        <p class="wiki-p">During his Seattle years, Huschle was an active participant in the local music scene, playing in the band Lyla Minor alongside longtime collaborators. The Seattle period is consistently described as formative on his worldview, particularly around creative friendship, community, and what he has called "the feeling of being enthusiastic about something alongside other people."</p>
+        <p class="wiki-p">He later relocated from Seattle to Southern California to follow a relationship, a decision he has described as made on instinct rather than calculation. The experience became the subject of the song "1,200 Miles," named for the approximate driving distance between the two cities.</p>
       </div>
 
       <!-- Career -->
       <div class="wiki-section" id="bio-career">
-        <h2 class="wiki-h2">Career <span class="wiki-edit">[edit]</span></h2>
+        <h2 class="wiki-h2">Career</h2>
 
         <h3 class="wiki-h3" id="bio-numberone">NumberOne AI (2024 – present)</h3>
-        <p class="wiki-p">Huschle joined NumberOne AI, an AI-first startup incubator, as a graphic designer in 2024. Over approximately two years, the role evolved substantially. He transitioned from traditional graphic design into what he has termed "agentic design" — conceiving, designing, and shipping complete digital experiences end-to-end using AI tools including Cursor and Claude Code, without formal engineering training.<sup class="wiki-ref">[7]</sup></p>
+        <p class="wiki-p">Huschle joined NumberOne AI, an AI-first startup incubator, as a graphic designer in 2024. Over approximately two years, the role evolved substantially. He transitioned from traditional graphic design into what he has termed "agentic design": conceiving, designing, and shipping complete digital experiences end-to-end using AI tools including Cursor and Claude Code, without formal engineering training.</p>
         <p class="wiki-p">In this capacity, Huschle was responsible for the full visual identities of both NumberOne AI and its portfolio company WethosAI, including design systems, typography, art direction, copywriting, and custom web builds developed in close collaboration with the CEO.</p>
 
         <h3 class="wiki-h3" id="bio-philosophy">Creative philosophy</h3>
         <p class="wiki-p">Huschle's creative philosophy rests on two core tenets articulated across interviews, project documentation, and his personal writing:</p>
-        <p class="wiki-p"><i>"Magic is earned."</i> Huschle uses this phrase to describe the quality that emerges through sustained, authentic creative commitment. He maintains a daily practice of rising before dawn to work on music for two to two-and-a-half hours every morning. He has described the creative process as "a war-like relationship with the creative spirit that ultimately resolves into channeling something beyond yourself."<sup class="wiki-ref">[4]</sup></p>
-        <p class="wiki-p"><i>The technical and the spiritual are not in conflict.</i> Huschle builds professionally with advanced AI tools while maintaining an intentionally analog, AI-free music production process. He holds both practices without apology, arguing that this refusal of a false binary is both rare and increasingly relevant as AI democratizes technical execution.<sup class="wiki-ref">[1]</sup></p>
+        <p class="wiki-p"><i>"Magic is earned."</i> Huschle uses this phrase to describe the quality that emerges through sustained, authentic creative commitment. He maintains a daily practice of rising before dawn to work on music for two to two-and-a-half hours every morning. He has described the creative process as "a war-like relationship with the creative spirit that ultimately resolves into channeling something beyond yourself."</p>
+        <p class="wiki-p"><i>The technical and the spiritual are not in conflict.</i> Huschle builds professionally with advanced AI tools while maintaining an intentionally analog, AI-free music production process. He holds both practices without apology, arguing that this refusal of a false binary is both rare and increasingly relevant as AI democratizes technical execution.</p>
 
         <h3 class="wiki-h3" id="bio-antiexpert">The anti-expert</h3>
-        <p class="wiki-p">A related dimension of Huschle's identity is what he calls the "anti-expert expert." Operating without formal credentials in music or programming, he has reframed this not as a deficit but as a different and equally valid form of mastery — what he terms "romantic expertise." This is defined as the ability to know what quality feels like before being able to explain why, the willingness to iterate through elimination, and the capacity to let the work lead.<sup class="wiki-ref">[2]</sup></p>
-        <p class="wiki-p">He has argued this form of expertise is increasingly valuable as AI handles more technical execution, shifting the premium toward taste, instinct, and vision. He has stated: "The enemy is the voice, internal and cultural, that tells people they are not qualified to begin."<sup class="wiki-ref">[3]</sup></p>
+        <p class="wiki-p">A related dimension of Huschle's identity is what he calls the "anti-expert." Operating without formal credentials in music or programming, he has reframed this not as a deficit but as a different and equally valid form of mastery he terms "instinctive mastery." This is defined as the ability to know what quality feels like before being able to explain why, the willingness to iterate through elimination, and the capacity to let the work lead.</p>
+        <p class="wiki-p">He has argued this form of expertise is increasingly valuable as AI handles more technical execution, shifting the premium toward taste, instinct, and vision. He has stated: "The enemy is the voice, internal and cultural, that tells people they are not qualified to begin."</p>
       </div>
 
       <!-- Music -->
       <div class="wiki-section" id="bio-music">
-        <h2 class="wiki-h2">Music <span class="wiki-edit">[edit]</span></h2>
+        <h2 class="wiki-h2">Music</h2>
 
         <h3 class="wiki-h3" id="bio-early-work">Early work</h3>
         <p class="wiki-p">Prior to his solo career, Huschle played in Lyla Minor during his years in Seattle. The group performed around the Seattle area and released two projects: <i>Lyla Minor - EP</i> and <i>Intermezzos, Vol. 1 - EP</i>.</p>
 
         <h3 class="wiki-h3" id="bio-debut">Debut solo album (forthcoming, 2026)</h3>
-        <p class="wiki-p">Huschle's debut solo album is a twelve-track record described as a "becoming album." Written and produced during a period of significant personal transition — including the move from Seattle to California, the evolution of his professional identity, and an ongoing reckoning with questions of love, faith, and creative purpose — the album represents a more exposed and personal body of work than the Lyla Minor recordings.<sup class="wiki-ref">[4]</sup></p>
-        <p class="wiki-p">The album is produced entirely by Huschle in an intentionally analog, AI-free process. He has described this as a values statement: "The resistance to letting AI finish songs is about protecting the discoveries that only happen through struggle and iteration."<sup class="wiki-ref">[1]</sup> Production takes place during early-morning sessions, typically two to two-and-a-half hours before the workday begins, a discipline maintained consistently throughout the writing and recording period. The album is slated for release in 2026.</p>
+        <p class="wiki-p">Huschle's debut solo album is a twelve-track record described as a "becoming album." Written and produced during a period of significant personal transition, including the move from Seattle to California, the evolution of his professional identity, and an ongoing reckoning with questions of love, faith, and creative purpose, the album represents a more exposed and personal body of work than the Lyla Minor recordings.</p>
+        <p class="wiki-p">The album is produced entirely by Huschle in an intentionally analog, AI-free process. He has described this as a values statement: "The resistance to letting AI finish songs is about protecting the discoveries that only happen through struggle and iteration." Production takes place during early-morning sessions, typically two to two-and-a-half hours before the workday begins, a discipline maintained consistently throughout the writing and recording period. The album is slated for release in 2026.</p>
       </div>
 
       <!-- Products -->
       <div class="wiki-section" id="bio-products">
-        <h2 class="wiki-h2">Products and projects <span class="wiki-edit">[edit]</span></h2>
+        <h2 class="wiki-h2">Products and projects</h2>
 
         <h3 class="wiki-h3">The Last Questions</h3>
-        <p class="wiki-p">The Last Questions is a web application designed around collective reflection. One question is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next question unlocks.<sup class="wiki-ref">[6]</sup></p>
+        <p class="wiki-p">The Last Questions is a web application designed around collective reflection. One question is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next question unlocks.</p>
         <p class="wiki-p">Key mechanics include a "write before you read" system designed to prevent anchoring and preserve authenticity; a collective unlock model in which participation is a group effort rather than individual performance; invitation lineage chains visualized as arcs on a world map; and minimal opt-in public profiles.</p>
-        <p class="wiki-p">Huschle has described the philosophy: "To provide a refuge from reactive internet culture through thoughtful, pattern-level reflection." He has also noted its connection to his broader artistic practice: "Write before you read is the same instinct as keeping the music analog."<sup class="wiki-ref">[6]</sup> As of March 2026, the application was described as approximately one to two weeks from shipping.</p>
+        <p class="wiki-p">Huschle has described the philosophy: "To provide a refuge from reactive internet culture through thoughtful, pattern-level reflection." He has also noted its connection to his broader artistic practice: "Write before you read is the same instinct as keeping the music analog." As of March 2026, the application was described as approximately one to two weeks from shipping.</p>
       </div>
 
       <!-- Cultural commentary -->
       <div class="wiki-section" id="bio-culture">
-        <h2 class="wiki-h2">Cultural commentary <span class="wiki-edit">[edit]</span></h2>
-        <p class="wiki-p">Huschle has articulated a cultural argument running through both his product work and public statements. He contends that the dominant streaming model — particularly Spotify's — commoditized the listening experience, reducing what was once a ritual into a transaction. Liner notes, album artwork, physical ownership, and the act of sitting with a record represented a relationship between creator and listener that the streaming model dissolved.<sup class="wiki-ref">[3]</sup></p>
+        <h2 class="wiki-h2">Cultural commentary</h2>
+        <p class="wiki-p">Huschle has articulated a cultural argument running through both his product work and public statements. He contends that the dominant streaming model, particularly Spotify's, commoditized the listening experience, reducing what was once a ritual into a transaction. Liner notes, album artwork, physical ownership, and the act of sitting with a record represented a relationship between creator and listener that the streaming model dissolved.</p>
         <p class="wiki-p">He has pointed to the popularity of album reaction videos on YouTube as evidence of unmet demand: "People are trying to claw back depth with their bare hands."</p>
-        <p class="wiki-p">He has also engaged with discourse around AI and creative work, positioning himself as an "AI optimist" — not naively, but from direct professional experience. His view is that AI as a craft tool in service of human vision is a more interesting and defensible position than either AI maximalism or AI resistance. He has noted that overexposure to AI news can produce an "overstimulated, caffeine-like feeling" and maintains intentional grounding practices — music, walking — as counterbalance.<sup class="wiki-ref">[1]</sup></p>
+        <p class="wiki-p">He has also engaged with discourse around AI and creative work, positioning himself as an "AI optimist," not naively, but from direct professional experience. His view is that AI as a craft tool in service of human vision is a more interesting and defensible position than either AI maximalism or AI resistance. He has noted that overexposure to AI news can produce an "overstimulated, caffeine-like feeling" and maintains intentional grounding practices like music and walking as counterbalance.</p>
       </div>
 
       <!-- Personal life -->
       <div class="wiki-section" id="bio-personal">
-        <h2 class="wiki-h2">Personal life <span class="wiki-edit">[edit]</span></h2>
-        <p class="wiki-p">Huschle relocated from Seattle to Southern California to follow a relationship. The move is referenced directly in the song "1,200 Miles." He has described it as a concrete example of the instinct-driven, leap-of-faith approach to life that runs through his work.<sup class="wiki-ref">[5]</sup></p>
-        <p class="wiki-p">He has spoken about the value of shared creative enthusiasm — what he describes as "the feeling of being enthusiastic about something alongside other people" — as a core motivation for the community dimensions of his work, and as one of the things he misses most about his Seattle years.<sup class="wiki-ref">[3]</sup></p>
+        <h2 class="wiki-h2">Personal life</h2>
+        <p class="wiki-p">Huschle relocated from Seattle to Southern California to follow a relationship. The move is referenced directly in the song "1,200 Miles." He has described it as a concrete example of the instinct-driven, leap-of-faith approach to life that runs through his work.</p>
+        <p class="wiki-p">He has spoken about the value of shared creative enthusiasm, what he describes as "the feeling of being enthusiastic about something alongside other people," as a core motivation for the community dimensions of his work, and as one of the things he misses most about his Seattle years.</p>
       </div>
 
-      <!-- Discography -->
-      <div class="wiki-section" id="bio-discography">
-        <h2 class="wiki-h2">Discography <span class="wiki-edit">[edit]</span></h2>
 
-        <h3 class="wiki-h3">Solo</h3>
-        <table class="wiki-table">
-          <thead><tr><th>Title</th><th>Year</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>Untitled debut album</td><td>2026 (expected)</td><td>12 tracks. Self-produced. Analog, AI-free production.</td></tr>
-          </tbody>
-        </table>
 
-        <h3 class="wiki-h3">With Lyla Minor</h3>
-        <table class="wiki-table">
-          <thead><tr><th>Title</th><th>Year</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>Lyla Minor - EP</td><td>2022</td><td>With Lyla Minor.</td></tr>
-            <tr><td>Intermezzos, Vol. 1 - EP</td><td>2023</td><td>With Lyla Minor.</td></tr>
-          </tbody>
-        </table>
-
-        <h3 class="wiki-h3">Software / products</h3>
-        <table class="wiki-table">
-          <thead><tr><th>Product</th><th>Status</th><th>Description</th></tr></thead>
-          <tbody>
-            <tr><td>The Last Questions</td><td>Near shipping (March 2026)</td><td>Collective reflection web app. Write-before-you-read mechanic.</td></tr>
-            <tr><td>aldenhuschle.com</td><td>In progress</td><td>Personal site as a unified home for all work.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- See also -->
-      <div class="wiki-section" id="bio-seealso">
-        <h2 class="wiki-h2">See also <span class="wiki-edit">[edit]</span></h2>
-        <ul class="wiki-see-also">
-          <li>Lyla Minor</li>
-          <li>NumberOne AI</li>
-          <li>The Last Questions</li>
-          <li>Pirsig, Robert M. — <i>Zen and the Art of Motorcycle Maintenance</i></li>
-        </ul>
-      </div>
-
-      <!-- References -->
-      <div class="wiki-section wiki-refs" id="bio-references">
-        <h2 class="wiki-h2">References <span class="wiki-edit">[edit]</span></h2>
-        <ol>
-          <li>"On Craft and AI: Alden Huschle in Conversation." <i>The Interface Podcast</i>, January 2025.</li>
-          <li>Huschle, Alden. "The anti-expert." aldenhuschle.com, February 2026.</li>
-          <li>"The Designer-Engineers of the AI Era." <i>Fast Company</i>, September 2024.</li>
-          <li>Huschle, Alden. "Magic is earned." aldenhuschle.com, March 2026.</li>
-          <li>Huschle, Alden. "1,200 miles." aldenhuschle.com, January 2026.</li>
-          <li>"Write Before You Read: The Last Questions and the Anti-Reactive Web." <i>Product Hunt Stories</i>, February 2026.</li>
-          <li>Huschle, Alden. Artist statement, NumberOne AI internal documentation, 2024.</li>
-          <li>Pirsig, Robert M. <i>Zen and the Art of Motorcycle Maintenance</i>. William Morrow, 1974.</li>
-        </ol>
-      </div>
-
-      <p class="wiki-footer-note">Retrieved from "aldenhuschle.com/bio" — This page was last edited March 2026.</p>
 
     </div>
   </div>
