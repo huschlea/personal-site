@@ -145,6 +145,20 @@
 
   /* ─── FEED LABEL ─────────────────────────────────────── */
 
+  .feed-section {
+    list-style: none;
+    padding: clamp(1.5rem, 3vw, 2.5rem) 0 0.25rem;
+    font-family: var(--body);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    color: var(--faded);
+    text-transform: capitalize;
+  }
+
+  .feed-section:first-child { padding-top: 0; }
+
   /* ─── FOOTER ─────────────────────────────────────────── */
 
   .home-footer {
@@ -199,7 +213,6 @@
     position: relative;
     flex: 1;
     min-width: 0;
-    overflow: hidden;
   }
 
   .stream-slot .feed-title {
@@ -230,6 +243,8 @@
   }
 
   .stream-choice:hover { color: var(--ink); }
+  .stream-choice-inactive { color: #A8A59E; cursor: default; }
+  .stream-choice-inactive:hover { color: #A8A59E; }
   .stream-choice-article { cursor: pointer; }
 
   .stream-choice + .stream-choice {
@@ -541,9 +556,9 @@
       white-space: nowrap;
     }
 
-    .home-footer { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .home-footer { flex-direction: row; align-items: flex-end; }
     .home-footer-name { font-size: 1.2rem; }
-    .home-footer-right { display: none; }
+    .home-footer-right { display: flex; }
     .article-title { font-size: clamp(2rem, 10vw, 3rem); white-space: normal; }
   }
 
@@ -914,63 +929,45 @@
     <main class="feed">
       <ul class="feed-list">
 
-        <li class="feed-item passive progress-85" onclick="openArticle('lastquestions')" style="cursor:pointer;">
-          <div class="feed-row">
-            <span class="feed-title">The Last Questions</span>
-          </div>
-        </li>
+        <li class="feed-section">Design</li>
 
-        <li class="feed-item passive progress-70" onclick="openArticle('debutalbum')" style="cursor:pointer;">
-          <div class="feed-row">
-            <span class="feed-title">Debut solo album</span>
-          </div>
-        </li>
-
-        </li>
-
-        <li class="feed-item thought" onclick="openArticle('anti-expert')">
-          <div class="feed-row">
-            <span class="feed-title">The anti-expert</span>
-          </div>
-        </li>
-
-        <li class="feed-item thought" onclick="openArticle('residue')">
-          <div class="feed-row">
-            <span class="feed-title">Dreams</span>
-          </div>
-        </li>
-
-        <li class="feed-item thought" onclick="openArticle('murmur')">
-          <div class="feed-row">
-            <span class="feed-title">Murmur</span>
-          </div>
-        </li>
-
-        <li class="feed-item" onclick="toggleStream(this, event)" style="cursor:pointer;">
+        <li class="feed-item passive progress-85" onclick="toggleStream(this, event)" style="cursor:pointer;">
           <div class="feed-row">
             <div class="stream-slot">
-              <span class="feed-title">WethosAI</span>
+              <span class="feed-title">The Last Questions</span>
               <div class="stream-choices">
-                <a class="stream-choice" href="https://wethos.ai/" target="_blank" rel="noopener">Website</a>
-                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'wethos-role')">About</span>
+                <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">Coming soon</span>
+                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'lastquestions')">About</span>
               </div>
             </div>
           </div>
         </li>
 
-        <li class="feed-item thought" onclick="openArticle('magik')">
+        <li class="feed-item">
           <div class="feed-row">
-            <span class="feed-title">Magic is earned</span>
+            <a class="feed-link" href="https://wethos.ai/" target="_blank" rel="noopener" style="flex:1;padding:0;">
+              <span class="feed-title">WethosAI</span>
+            </a>
           </div>
         </li>
 
-        <li class="feed-item" onclick="toggleStream(this, event)" style="cursor:pointer;">
+        <li class="feed-item">
+          <div class="feed-row">
+            <a class="feed-link" href="https://numberone.ai/" target="_blank" rel="noopener" style="flex:1;padding:0;">
+              <span class="feed-title">NumberOne AI</span>
+            </a>
+          </div>
+        </li>
+
+        <li class="feed-section">Music</li>
+
+        <li class="feed-item passive progress-70" onclick="toggleStream(this, event)" style="cursor:pointer;">
           <div class="feed-row">
             <div class="stream-slot">
-              <span class="feed-title">NumberOne AI</span>
+              <span class="feed-title">Debut solo album</span>
               <div class="stream-choices">
-                <a class="stream-choice" href="https://numberone.ai/" target="_blank" rel="noopener">Website</a>
-                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'numberone-role')">About</span>
+                <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">Coming soon</span>
+                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'debutalbum')">About</span>
               </div>
             </div>
           </div>
@@ -988,12 +985,6 @@
           </div>
         </li>
 
-        <li class="feed-item thought" onclick="openArticle('miles')">
-          <div class="feed-row">
-            <span class="feed-title">1,200 miles</span>
-          </div>
-        </li>
-
         <li class="feed-item" onclick="toggleStream(this, event)" style="cursor:pointer;">
           <div class="feed-row">
             <div class="stream-slot">
@@ -1006,15 +997,51 @@
           </div>
         </li>
 
+        <li class="feed-section">Thoughts</li>
+
+        <li class="feed-item thought" onclick="openArticle('anti-expert')">
+          <div class="feed-row">
+            <span class="feed-title">The anti-expert</span>
+          </div>
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('magik')">
+          <div class="feed-row">
+            <span class="feed-title">Magic is earned</span>
+          </div>
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('miles')">
+          <div class="feed-row">
+            <span class="feed-title">1,200 miles</span>
+          </div>
+        </li>
+
+        <li class="feed-section">About</li>
+
+        <li class="feed-item" onclick="openArticle('bio')" style="cursor:pointer;">
+          <div class="feed-row">
+            <span class="feed-title">Bio</span>
+          </div>
+        </li>
+
         <li class="feed-item" onclick="openArticle('resume')" style="cursor:pointer;">
           <div class="feed-row">
             <span class="feed-title">Resume</span>
           </div>
         </li>
 
-        <li class="feed-item" onclick="openArticle('bio')" style="cursor:pointer;">
+        <li class="feed-section">Other</li>
+
+        <li class="feed-item thought" onclick="openArticle('murmur')">
           <div class="feed-row">
-            <span class="feed-title">Bio</span>
+            <span class="feed-title">Themes</span>
+          </div>
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('residue')">
+          <div class="feed-row">
+            <span class="feed-title">Dreams</span>
           </div>
         </li>
 
@@ -1032,7 +1059,7 @@
         <p class="home-footer-loc">Alden Huschle</p>
       </div>
       <div class="home-footer-right">
-        <a href="mailto:your@email.com">Contact</a>
+        <a href="mailto:your@email.com">contact</a>
       </div>
     </footer>
   </div>
@@ -1044,7 +1071,7 @@
       <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>    </div>
     <div class="article-body">
       <h1 class="article-title">The anti-expert</h1>
-      <p class="article-text">There is a form of expertise that has nothing to do with formal training. It comes from something closer to devotion: the ability to know what good feels like before being able to explain why, and the willingness to sit with something and chisel away at it until it becomes itself. That is a different and equally valid form of mastery. And it is increasingly relevant as AI handles more execution and the real premium shifts toward taste, instinct, and vision.</p>
+      <p class="article-text">There is a form of expertise that has nothing to do with formal training. It comes from something closer to devotion: the ability to know what good feels like before being able to explain why, and the willingness to sit with something and chisel away at it until it becomes a mirror. That is a different and equally valid form of mastery.</p>
     </div>
   </div>
 
@@ -1084,9 +1111,8 @@
     </div>
     <div class="article-body">
       <h1 class="article-title">Debut solo album</h1>
-      <p class="article-text">This one is harder to describe than anything else I've made — which is probably a good sign.</p>
-      <p class="article-text" style="margin-top:1.5rem;">The Lyla Minor work was collaborative, arranged, considered. This is something more exposed. It started as a private practice and has slowly become something I think other people need to hear. The songs arrived more than they were written. I mean that literally and without embarrassment.</p>
-      <p class="article-text" style="margin-top:1.5rem;">No title yet. No release date beyond 2026. Some things shouldn't be rushed into language before they're ready.</p>
+      <p class="article-text">While the Lyla Minor work was collaborative, arranged, negotiated, this is something more exposed. It started as a private practice and has slowly become something that needs to be heard.</p>
+      <p class="article-text" style="margin-top:1.5rem;">No title yet, no release date beyond 2026. The songs are written as they arrive.</p>
     </div>
   </div>
 
@@ -1374,6 +1400,38 @@ Concepted and executed the full identity and web presence: visual language, desi
         <li class="changelog-entry"><p>the links don't take you to the right place in the article</p></li>
         <li class="changelog-entry"><p>remove "from the free encyclopedia" / the photo captio should read "Huschle in 2023"</p></li>
         <li class="changelog-entry"><p>move bio right above changelog</p></li>
+        <li class="changelog-entry"><p>For the last questions and the debut solo album, I want to introduce a similar sort of optional clicking animation, similar to Spotify and Apple Music. The options will be:
+1. The first one won't be an option; it'll say "Coming soon".
+2. The second thing will be clickable, and it will say "About"</p></li>
+        <li class="changelog-entry"><p>Since "Coming soon" is not clickable, I want it to be the same light gray color as the last question's title, and then make sure the bottom of the text isn't getting cut off. Right now, the bottom of the lower case g in "coming" is getting cut off at the bottom.</p></li>
+        <li class="changelog-entry"><p>[Image #1]</p></li>
+        <li class="changelog-entry"><p>Now that we have this sort of underlying structure of the murmur page, what I want to do is change the name of that to "themes". Instead of it just being a set collection of words, I want all the words to relate to themes that I am thinking about talking about or working with across my site. I wanted to look and act just as it does now, like all the moving words, the same amount of words, but I want them to be more specific to me and what is floating around my head.</p></li>
+        <li class="changelog-entry"><p>Make sure words don't repeat. I see two large instances of structure.</p></li>
+        <li class="changelog-entry"><p>I want the color of the "Coming Soon" text to be exactly the same shade of gray as the last question's title. Right now, it's a little bit darker.</p></li>
+        <li class="changelog-entry"><p>The description of the debut solo album should be in the third person.</p></li>
+        <li class="changelog-entry"><p>Don't use the word "he". Don't make it about the person; make it about the project, the work.</p></li>
+        <li class="changelog-entry"><p>Just say, "While the Lyla Minor work was collaboratively arranged, considered, this is something more exposed. He started as a private practice and has slowly become something that needs to be heard. The songs arrive more than they were written." Skip the last sentence and then say, "No title yet, no release date beyond 2026."</p></li>
+        <li class="changelog-entry"><p>Delete the first sentence and then make sure it's while the Lyla Minor work was collaborative, arranged, considered.</p></li>
+        <li class="changelog-entry"><p>It started as a private practice of surrender</p></li>
+        <li class="changelog-entry"><p>Remove the sentence the songs arrive more than they are written and then add it back on to the very last sentence but rewrite it as the songs are written as they arrive from beyond</p></li>
+        <li class="changelog-entry"><p>Remove from beyond.</p></li>
+        <li class="changelog-entry"><p>Replace the word "considered" with "negotiated."</p></li>
+        <li class="changelog-entry"><p>On the copy for the anti-expert, change the word itself to a mirror.</p></li>
+        <li class="changelog-entry"><p>Remove the last sentence.</p></li>
+        <li class="changelog-entry"><p>I want the #1 AI and Wethos AI entries to just go right to the website. I don't want those to have an option to read the about page.</p></li>
+        <li class="changelog-entry"><p>Let's try organizing the home page into three sections: Design, Music, and About. For the section titles, I want to use the same font and size that we're using for my name.</p></li>
+        <li class="changelog-entry"><p>We'll also want to have one that says "Writing" or actually "Thoughts".</p></li>
+        <li class="changelog-entry"><p>Small name with italic.</p></li>
+        <li class="changelog-entry"><p>Dreams and themes should be in the "About" section, and then move The Last Questions to the top of the Design section.</p></li>
+        <li class="changelog-entry"><p>Let's add another section titled "Other" that will live beneath "About". That will house Dreams, Themes, and Changelog.</p></li>
+        <li class="changelog-entry"><p>Put Themes above Dreams.</p></li>
+        <li class="changelog-entry"><p>Remove "of surrender" from the copy in the debut solo album about section.</p></li>
+        <li class="changelog-entry"><p>Make the back button all lower case, and same with my name and contact.</p></li>
+        <li class="changelog-entry"><p>Contact needs to be visible on all breakpoints. I don't want it to hide on mobile.</p></li>
+        <li class="changelog-entry"><p>I want it to live to the right on mobile too. I don't like how it sits beneath my name.</p></li>
+        <li class="changelog-entry"><p>Make contact lowercase and then make my name title case.</p></li>
+        <li class="changelog-entry"><p>Let's actually make all the category names title case as well as the back button.</p></li>
+        <li class="changelog-entry"><p>And what about the category names? Design, music, thoughts, about, and other. Those should be title case as well.</p></li>
       </ol>
     </div>
   </div>
@@ -2068,44 +2126,22 @@ Concepted and executed the full identity and web presence: visual language, desi
   /* ─── MURMUR ─────────────────────────────────────────────── */
 
   const MURMUR_WORDS = [
-    'ache','adapt','adrift','aftermath','almost','amble','ancient','answer','arc',
-    'archive','arrival','ask','atmosphere','awake','barely','beckon','belief','belong',
-    'between','bloom','body','border','breathe','brief','broken','calibrate','calm',
-    'carry','cascade','catch','change','chase','circle','clarity','cliff','climb',
-    'close','collect','collide','color','comfort','compress','converge','corner',
-    'crack','current','curve','dark','dawn','deep','define','delay','dense','depth',
-    'detect','differ','diffuse','dim','dissolve','distance','distill','divide','doubt',
-    'draw','drift','drown','echo','edge','emerge','empty','encounter','energy','enter',
-    'escape','evolve','exact','exist','expand','expire','fade','fall','feel','field',
-    'figure','filter','find','finish','float','flow','focus','fold','follow','form',
-    'fracture','fragment','free','gentle','glow','grace','ground','grow','half',
-    'happen','haze','hear','heat','held','here','hold','hollow','horizon','hum',
-    'idea','imagine','impulse','inside','instinct','intent','interval','inward',
-    'language','last','late','layer','lean','leave','light','limit','listen',
-    'live','long','loop','lose','make','map','matter','mean','memory','merge',
-    'middle','miss','moment','motion','move','murmur','name','near','need','next',
-    'noise','nothing','notice','open','orbit','origin','other','pass','past','pause',
-    'persist','place','point','possible','presence','press','pull','push','question',
-    'quiet','reach','recall','reflect','remain','repeat','resist','return','reveal',
-    'rise','root','run','scatter','sense','settle','shape','shift','signal','silence',
-    'simple','sink','slow','small','soft','somewhere','sound','space','start','stay',
-    'still','stop','surface','suspend','sustain','tension','think','through','time',
-    'trace','track','transmit','travel','true','turn','under','unfold','vanish',
-    'vary','vibrate','voice','void','wait','wake','walk','want','warm','watch',
-    'wave','weight','whole','wide','wonder','word','world','write','yield',
-    'almost','anchor','angular','bare','blur','bound','bright','burn','call',
-    'clean','clear','cold','contact','contain','converge','core','debris','decide',
-    'dense','direct','dry','enter','exact','faster','finally','first','fixed',
-    'flat','fuse','gather','given','gone','guess','hard','hit','home','just',
-    'keep','known','land','large','later','line','little','live','long','low',
-    'mark','match','meet','miss','more','most','much','never','next','north',
-    'now','off','old','once','only','open','over','own','part','plain',
-    'press','prior','pure','raw','real','rest','right','same','sharp','short',
-    'side','since','slight','slow','small','smart','solid','some','soon','south',
-    'spare','specific','split','stand','static','steady','step','still','straight',
-    'strong','such','sure','take','tend','tight','tired','together','touch','toward',
-    'trace','translate','true','try','turn','twice','under','unless','until','use',
-    'vast','very','visible','want','warm','west','while','within','without','work'
+    'becoming','belong','before','build','commit','compose','craft','deliberate',
+    'design','distance','doubt','earned','expose','faith','found','honest',
+    'identity','instinct','intent','leap','listen','love','magic','make','mark',
+    'motion','move','notice','origin','patient','personal','practice','private',
+    'purpose','question','reach','record','reckoning','release','reveal',
+    'romantic','root','signal','slow','solo','song','sound','structure',
+    'threshold','transition','trust','voice','write','west','salt','arrive',
+    'minor','twelve','long','coast','weight','spare','precise','land','settle',
+    'almost','quiet','ache','clarity','authentic','album','agent','shape',
+    'trace','surface','remain','logic','feeling','compress','iron','stone',
+    'mineral','cold','name','ship','brand','system','press','plant','collapse',
+    'expand','true','urgent','grace','held','made','given','told',
+    'unnamed','untold','anchor','drift','together','alone','exposed',
+    'intermezzos','lyla','california','seattle','pacific',
+    'anti','expert','self','taught','care','attention',
+    'enforce','after','prayer','tender','open','named','spoken','north','pull'
   ];
 
   let murmurInitialized = false;
