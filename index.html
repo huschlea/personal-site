@@ -117,11 +117,8 @@
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    transition: transform 0.2s ease;
   }
 
-  .feed-link:hover { transform: translateX(0.5rem); }
-  .feed-link:hover .feed-title { color: var(--accent); }
 
   .feed-row {
     display: flex;
@@ -133,11 +130,7 @@
 
   .feed-item.thought .feed-row {
     cursor: pointer;
-    transition: transform 0.2s ease;
   }
-
-  .feed-item.thought:hover .feed-row { transform: translateX(0.5rem); }
-  .feed-item.thought:hover .feed-title { color: var(--accent); }
 
   /* ─── FEED TITLE ─────────────────────────────────────── */
 
@@ -240,10 +233,9 @@
     white-space: nowrap;
     opacity: 0;
     transform: translateX(2rem);
-    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .stream-choice:hover { color: var(--ink); }
   .stream-choice-inactive { color: #A8A59E; cursor: default; }
   .stream-choice-inactive:hover { color: #A8A59E; }
   .stream-choice-article { cursor: pointer; }
@@ -933,36 +925,6 @@
     <main class="feed">
       <ul class="feed-list">
 
-        <li class="feed-section">Design</li>
-
-        <li class="feed-item passive progress-85" onclick="toggleStream(this, event)" style="cursor:pointer;">
-          <div class="feed-row">
-            <div class="stream-slot">
-              <span class="feed-title">The Last Questions</span>
-              <div class="stream-choices">
-                <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">Coming soon</span>
-                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'lastquestions')">About</span>
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <li class="feed-item">
-          <div class="feed-row">
-            <a class="feed-link" href="https://wethos.ai/" target="_blank" rel="noopener" style="flex:1;padding:0;">
-              <span class="feed-title">WethosAI</span>
-            </a>
-          </div>
-        </li>
-
-        <li class="feed-item">
-          <div class="feed-row">
-            <a class="feed-link" href="https://numberone.ai/" target="_blank" rel="noopener" style="flex:1;padding:0;">
-              <span class="feed-title">NumberOne AI</span>
-            </a>
-          </div>
-        </li>
-
         <li class="feed-section">Music</li>
 
         <li class="feed-item passive progress-70" onclick="toggleStream(this, event)" style="cursor:pointer;">
@@ -1001,6 +963,36 @@
           </div>
         </li>
 
+        <li class="feed-section">Design</li>
+
+        <li class="feed-item passive progress-85" onclick="toggleStream(this, event)" style="cursor:pointer;">
+          <div class="feed-row">
+            <div class="stream-slot">
+              <span class="feed-title">The Last Questions</span>
+              <div class="stream-choices">
+                <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">Coming soon</span>
+                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'lastquestions')">About</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="feed-item">
+          <div class="feed-row">
+            <a class="feed-link" href="https://wethos.ai/" target="_blank" rel="noopener" style="flex:1;padding:0;">
+              <span class="feed-title">WethosAI</span>
+            </a>
+          </div>
+        </li>
+
+        <li class="feed-item">
+          <div class="feed-row">
+            <a class="feed-link" href="https://numberone.ai/" target="_blank" rel="noopener" style="flex:1;padding:0;">
+              <span class="feed-title">NumberOne AI</span>
+            </a>
+          </div>
+        </li>
+
         <li class="feed-section">Thoughts</li>
 
         <li class="feed-item thought" onclick="openArticle('anti-expert')">
@@ -1023,13 +1015,13 @@
 
         <li class="feed-section">About</li>
 
-        <li class="feed-item" onclick="openArticle('bio')" style="cursor:pointer;">
+        <li class="feed-item thought" onclick="openArticle('bio')">
           <div class="feed-row">
             <span class="feed-title">Bio</span>
           </div>
         </li>
 
-        <li class="feed-item" onclick="openArticle('resume')" style="cursor:pointer;">
+        <li class="feed-item thought" onclick="openArticle('resume')">
           <div class="feed-row">
             <span class="feed-title">Resume</span>
           </div>
@@ -1049,7 +1041,7 @@
           </div>
         </li>
 
-        <li class="feed-item" onclick="openArticle('changelog')" style="cursor:pointer;">
+        <li class="feed-item thought" onclick="openArticle('changelog')">
           <div class="feed-row">
             <span class="feed-title">Changelog</span>
           </div>
@@ -1189,8 +1181,8 @@
       <div class="resume-footer">
         <p class="resume-footer-label">Proficiencies</p>
         <ul class="resume-skills-list">
-          <li>Cursor</li>
           <li>Claude Code</li>
+          <li>Cursor</li>
           <li>prototyping</li>
           <li>brand design</li>
           <li>web design</li>
@@ -1550,6 +1542,18 @@ in the final stages of development.</p></li>
         <li class="changelog-entry"><p>add this as a new dream entry. The dream took place on February 10th, 2026, and the caption should be undesired seating arrangement</p></li>
         <li class="changelog-entry"><p>okay, now this one for January 24, 2026, with the caption: culinary clutter.</p></li>
         <li class="changelog-entry"><p>now this for January 18th, 2026, with the caption "field mentorship".</p></li>
+        <li class="changelog-entry"><p>Move the music section above the design section.</p></li>
+        <li class="changelog-entry"><p>replace the cluttered kitcehn imagery with this</p></li>
+        <li class="changelog-entry"><p>replace the seating arrangement image with this</p></li>
+        <li class="changelog-entry"><p>move claude code ahead of cursor on proficiences</p></li>
+        <li class="changelog-entry"><p>the hover animation doesnt work on bio, resume, and changelog</p></li>
+        <li class="changelog-entry"><p>Okay, that works, and now the only options that don't have the hover animation are the ones that then open up to multiple options, such as Apple Music, Spotify, or Coming Soon. I kind of want those to have the hover animation, so let's try implementing that.</p></li>
+        <li class="changelog-entry"><p>Make it so that the words don't change colors when they're hovered. Now that we have the animation, I don't think both are necessary.</p></li>
+        <li class="changelog-entry"><p>Okay, and now when the Spotify, Apple Music, or Coming Soon About animation swaps in, it's a little glitchy. I think it's because we added that hover animation, so how do we smooth that out as best as possible?</p></li>
+        <li class="changelog-entry"><p>let's remove the hover animation</p></li>
+        <li class="changelog-entry"><p>okay and bring back the hover color changes from before</p></li>
+        <li class="changelog-entry"><p>actually revert that</p></li>
+        <li class="changelog-entry"><p>there's still a hover on apple music / spotify and about</p></li>
       </ol>
     </div>
   </div>
