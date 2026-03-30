@@ -397,6 +397,20 @@
     color: var(--mid);
   }
 
+  /* ─── GIG POSTERS ────────────────────────────────────── */
+
+  .poster-stack {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .poster-stack img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
   /* ─── RESUME ─────────────────────────────────────────── */
 
   #resume .article-body {
@@ -993,6 +1007,18 @@
           </div>
         </li>
 
+        <li class="feed-item thought" onclick="openArticle('gig-posters')">
+          <div class="feed-row">
+            <span class="feed-title">Gig posters</span>
+          </div>
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('house')">
+          <div class="feed-row">
+            <span class="feed-title">A house is not a home</span>
+          </div>
+        </li>
+
         <li class="feed-section">Thoughts</li>
 
         <li class="feed-item thought" onclick="openArticle('anti-expert')">
@@ -1058,6 +1084,51 @@
         <a href="mailto:huschledesign@gmail.com">contact</a>
       </div>
     </footer>
+  </div>
+
+  <!-- ─── ARTICLE: GIG POSTERS ────────────────────────── -->
+
+  <div class="article" id="gig-posters">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">Gig posters</h1>
+      <div class="poster-stack">
+        <img src="poster-shoecraft.png" alt="Fine Arts Shoecraft gig poster">
+        <img src="poster-bathroom-poets.png" alt="The Bathroom Poets gig poster">
+        <img src="poster-dull-culprit.png" alt="Dull Culprit gig poster">
+        <img src="poster-esteb.png" alt="McKenna Esteb gig poster">
+        <img src="poster-lyla-minor.png" alt="Lyla Minor gig poster">
+        <img src="poster-little-planet.png" alt="Little Planet gig poster">
+        <img src="poster-elvis-batchild.png" alt="Elvis Batchild gig poster">
+        <img src="poster-lyla-minor-2.png" alt="Lyla Minor gig poster">
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: A HOUSE IS NOT A HOME ──────────────── -->
+
+  <div class="article" id="house">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">A house is not a home</h1>
+      <div class="poster-stack">
+        <img src="house1.jpeg" alt="">
+        <img src="house2.jpeg" alt="">
+        <img src="house3.jpeg" alt="">
+        <img src="house4.jpeg" alt="">
+        <img src="house5.jpeg" alt="">
+        <img src="house6.jpeg" alt="">
+        <img src="house7.jpeg" alt="">
+        <img src="house8.jpeg" alt="">
+        <img src="house9.jpeg" alt="">
+        <img src="house10.jpeg" alt="">
+        <img src="house11.jpeg" alt="">
+      </div>
+    </div>
   </div>
 
   <!-- ─── ARTICLE: THE ANTI-EXPERT ─────────────────── -->
@@ -1554,6 +1625,14 @@ in the final stages of development.</p></li>
         <li class="changelog-entry"><p>okay and bring back the hover color changes from before</p></li>
         <li class="changelog-entry"><p>actually revert that</p></li>
         <li class="changelog-entry"><p>there's still a hover on apple music / spotify and about</p></li>
+        <li class="changelog-entry"><p>we need to make a addition to the design section at the bottom titles "gig posters" and include the attached images only problem is each of the posters is sitting ona a white background and they need to be cropped so it is just the posters</p></li>
+        <li class="changelog-entry"><p>make it so the posters are larger and scrollable vertically one at a time</p></li>
+        <li class="changelog-entry"><p>they're way too big now. they all need to be uniform in size, there needs to be a page title, and they shoukldn't exceed the margin width of other pages. use the thoughts pages as an example</p></li>
+        <li class="changelog-entry"><p>there's still white around the edge of the green poster. it is not trimmed properly</p></li>
+        <li class="changelog-entry"><p>okay and now we need to take this same approach and mak another page under the design section, beneath gig posters, titled "a house is not a home" with the attached images in order that they're named no trimming necessary this time</p></li>
+        <li class="changelog-entry"><p>less vertical spacing betywen images</p></li>
+        <li class="changelog-entry"><p>swap the order of the last and second to last gig poster</p></li>
+        <li class="changelog-entry"><p>add a new dream to dreams. image attached. date 3/30/2026 and caption "a flight not taken."</p></li>
       </ol>
     </div>
   </div>
@@ -1592,6 +1671,16 @@ in the final stages of development.</p></li>
     </div>
     <div class="article-body">
       <h1 class="article-title">Dreams</h1>
+
+      <div class="dream-entry">
+        <div class="dream-sketch">
+          <img src="flight-dream.png" alt="dream sketch" style="width:100%;height:auto;display:block;"/>
+        </div>
+        <div class="dream-meta">
+          <span class="dream-phrase">a flight not taken.</span>
+          <span class="dream-date">2026.03.30</span>
+        </div>
+      </div>
 
       <div class="dream-entry">
         <div class="dream-sketch">
@@ -2200,7 +2289,9 @@ in the final stages of development.</p></li>
     'wethos-role': document.getElementById('wethos-role'),
     'numberone-role': document.getElementById('numberone-role'),
     'murmur': document.getElementById('murmur'),
-    'residue': document.getElementById('residue')
+    'residue': document.getElementById('residue'),
+    'gig-posters': document.getElementById('gig-posters'),
+    'house': document.getElementById('house')
   };
 
   /* ─── MURMUR ─────────────────────────────────────────────── */
