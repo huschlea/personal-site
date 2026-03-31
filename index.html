@@ -927,6 +927,96 @@
     }
     .wiki-toc { display: block; }
   }
+
+  /* ─── HOUSE PHOTO STRIP ───────────────────────────────── */
+
+  .house-strip-title {
+    padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 5vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
+    flex-shrink: 0;
+  }
+
+  .house-strip-body {
+    height: clamp(260px, 52vh, 520px);
+    flex-shrink: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    cursor: grab;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .house-strip-body::-webkit-scrollbar { display: none; }
+
+  .house-strip-body.dragging { cursor: grabbing; }
+
+  .house-strip {
+    display: flex;
+    height: 100%;
+    line-height: 0;
+  }
+
+  .house-strip img {
+    height: 100%;
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+
+  /* ─── MOLECULE ───────────────────────────────────────────── */
+
+  .molecule-article {
+    background: var(--bg);
+  }
+
+  .molecule-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    perspective: 1000px;
+    perspective-origin: 50% 50%;
+  }
+
+  .molecule-cards {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(1rem, 3vw, 2rem);
+    padding: clamp(3rem, 7vw, 6rem) 0 clamp(2rem, 4vw, 3rem);
+    width: min(70vw, 400px);
+  }
+
+  .molecule-card {
+    width: min(70vw, 400px);
+    overflow: hidden;
+    will-change: transform;
+  }
+
+  .molecule-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .molecule-card:nth-child(2) { animation: spinCW  30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: 0s,     0s; }
+  .molecule-card:nth-child(3) { animation: spinCCW 30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: -7.5s,  0s; }
+  .molecule-card:nth-child(4) { animation: spinCW  30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: -15s,   0s; }
+  .molecule-card:nth-child(5) { animation: spinCCW 30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: -22.5s, 0s; }
+
+  @keyframes spinCW  { from { transform: rotateY(0deg); }    to { transform: rotateY(360deg); } }
+  @keyframes spinCCW { from { transform: rotateY(0deg); }    to { transform: rotateY(-360deg); } }
+
+  @keyframes moleculeHue {
+    from { filter: hue-rotate(0deg); }
+    to   { filter: hue-rotate(360deg); }
+  }
+
+
 </style>
 </head>
 <body>
@@ -982,7 +1072,7 @@
         <li class="feed-item passive progress-85" onclick="toggleStream(this, event)" style="cursor:pointer;">
           <div class="feed-row">
             <div class="stream-slot">
-              <span class="feed-title">The Last Questions</span>
+              <span class="feed-title">Prompting People</span>
               <div class="stream-choices">
                 <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">Coming soon</span>
                 <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'lastquestions')">About</span>
@@ -1016,6 +1106,12 @@
         <li class="feed-item thought" onclick="openArticle('house')">
           <div class="feed-row">
             <span class="feed-title">A house is not a home</span>
+          </div>
+        </li>
+
+        <li class="feed-item thought" onclick="openArticle('molecule')">
+          <div class="feed-row">
+            <span class="feed-title">Molecule</span>
           </div>
         </li>
 
@@ -1113,9 +1209,9 @@
     <div class="article-nav">
       <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
-    <div class="article-body">
-      <h1 class="article-title">A house is not a home</h1>
-      <div class="poster-stack">
+    <h1 class="article-title house-strip-title">A house is not a home</h1>
+    <div class="house-strip-body" id="houseStripBody">
+      <div class="house-strip">
         <img src="house1.jpeg" alt="">
         <img src="house2.jpeg" alt="">
         <img src="house3.jpeg" alt="">
@@ -1127,6 +1223,23 @@
         <img src="house9.jpeg" alt="">
         <img src="house10.jpeg" alt="">
         <img src="house11.jpeg" alt="">
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: MOLECULE ───────────────────────────── -->
+
+  <div class="article molecule-article" id="molecule">
+    <div class="article-nav molecule-nav">
+      <button class="back-btn molecule-back" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="molecule-body">
+      <div class="molecule-cards">
+        <h1 class="article-title molecule-title">Molecule</h1>
+        <div class="molecule-card"><img src="lsd1-01.webp" alt=""></div>
+        <div class="molecule-card"><img src="lsd2-01.webp" alt=""></div>
+        <div class="molecule-card"><img src="lsd4-01.webp" alt=""></div>
+        <div class="molecule-card"><img src="lsd3-01.webp" alt=""></div>
       </div>
     </div>
   </div>
@@ -1162,10 +1275,10 @@
       <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
-      <h1 class="article-title">The Last Questions</h1>
-      <p class="article-text">most social products are built around ephemerality. scroll until you (maybe) find something interesting, move on. the last questions is built around the opposite instinct: sitting still as a feature, not a flaw.</p>
-      <p class="article-text" style="margin-top:1.5rem;">the core mechanic is simple. one question at a time. you write your answer before you can read anyone else's. the feed only opens after you've contributed something uniquely <em>you</em>.</p>
-      <p class="article-text" style="margin-top:1.5rem;">it's built for humans and agents alike. as ai becomes a more present participant in our social lives, the question of what authentic expression even means becomes urgent. the last questions is a space where the act of writing before reading (read: creating before consuming) restores something that most platforms have quietly eroded.</p>
+      <h1 class="article-title">Prompting People</h1>
+      <p class="article-text">most social products are built around ephemerality. click and scroll until you (maybe) find something interesting, move on. prompting people is built around the opposite instinct: sitting still as a feature, not a flaw.</p>
+      <p class="article-text" style="margin-top:1.5rem;">the core mechanic is simple. one prompt at a time. you write your response before you can read anyone else's. the feed only opens after you've contributed something uniquely you.</p>
+      <p class="article-text" style="margin-top:1.5rem;">prompting people is a space where the act of writing before reading (creating before consuming) restores something that most platforms have mechanistically eroded.</p>
       <p class="article-text" style="margin-top:1.5rem;">in the final stages of development.</p>
     </div>
   </div>
@@ -1561,7 +1674,7 @@ Huschle's debut solo album is a twelve-track record described as a "becoming alb
 The album is produced entirely by Huschle in an intentionally AI-free process. He has described this as a values statement: "The resistance to letting AI finish songs is about protecting the discoveries that only happen through struggle and iteration." Production takes place during early-morning sessions, typically two to two-and-a-half hours before the workday begins, a discipline maintained consistently throughout the writing and recording period. The album is slated for release in 2026.
 ## Products and projects
 **The Last Questions**
-The Last Questions is a web application designed around collective reflection. One question is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next question unlocks.
+The Last Questions is a web application designed around collective reflection. One prompt is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next prompt unlocks.
 Key mechanics include a "write before you read" system designed to prevent anchoring and preserve authenticity; a collective unlock model in which participation is a group effort rather than individual performance; invitation lineage chains visualized as arcs on a world map; and minimal opt-in public profiles.
 Huschle has described the philosophy: "To provide a refuge from reactive internet culture through thoughtful, pattern-level reflection." He has also noted its connection to his broader artistic practice: "Write before you read is the same instinct as keeping the music analog." As of March 2026, the application was described as approximately one to two weeks from shipping.</p></li>
         <li class="changelog-entry"><p>when i click the last questions, i then see coming soon and about, and then when i xclick about, as the page changes it quickly flashes back to the last questions. i don't want it to flash back to that. this is true for anywhere on the site where we have this type of transition animation in place</p></li>
@@ -1574,7 +1687,7 @@ Huschle has described the philosophy: "To provide a refuge from reactive interne
         <li class="changelog-entry"><p>the contact should route to huschledesign@gmail.com</p></li>
         <li class="changelog-entry"><p>I re-wrote the copy for the "The Last Questions" about page. Please replace it word for word: most social products are built around ephemerality. scroll until you (maybe) find something interesting, move on. the last questions is built around the opposite instinct: sitting still as a feature, not a flaw.
 
-the core mechanic is simple. one question at a time. you write your answer before you can read anyone else's. the feed only opens after you've contributed something uniquely *you*.
+the core mechanic is simple. one prompt at a time. you write your answer before you can read anyone else's. the feed only opens after you've contributed something uniquely *you*.
 
 it's built for humans and agents alike. as ai becomes a more present participant in our social lives, the question of what authentic expression even means becomes urgent. the last questions is a space where the act of writing before reading (read: creating before consuming) restores something that most platforms have quietly eroded.
 
@@ -1633,6 +1746,35 @@ in the final stages of development.</p></li>
         <li class="changelog-entry"><p>less vertical spacing betywen images</p></li>
         <li class="changelog-entry"><p>swap the order of the last and second to last gig poster</p></li>
         <li class="changelog-entry"><p>add a new dream to dreams. image attached. date 3/30/2026 and caption "a flight not taken."</p></li>
+        <li class="changelog-entry"><p>So I want to change the name of the Last Questions project to Prompting People, and anywhere on the site where it is mentioned as the Last Questions, we need to change that to Prompting People.</p></li>
+        <li class="changelog-entry"><p>Some of the copy describing Prompting People says it has questions, such as "one question is published at a time". We need to change all these instances to "one prompt is published at a time".</p></li>
+        <li class="changelog-entry"><p>We wrote the copy from the Prompting People page. Please swap it in word for word: most social products are built around ephemerality. click and scroll until you (maybe) find something interesting, move on. prompting people is built around the opposite instinct: sitting still as a feature, not a flaw.
+
+the core mechanic is simple. one prompt at a time. you write your response before you can read anyone else's. the feed only opens after you've contributed something uniquely you.
+
+prompting people is a space where the act of writing before reading (creating before consuming) restores something that most platforms have mechanistically eroded.
+
+in the final stages of development.</p></li>
+        <li class="changelog-entry"><p>unique to you -> uniquely you</p></li>
+        <li class="changelog-entry"><p>quietly -> mechanistically</p></li>
+        <li class="changelog-entry"><p>Okay, and now, for a house is not home, I'm going to throw a curveball at you. We need to actually take each page, and what I want to do is I want to display it as if you're looking at a book, because each of these pages is a book. What we need to do is take first one and actually move it to the end, and then, starting with two, we should be looking at a full spread like a book. The best-case scenario would actually be that you could sort of flip through it and have it even animate like a book, but basically we will want a full spread. On mobile breakpoints, we will actually want there to be a little thing that tells people to turn their phone sideways, because I really want them to be able to flip through. This is meant to be a book-like experience, and for this specific component, because the two images next to each other are going to be somewhat wide, I'm okay on the larger breakpoints with us breaking this sort of width rule for the margin that we've been using elsewhere. This is an exception for that rule.</p></li>
+        <li class="changelog-entry"><p>Okay, instead of it just transitioning two pages at a time, is there any way we can make it look like a page is turning, like an actual page?</p></li>
+        <li class="changelog-entry"><p>Okay, now that I'm seeing it like this, maybe the last page does actually need to be the cover. In that case, we'll have to figure out how to make that look good, because the cover isn't going to be a full spread.</p></li>
+        <li class="changelog-entry"><p>Okay, but it still is the last page of the book, so we need to bring that to the front.</p></li>
+        <li class="changelog-entry"><p>Okay, what if instead of doing the enlarged thing at the beginning, we kept it wide? Obviously, at the start you would see the cover on the right side, and on the left side we have an icon, a gesture icon for a swipe, which would be intuitive on mobile breakpoints. On desktop, what if hovering your mouse over the book creates a swipe effect so you can sort of swipe through the pages with your mouse? Those arrows at the bottom wouldn't even be necessary.</p></li>
+        <li class="changelog-entry"><p>okay, so now we need to create a new entry in the design section titled "Molecule". I've attached four images, and these four images need to be displayed as art pieces, but they represent LSD. I want them to be displayed in a way that sort of plays nicely with the trippy, psychedelic nature of LSD. I'm open to suggestions on what that might look like, but I want it to catch people off guard.</p></li>
+        <li class="changelog-entry"><p>Okay, I like the color. I don't like the hover effect that kind of makes it a little larger. Let's remove that and then let's use just our standard background that we use across the site for this.</p></li>
+        <li class="changelog-entry"><p>So I'm down to do something different with the background. I just didn't like the flat purple color. How can we just really make it crazy looking? I want to just completely make people go 'whoa'. It doesn't have to look pretty or anything; it can look messy. I just want the whole background to be like a splatter of craziness and different colors and movement. I want it to be performant, of course, but I just want it to be wild, and then the whole art piece should be a little bit smaller, I think too.</p></li>
+        <li class="changelog-entry"><p>Okay, wow that actually looks really bad. I don't like that at all. We need to revert back to the standard background. And then I actually want to take each of the four sides of this image and I want to make a 3D cube that users can rotate around and see the different sides of the art piece. And I want to get rid of the morphing colors, actually no, let's keep the morphing colors and let's amp it up a bit. I want them to change a bit more drastically.</p></li>
+        <li class="changelog-entry"><p>The cube is not rendering properly. All I see is one side rotating, but actually it kinda looks cool that way. Maybe we stack all four sides so that there are four of these rotating 3D art pieces. They're all rotating, and if the top one is rotating clockwise, the one beneath is rotating counterclockwise, and so on.</p></li>
+        <li class="changelog-entry"><p>They need to rotate much slower. Like, very slow.</p></li>
+        <li class="changelog-entry"><p>Swap the placement of the third and fourth ones.</p></li>
+        <li class="changelog-entry"><p>We need to have a page title on this page.</p></li>
+        <li class="changelog-entry"><p>Why is it so far off to the left? It should be consistent with the other placement on the website.</p></li>
+        <li class="changelog-entry"><p>Now, on the other places of the website, it's much more centered. Perhaps left-aligned in the margin, but it looks way more in the center of the page, and that's what I want it to be on this.</p></li>
+        <li class="changelog-entry"><p>do you see how it's still way off to the left?</p></li>
+        <li class="changelog-entry"><p>Okay, and now I'd like to try something actually totally different: "A house is not a home." Instead of making it a book, I want to connect all of the images into one long horizontal image and allow that to essentially be like a scroll bar, like an image scroll feed, but horizontally, and you can just scroll from one side to the other. I want it to look like all one big horizontal picture. I think it's going to be awesome.</p></li>
+        <li class="changelog-entry"><p>It's showing up way, way, way too big, and there's no page title.</p></li>
       </ol>
     </div>
   </div>
@@ -2193,7 +2335,7 @@ in the final stages of development.</p></li>
       <!-- Lead -->
       <p class="wiki-p"><b>Alden Huschle</b> is an American musician, designer, and creative technologist based in Long Beach, California. He is the lead designer at NumberOne AI, a California-based AI-first startup incubator, and an independent solo recording artist.</p>
       <p class="wiki-p">Huschle's work spans music production, product design, brand design, and experience design. He embodies a creative philosophy that holds the technical and the spiritual as complementary rather than opposed, building with advanced AI tools professionally while maintaining an intentionally grounded music-making practice. He has described this sensibility as "romantic expertise": the ability to intuit quality before being able to explain it analytically, a concept he connects to Robert Pirsig's distinction between romantic and classical modes of understanding.</p>
-      <p class="wiki-p">He is also the creator of The Last Questions, a web application designed around collective reflection.</p>
+      <p class="wiki-p">He is also the creator of Prompting People, a web application designed around collective reflection.</p>
 
       <!-- TOC -->
       <nav class="wiki-toc">
@@ -2259,8 +2401,8 @@ in the final stages of development.</p></li>
       <div class="wiki-section" id="bio-products">
         <h2 class="wiki-h2">Products and projects</h2>
 
-        <h3 class="wiki-h3">The Last Questions</h3>
-        <p class="wiki-p">The Last Questions is a web application designed around collective reflection. One question is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next question unlocks.</p>
+        <h3 class="wiki-h3">Prompting People</h3>
+        <p class="wiki-p">Prompting People is a web application designed around collective reflection. One prompt is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next prompt unlocks.</p>
         <p class="wiki-p">Key mechanics include a "write before you read" system designed to prevent anchoring and preserve authenticity; a collective unlock model in which participation is a group effort rather than individual performance; invitation lineage chains visualized as arcs on a world map; and minimal opt-in public profiles.</p>
         <p class="wiki-p">Huschle has described the philosophy: "To provide a refuge from reactive internet culture through thoughtful, pattern-level reflection." He has also noted its connection to his broader artistic practice: "Write before you read is the same instinct as keeping the music analog." As of March 2026, the application was described as approximately one to two weeks from shipping.</p>
       </div>
@@ -2291,7 +2433,8 @@ in the final stages of development.</p></li>
     'murmur': document.getElementById('murmur'),
     'residue': document.getElementById('residue'),
     'gig-posters': document.getElementById('gig-posters'),
-    'house': document.getElementById('house')
+    'house': document.getElementById('house'),
+    'molecule': document.getElementById('molecule')
   };
 
   /* ─── MURMUR ─────────────────────────────────────────────── */
@@ -2455,6 +2598,58 @@ in the final stages of development.</p></li>
       }
     }
   }
+
+  /* ─── HOUSE PHOTO STRIP ─────────────────────────────────── */
+  (function() {
+    var el = document.getElementById('houseStripBody');
+    if (!el) return;
+
+    var dragging = false;
+    var startX, startScroll;
+    var velX = 0, lastX, lastT;
+    var rafId;
+
+    el.addEventListener('pointerdown', function(e) {
+      dragging = true;
+      startX = e.clientX;
+      startScroll = el.scrollLeft;
+      lastX = e.clientX;
+      lastT = Date.now();
+      velX = 0;
+      el.classList.add('dragging');
+      el.setPointerCapture(e.pointerId);
+      cancelAnimationFrame(rafId);
+      e.preventDefault();
+    });
+
+    el.addEventListener('pointermove', function(e) {
+      if (!dragging) return;
+      var now = Date.now();
+      var dt = Math.max(1, now - lastT);
+      velX = (e.clientX - lastX) / dt;
+      lastX = e.clientX;
+      lastT = now;
+      el.scrollLeft = startScroll - (e.clientX - startX);
+    });
+
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      var v = -velX * 16;
+      function coast() {
+        if (Math.abs(v) < 0.3) return;
+        el.scrollLeft += v;
+        v *= 0.92;
+        rafId = requestAnimationFrame(coast);
+      }
+      coast();
+    }
+
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+  })();
+
 </script>
 
 </body>
