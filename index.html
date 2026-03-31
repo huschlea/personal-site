@@ -955,6 +955,39 @@
     line-height: 0;
   }
 
+
+  .house-swipe-hint {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0 0.5rem;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  .house-swipe-hint.hidden {
+    opacity: 0;
+  }
+
+  .house-swipe-hint svg {
+    width: 44px;
+    height: 22px;
+    color: rgba(0,0,0,0.25);
+    animation: houseSwipeAnim 1.4s ease-in-out infinite alternate;
+  }
+
+  @keyframes houseSwipeAnim {
+    from { transform: translateX(-7px); }
+    to   { transform: translateX(7px); }
+  }
+
+  @media (max-width: 640px) {
+    .house-strip-body {
+      height: 72vw;
+    }
+  }
+
   .house-strip img {
     height: 100%;
     width: auto;
@@ -978,43 +1011,52 @@
     align-items: center;
     justify-content: center;
     overflow-y: auto;
-    perspective: 1000px;
+    perspective: 1200px;
     perspective-origin: 50% 50%;
+    transform: translateZ(0);
   }
 
   .molecule-cards {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: clamp(1rem, 3vw, 2rem);
+    gap: 0;
     padding: clamp(3rem, 7vw, 6rem) 0 clamp(2rem, 4vw, 3rem);
     width: min(70vw, 400px);
+    line-height: 0;
+    font-size: 0;
   }
 
   .molecule-card {
     width: min(70vw, 400px);
-    overflow: hidden;
     will-change: transform;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+    font-size: 0;
   }
 
   .molecule-card img {
     width: 100%;
     height: auto;
     display: block;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
   }
 
-  .molecule-card:nth-child(2) { animation: spinCW  30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: 0s,     0s; }
-  .molecule-card:nth-child(3) { animation: spinCCW 30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: -7.5s,  0s; }
-  .molecule-card:nth-child(4) { animation: spinCW  30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: -15s,   0s; }
-  .molecule-card:nth-child(5) { animation: spinCCW 30s linear infinite,  moleculeHue 10s linear infinite;      animation-delay: -22.5s, 0s; }
-
-  @keyframes spinCW  { from { transform: rotateY(0deg); }    to { transform: rotateY(360deg); } }
-  @keyframes spinCCW { from { transform: rotateY(0deg); }    to { transform: rotateY(-360deg); } }
-
-  @keyframes moleculeHue {
-    from { filter: hue-rotate(0deg); }
-    to   { filter: hue-rotate(360deg); }
+  .molecule-card:nth-child(5) img {
+    clip-path: inset(4px);
   }
+
+  .molecule-card:nth-child(2) { animation: spinCW_b 30s linear infinite; animation-delay: 0s; }
+  .molecule-card:nth-child(3) { animation: spinCW_f 30s linear infinite; animation-delay: -3.75s; }
+  .molecule-card:nth-child(4) { animation: spinCW_b 30s linear infinite; animation-delay: -7.5s; }
+  .molecule-card:nth-child(5) { animation: spinCW_f 30s linear infinite; animation-delay: -11.25s; }
+
+  @keyframes spinCW_b { from { transform: rotateY(0deg) rotateX(-10deg); } to { transform: rotateY(360deg) rotateX(-10deg); } }
+  @keyframes spinCW_f { from { transform: rotateY(0deg) rotateX(10deg);  } to { transform: rotateY(360deg) rotateX(10deg);  } }
+
 
 
 </style>
@@ -1209,7 +1251,7 @@
     <div class="article-nav">
       <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
-    <h1 class="article-title house-strip-title">A house is not a home</h1>
+    <h1 class="article-title house-strip-title">A house is not a&nbsp;home</h1>
     <div class="house-strip-body" id="houseStripBody">
       <div class="house-strip">
         <img src="house1.jpeg" alt="">
@@ -1224,6 +1266,15 @@
         <img src="house10.jpeg" alt="">
         <img src="house11.jpeg" alt="">
       </div>
+    </div>
+    <div class="house-swipe-hint" id="houseSwipeHint">
+      <svg viewBox="0 0 56 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="15" y1="12" x2="4" y2="12"/>
+        <polyline points="9,7 4,12 9,17"/>
+        <circle cx="28" cy="12" r="3" fill="currentColor" stroke="none"/>
+        <line x1="41" y1="12" x2="52" y2="12"/>
+        <polyline points="47,7 52,12 47,17"/>
+      </svg>
     </div>
   </div>
 
@@ -1775,6 +1826,28 @@ in the final stages of development.</p></li>
         <li class="changelog-entry"><p>do you see how it's still way off to the left?</p></li>
         <li class="changelog-entry"><p>Okay, and now I'd like to try something actually totally different: "A house is not a home." Instead of making it a book, I want to connect all of the images into one long horizontal image and allow that to essentially be like a scroll bar, like an image scroll feed, but horizontally, and you can just scroll from one side to the other. I want it to look like all one big horizontal picture. I think it's going to be awesome.</p></li>
         <li class="changelog-entry"><p>It's showing up way, way, way too big, and there's no page title.</p></li>
+        <li class="changelog-entry"><p>push changes</p></li>
+        <li class="changelog-entry"><p>remove the vertical spacing between the 4 images on molecule, and remove the black outline around the bottom white one</p></li>
+        <li class="changelog-entry"><p>now offset the starting angles of each image so that they progress ina  way that makes the stack look like a rotating spiral</p></li>
+        <li class="changelog-entry"><p>yeah but there are two paits that are spinning at the same angle. I want them all to be different so it ends up looking like a spiral staircase</p></li>
+        <li class="changelog-entry"><p>okay and remove the black outine from the bottom image</p></li>
+        <li class="changelog-entry"><p>nice, now can we add a bit of 3D depth to each image so it doesn't look completely flat? just a bit of depth will do</p></li>
+        <li class="changelog-entry"><p>you leaned them. I wanted you to make them look more 3D as in make them look like thin slices of cubes. not leaned</p></li>
+        <li class="changelog-entry"><p>nop they still look flat and 2D</p></li>
+        <li class="changelog-entry"><p>i actually don't like this. let's revert back to the tilt but let's make them alternate the way they tilt</p></li>
+        <li class="changelog-entry"><p>cool. now for house is not a home, we need to adda a subtle swipe icon (no text) and we need o turn it sideways on mobile and add a rotate phone icon (again, no text)</p></li>
+        <li class="changelog-entry"><p>you should be able to see the art piece turned sideways on mobile. and that rotate phone icon is not good enough</p></li>
+        <li class="changelog-entry"><p>okay maybe we don't have the rotate capability. bet let's make the image a littler bigger on mobile</p></li>
+        <li class="changelog-entry"><p>remove the color changing on molecule. keep it the OG colors</p></li>
+        <li class="changelog-entry"><p>okay and make sure the animation on that page is as smooothe as possible. no glitches ever</p></li>
+        <li class="changelog-entry"><p>only the first two images are rendering now</p></li>
+        <li class="changelog-entry"><p>okay and eliminate any vertical space between the images</p></li>
+        <li class="changelog-entry"><p>replace the swipe animation with the attached icon. place it to the right of the house is not a home title</p></li>
+        <li class="changelog-entry"><p>needs to be larger and a little closer to the title</p></li>
+        <li class="changelog-entry"><p>actually remove the icon. let prople figure it out on their own. also, on mobile breakpoints, this title cannot break into an orphan line</p></li>
+        <li class="changelog-entry"><p>cool, and then on mobile let's make the art piece larger</p></li>
+        <li class="changelog-entry"><p>okay and bring back the original swipe animation</p></li>
+        <li class="changelog-entry"><p>make it move smoother</p></li>
       </ol>
     </div>
   </div>
@@ -2648,6 +2721,13 @@ in the final stages of development.</p></li>
 
     el.addEventListener('pointerup', endDrag);
     el.addEventListener('pointercancel', endDrag);
+
+    var hint = document.getElementById('houseSwipeHint');
+    function hideHint() {
+      if (hint) hint.classList.add('hidden');
+    }
+    el.addEventListener('pointerdown', hideHint, { once: true });
+    el.addEventListener('scroll', hideHint, { once: true });
   })();
 
 </script>
