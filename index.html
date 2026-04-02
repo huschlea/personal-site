@@ -351,6 +351,10 @@
     color: var(--mid);
   }
 
+  .article-text + .article-text {
+    margin-top: 1em;
+  }
+
   /* ─── CHANGELOG ─────────────────────────────────────── */
 
   .changelog-meta {
@@ -656,277 +660,31 @@
 
   /* ─── WIKI BIO ───────────────────────────────────────── */
 
-  .wiki-body {
-    flex: 1;
-    width: 100%;
-    max-width: 820px;
-    margin: 0 auto;
-    padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 5vw, 4rem) clamp(4rem, 8vw, 7rem);
-    text-transform: none;
+  /* ─── BIO / WIKIPEDIA CHROME ─────────────────────────── */
+
+
+  /* ─── BIO ────────────────────────────────────────────── */
+
+  #bio .article-body {
+    max-width: min(100%, 680px);
   }
 
-  .wiki-tagline {
-    font-family: var(--body);
-    font-style: italic;
-    font-weight: 300;
-    font-size: 0.7rem;
-    color: var(--faded);
-    margin-bottom: 0.4rem;
+  .bio-section {
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
 
-  .wiki-title {
+  .bio-section-title {
     font-family: var(--display);
     font-weight: 800;
-    font-size: clamp(2rem, 6vw, 3rem);
-    letter-spacing: -0.02em;
-    line-height: 1.0;
-    color: var(--ink);
-    border-bottom: 1px solid rgba(20,18,16,0.14);
-    padding-bottom: 0.6rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .wiki-infobox {
-    float: right;
-    clear: right;
-    margin: 0 0 1.5rem 2.5rem;
-    width: 210px;
-    border: 1px solid rgba(20,18,16,0.13);
-    font-family: var(--body);
-    font-size: 0.7rem;
-    background: var(--bg-sub);
-  }
-
-  .wiki-infobox-name {
-    font-family: var(--body);
-    font-weight: 300;
-    font-style: italic;
     font-size: 0.76rem;
-    text-align: center;
-    padding: 0.5rem 0.75rem 0.4rem;
-    border-bottom: 1px solid rgba(20,18,16,0.10);
-    color: var(--ink);
-    letter-spacing: 0.01em;
-  }
-
-  .wiki-infobox img {
-    width: 100%;
-    display: block;
-    border-bottom: 1px solid rgba(20,18,16,0.10);
-  }
-
-  .wiki-infobox-caption {
-    font-family: var(--body);
-    font-style: italic;
-    font-weight: 300;
-    font-size: 0.65rem;
+    letter-spacing: 0.1em;
     color: var(--faded);
-    text-align: center;
-    padding: 0.4rem 0.65rem;
-    border-bottom: 1px solid rgba(20,18,16,0.10);
-    line-height: 1.4;
+    text-transform: lowercase;
+    margin-bottom: 0.9rem;
+    border-bottom: 1px solid var(--ghost);
+    padding-bottom: 0.5rem;
   }
 
-  .wiki-infobox table { width: 100%; border-collapse: collapse; }
-
-  .wiki-infobox td {
-    padding: 0.3rem 0.6rem;
-    vertical-align: top;
-    border-bottom: 1px solid rgba(20,18,16,0.06);
-    line-height: 1.45;
-    font-weight: 300;
-  }
-
-  .wiki-infobox td:first-child {
-    font-weight: 400;
-    color: var(--mid);
-    width: 42%;
-    white-space: nowrap;
-  }
-
-  .wiki-infobox td:last-child { color: var(--ink); }
-
-  .wiki-toc {
-    display: inline-block;
-    border: 1px solid rgba(20,18,16,0.12);
-    padding: 0.75rem 1.1rem 0.85rem;
-    margin: 0.5rem 0 1.5rem;
-    min-width: 200px;
-    background: var(--bg-sub);
-    clear: left;
-  }
-
-  .wiki-toc-title {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 0.7rem;
-    color: var(--mid);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 0.55rem;
-  }
-
-  .wiki-toc ol {
-    margin: 0;
-    padding-left: 1.1rem;
-    list-style: decimal;
-  }
-
-  .wiki-toc li {
-    font-family: var(--body);
-    font-size: 0.71rem;
-    color: var(--mid);
-    margin-bottom: 0.22rem;
-    font-weight: 300;
-    line-height: 1.5;
-  }
-
-  .wiki-toc a {
-    color: #5a7fa8;
-    text-decoration: none;
-  }
-
-  .wiki-toc a:hover { text-decoration: underline; }
-
-  .wiki-toc ol ol {
-    margin-top: 0.18rem;
-    padding-left: 1rem;
-    list-style: lower-alpha;
-  }
-
-  .wiki-toc ol ol li { font-size: 0.67rem; }
-
-  .wiki-section { margin-top: 1.75rem; }
-
-  .wiki-h2 {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
-    letter-spacing: 0.01em;
-    color: var(--ink);
-    border-bottom: 1px solid rgba(20,18,16,0.13);
-    padding-bottom: 0.28rem;
-    margin-bottom: 0.85rem;
-  }
-
-  .wiki-h3 {
-    font-family: 'Fjalla One', sans-serif;
-    font-weight: 400;
-    font-size: 0.9rem;
-    letter-spacing: 0.02em;
-    color: #5E5C57;
-    margin: 1.1rem 0 0.55rem;
-  }
-
-  .wiki-edit {
-    font-family: var(--body);
-    font-size: 0.62rem;
-    font-weight: 300;
-    font-style: normal;
-    color: #5a7fa8;
-    margin-left: 0.6rem;
-    opacity: 0.5;
-    cursor: default;
-    letter-spacing: 0;
-  }
-
-  .wiki-p {
-    font-family: var(--body);
-    font-weight: 300;
-    font-size: 0.875rem;
-    line-height: 1.8;
-    color: var(--ink);
-    margin-bottom: 0.85rem;
-  }
-
-  .wiki-p b {
-    font-weight: 400;
-  }
-
-  sup.wiki-ref {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: #5a7fa8;
-    letter-spacing: 0;
-    margin-left: 0.05em;
-  }
-
-  .wiki-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--body);
-    font-size: 0.78rem;
-    margin: 0.75rem 0 1.5rem;
-  }
-
-  .wiki-table th {
-    font-family: var(--display);
-    font-weight: 600;
-    font-size: 0.7rem;
-    text-align: left;
-    border-bottom: 1px solid rgba(20,18,16,0.18);
-    padding: 0.4rem 0.75rem;
-    color: var(--mid);
-    letter-spacing: 0.04em;
-  }
-
-  .wiki-table td {
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid rgba(20,18,16,0.07);
-    font-weight: 300;
-    color: var(--ink);
-    vertical-align: top;
-    line-height: 1.5;
-  }
-
-  .wiki-table td:first-child { font-style: italic; }
-
-  .wiki-refs { margin-top: 0.5rem; }
-
-  .wiki-refs ol {
-    padding-left: 1.4rem;
-    margin: 0;
-  }
-
-  .wiki-refs li {
-    font-family: var(--body);
-    font-size: 0.68rem;
-    font-weight: 300;
-    color: var(--faded);
-    line-height: 1.55;
-    margin-bottom: 0.3rem;
-  }
-
-  .wiki-see-also li {
-    font-family: var(--body);
-    font-size: 0.82rem;
-    font-weight: 300;
-    color: var(--mid);
-    margin-bottom: 0.3rem;
-    list-style: disc;
-  }
-
-  .wiki-see-also { padding-left: 1.4rem; margin: 0; }
-
-  .wiki-footer-note {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: var(--faded);
-    margin-top: 2.5rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(20,18,16,0.08);
-    letter-spacing: 0.03em;
-    opacity: 0.65;
-  }
-
-  @media (max-width: 640px) {
-    .wiki-infobox {
-      float: none;
-      width: 100%;
-      margin: 0 0 1.5rem 0;
-    }
-    .wiki-toc { display: block; }
-  }
 
   /* ─── HOUSE PHOTO STRIP ───────────────────────────────── */
 
@@ -1159,6 +917,12 @@
 
         <li class="feed-section">Thoughts</li>
 
+        <li class="feed-item thought" onclick="openArticle('youalwaysknow')">
+          <div class="feed-row">
+            <span class="feed-title">You already know</span>
+          </div>
+        </li>
+
         <li class="feed-item thought" onclick="openArticle('anti-expert')">
           <div class="feed-row">
             <span class="feed-title">The anti-expert</span>
@@ -1319,6 +1083,18 @@
     </div>
   </div>
 
+  <!-- ─── ARTICLE: YOU ALWAYS KNOW ───────────────────── -->
+
+  <div class="article" id="youalwaysknow">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">You already know</h1>
+      <p class="article-text">Indecision is rarely the absence of a preference. Somewhere beneath the noise of other people's opinions and the fear of being wrong, there is already a direction. Most people can feel it, even when they refuse to name it. The hard part is not figuring out what to do. It is finding the nerve to admit that you already know.</p>
+    </div>
+  </div>
+
   <!-- ─── ARTICLE: THE LAST QUESTIONS ─────────────────── -->
 
   <div class="article" id="lastquestions">
@@ -1416,15 +1192,15 @@
       <div class="resume-footer">
         <p class="resume-footer-label">Proficiencies</p>
         <ul class="resume-skills-list">
-          <li>Claude Code</li>
           <li>Cursor</li>
+          <li>Claude Code</li>
           <li>prototyping</li>
           <li>brand design</li>
           <li>web design</li>
           <li>copywriting</li>
           <li>UI/UX</li>
           <li>typography</li>
-          <li>audio production</li>
+          <li>art direction</li>
           <li>whatever the story needs</li>
         </ul>
       </div>
@@ -1848,6 +1624,63 @@ in the final stages of development.</p></li>
         <li class="changelog-entry"><p>cool, and then on mobile let's make the art piece larger</p></li>
         <li class="changelog-entry"><p>okay and bring back the original swipe animation</p></li>
         <li class="changelog-entry"><p>make it move smoother</p></li>
+        <li class="changelog-entry"><p>push changes</p></li>
+        <li class="changelog-entry"><p>I have a new thought entry. We'll title this one "you always know" - indecision is rarely the absence of a preference. somewhere beneath the noise of other people's opinions and the fear of being wrong, there is already a direction. most people can feel it, even when they refuse to name it. the hard part is not figuring out what to do. it is finding the nerve to admit that you already know.</p></li>
+        <li class="changelog-entry"><p>Place it at the top of that section since it is the newest.</p></li>
+        <li class="changelog-entry"><p>Okay, now I'd like to try something with the bio section. We have this stylized as kind of in the style of a Wikipedia page, but we're using the style of the website and sort of making that into a Wikipedia page. What I'd like to do is run a web search to figure out exactly the style that Wikipedia pages are made from fonts and everything, and then recreate that page as it stands right now using those styles. I want someone to almost think that they accidentally clicked on a Wikipedia link when they click that.</p></li>
+        <li class="changelog-entry"><p>The page is showing up blank when I click on the new thought "you always know".</p></li>
+        <li class="changelog-entry"><p>Okay, next we're going to try something kind of funky on the resume page. Right now it's just listed out very, very sort of generic and in the style of the site. What I'd like to do instead is use a different color background. I want the resume to look as if it was written on a tombstone, a tombstone that you scroll down to read. It's okay if it's a long tombstone, but make the font and everything look like a tombstone and make it look three-dimensional.</p></li>
+        <li class="changelog-entry"><p>The shape kinda looks like shit, and I don't like the fonts you chose, and the texture does not look like a stone. Let's fix all those. I want the font to be a little bit more old English-y. Really make this look like an ancient tombstone.</p></li>
+        <li class="changelog-entry"><p>this looks far too beginner. It needs to have some level of depth to it, and you definitely need to be able to read all the text. Maybe let's rethink the approach we're taking and make sure we nail the depth and the legibility to begin with.</p></li>
+        <li class="changelog-entry"><p>Okay, that's better in terms of the legibility, but the shape of the tombstone itself still just looks weird to me. Can we run a web search and find if there are any components online that we could pull directly or pull some inspo from? Think about this more in terms of a video game. It should look almost secure in a cemetery. It's fine to have the black background, but the tombstone itself should look like you'd find it in a video game, like it has that level of sophistication and depth.</p></li>
+        <li class="changelog-entry"><p>okay that's better. let's now make the text look as if it is etched into the stone and let's find a more legible old english font</p></li>
+        <li class="changelog-entry"><p>use UnifrakturCook on google fonts</p></li>
+        <li class="changelog-entry"><p>actually maybe IM fell english. and all the text needs to look etched in. make it more subtle tho, it shouldn't look like a drop shadow. also, mak te stone textexture much more granular and add subtle cracks to it</p></li>
+        <li class="changelog-entry"><p>remove the cracks and make all the text black. also, go back to the last font we had</p></li>
+        <li class="changelog-entry"><p>okay now made all the text look etched into the stone while keping it black</p></li>
+        <li class="changelog-entry"><p>that looks like it protrudes out, not etched in</p></li>
+        <li class="changelog-entry"><p>let's make the shape at the top more complex and ornate. then make it so it all looks like one hape, right now there's a separating line where the top semi circle begins</p></li>
+        <li class="changelog-entry"><p>that looks horrible. run a websearch and find ornate shapes for tombstomnes and pcik your favorite. also, there's still seapration between the shapoes. fix it</p></li>
+        <li class="changelog-entry"><p>revert back to the circle shape, this looks awful. and the shape is STILL not all one shape. the tombtone should be all one shape with a rounded top!!</p></li>
+        <li class="changelog-entry"><p>now that it's finally all one shape, move the text up so that the name sits closer to the top of the tombstone</p></li>
+        <li class="changelog-entry"><p>a little further down</p></li>
+        <li class="changelog-entry"><p>okay and then make it so the bottom of the tombstone sits on the bottom of the page</p></li>
+        <li class="changelog-entry"><p>when i scroll past the extend of the page, the background should remiain black. right now it's white</p></li>
+        <li class="changelog-entry"><p>nop it's still white on the overscroll and there's white at the bottom of the base of the tomb even before the overscroll</p></li>
+        <li class="changelog-entry"><p>overscroll is still white. is this because i'm viewign lcoally?</p></li>
+        <li class="changelog-entry"><p>okay. make the subtle ornamnets on the lines of the tombstone the same color as the lines they coincide with</p></li>
+        <li class="changelog-entry"><p>still looks fsint white</p></li>
+        <li class="changelog-entry"><p>make them solid dark, same color as the text</p></li>
+        <li class="changelog-entry"><p>actually just remove them</p></li>
+        <li class="changelog-entry"><p>increase the text size for the years and proficinces</p></li>
+        <li class="changelog-entry"><p>change musician to something design related for the sebtitle on the tombstone</p></li>
+        <li class="changelog-entry"><p>put whatver the story needs on its own line, and change audio production to art direction</p></li>
+        <li class="changelog-entry"><p>move UX/UI down a line</p></li>
+        <li class="changelog-entry"><p>move brand in brand design down a line</p></li>
+        <li class="changelog-entry"><p>can we add some pixelated flowers at the bottom of the tombstone></p></li>
+        <li class="changelog-entry"><p>no i mean like at the base of the tomstone, sprouting upwards around it. colorful and minecraft esq</p></li>
+        <li class="changelog-entry"><p>the tombstone needs to be brighter. it's a bit faint right now</p></li>
+        <li class="changelog-entry"><p>okay and move all the text up a bit higher</p></li>
+        <li class="changelog-entry"><p>rvert that change and add some type of cool engraved pattern to the space above the text, something symbolic</p></li>
+        <li class="changelog-entry"><p>okayI like that!@ let's make it larger and decrease the vertical space between the bottom of it and my name</p></li>
+        <li class="changelog-entry"><p>okay now imagine the text and the symbol are grouped together. move the whole thing down a bit on the tomstone</p></li>
+        <li class="changelog-entry"><p>The tombstone visual is still coming across as fairly dim. I think the rock itself needs to be a little bit brighter so it lightens up the whole page.</p></li>
+        <li class="changelog-entry"><p>That's better, and then I think we need to find a different font to use for the old English font. This one is just not working for me anymore.</p></li>
+        <li class="changelog-entry"><p>I want to stay with an old English font, not like a swoopy serif.</p></li>
+        <li class="changelog-entry"><p>That one is interesting, but still not right.</p></li>
+        <li class="changelog-entry"><p>you pick</p></li>
+        <li class="changelog-entry"><p>Okay, that's fine for now. Let's make the visual symbol at the top of the tombstone a little bit smaller and create a little bit more space between the bottom of that and the top of my name.</p></li>
+        <li class="changelog-entry"><p>Now there's too much space between those elements.</p></li>
+        <li class="changelog-entry"><p>Still a bit too much. Maybe leave my name where it is and move the circle symbol down a bit.</p></li>
+        <li class="changelog-entry"><p>Now can we try taking this whole tombstone with the text included and make it so it's rotated a little bit so you can really see the 3D dimensionality of it, but make it so you still see and read the text on it?</p></li>
+        <li class="changelog-entry"><p>interesting. make it look thicker</p></li>
+        <li class="changelog-entry"><p>revert the last change</p></li>
+        <li class="changelog-entry"><p>and the change before it too</p></li>
+        <li class="changelog-entry"><p>Okay, now when I click the back button, all I see is a blank white page.</p></li>
+        <li class="changelog-entry"><p>let's veret back to the resume page before we made it a tombstone</p></li>
+        <li class="changelog-entry"><p>okay and let's revert the wiki bio back to the stylized version too that matches the rest of the site</p></li>
+        <li class="changelog-entry"><p>make sure paragraphs have line spcesbetween them</p></li>
+        <li class="changelog-entry"><p>change you always know to you already know</p></li>
       </ol>
     </div>
   </div>
@@ -2385,105 +2218,35 @@ in the final stages of development.</p></li>
     <div class="article-nav">
       <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
-    <div class="wiki-body">
+    <div class="article-body">
+      <h1 class="article-title">Bio</h1>
 
-      <h1 class="wiki-title">Alden Huschle</h1>
+      <p class="article-text"><b>Alden Huschle</b> is an American musician, designer, and creative technologist based in Long Beach, California. He is the lead designer at NumberOne AI, a California-based AI-first startup incubator, and an independent solo recording artist.</p>
+      <p class="article-text">His work spans music production, product design, brand design, and experience design. He embodies a creative philosophy that holds the technical and the spiritual as complementary rather than opposed, building with advanced AI tools professionally while maintaining an intentionally grounded music-making practice.</p>
 
-      <!-- Infobox -->
-      <aside class="wiki-infobox">
-        <div class="wiki-infobox-name">Alden Huschle</div>
-        <img src="headshot.jpg" alt="Alden Huschle"/>
-        <div class="wiki-infobox-caption">Huschle in 2023</div>
-        <table>
-          <tr><td>Born</td><td>January 29, 1998</td></tr>
-          <tr><td>Origin</td><td>Snoqualmie, Washington, U.S.</td></tr>
-          <tr><td>Residence</td><td>Long Beach, California, U.S.</td></tr>
-          <tr><td>Occupation</td><td>Musician · Designer · Product builder</td></tr>
-          <tr><td>Active</td><td>2015 – present</td></tr>
-          <tr><td>Labels</td><td>Independent</td></tr>
-          <tr><td>Assoc. acts</td><td>Lyla Minor · NumberOne AI · WethosAI</td></tr>
-        </table>
-      </aside>
-
-      <!-- Lead -->
-      <p class="wiki-p"><b>Alden Huschle</b> is an American musician, designer, and creative technologist based in Long Beach, California. He is the lead designer at NumberOne AI, a California-based AI-first startup incubator, and an independent solo recording artist.</p>
-      <p class="wiki-p">Huschle's work spans music production, product design, brand design, and experience design. He embodies a creative philosophy that holds the technical and the spiritual as complementary rather than opposed, building with advanced AI tools professionally while maintaining an intentionally grounded music-making practice. He has described this sensibility as "romantic expertise": the ability to intuit quality before being able to explain it analytically, a concept he connects to Robert Pirsig's distinction between romantic and classical modes of understanding.</p>
-      <p class="wiki-p">He is also the creator of Prompting People, a web application designed around collective reflection.</p>
-
-      <!-- TOC -->
-      <nav class="wiki-toc">
-        <div class="wiki-toc-title">Contents</div>
-        <ol>
-          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-early-life').scrollIntoView({behavior:'smooth'})">Early life and background</a></li>
-          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-career').scrollIntoView({behavior:'smooth'})">Career</a>
-            <ol>
-              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-numberone').scrollIntoView({behavior:'smooth'})">NumberOne AI</a></li>
-              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-philosophy').scrollIntoView({behavior:'smooth'})">Creative philosophy</a></li>
-              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-antiexpert').scrollIntoView({behavior:'smooth'})">The anti-expert</a></li>
-            </ol>
-          </li>
-          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-music').scrollIntoView({behavior:'smooth'})">Music</a>
-            <ol>
-              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-early-work').scrollIntoView({behavior:'smooth'})">Early work</a></li>
-              <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-debut').scrollIntoView({behavior:'smooth'})">Debut solo album</a></li>
-            </ol>
-          </li>
-          <li><a href="#" onclick="event.preventDefault();document.getElementById('bio-products').scrollIntoView({behavior:'smooth'})">Products and projects</a></li>
-        </ol>
-      </nav>
-
-      <!-- Early life -->
-      <div class="wiki-section" id="bio-early-life">
-        <h2 class="wiki-h2">Early life and background</h2>
-        <p class="wiki-p">Huschle grew up in Snoqualmie, Washington. He studied design and played baseball at Seattle University, completing a Bachelor of Arts in Digital Design.</p>
-        <p class="wiki-p">During his Seattle years, Huschle was an active participant in the local music scene, playing in the band Lyla Minor alongside longtime collaborators. The Seattle period was formative on his worldview, particularly around creative collaboration, community, and dedication to craft.</p>
-        <p class="wiki-p">He later relocated from Seattle to Southern California to follow a relationship, a decision he has described as made on instinct rather than calculation. The experience became the subject of the song "1,200 Miles," named for the approximate driving distance between the two cities.</p>
+      <div class="bio-section">
+        <p class="bio-section-title">Early life</p>
+        <p class="article-text">Huschle grew up in Snoqualmie, Washington. He studied design and played baseball at Seattle University, completing a Bachelor of Arts in Digital Design.</p>
+        <p class="article-text">During his Seattle years, he was an active participant in the local music scene, playing in the band Lyla Minor alongside longtime collaborators. He later relocated to Southern California on instinct — a decision that became the subject of the song &ldquo;1,200 Miles.&rdquo;</p>
       </div>
 
-      <!-- Career -->
-      <div class="wiki-section" id="bio-career">
-        <h2 class="wiki-h2">Career</h2>
-
-        <h3 class="wiki-h3" id="bio-numberone">NumberOne AI (2024 – present)</h3>
-        <p class="wiki-p">Huschle joined NumberOne AI, an AI-first startup incubator, as a graphic designer in 2024. Over approximately two years, the role evolved substantially. He transitioned from traditional graphic design into agentic design, conceiving, designing, and shipping complete digital experiences end-to-end without formal engineering training.</p>
-        <p class="wiki-p">In this capacity, Huschle was responsible for the full visual identities of both NumberOne AI and its portfolio company WethosAI, including design systems, typography, art direction, copywriting, and custom web builds.</p>
-
-        <h3 class="wiki-h3" id="bio-philosophy">Creative philosophy</h3>
-        <p class="wiki-p">Huschle's creative philosophy rests on two core tenets:</p>
-        <p class="wiki-p"><i>Magic is earned.</i> Huschle uses this phrase to describe the quality that emerges through sustained, authentic creative commitment. He maintains a daily practice of rising before dawn to work on music for two to two-and-a-half hours every morning. He has described the creative process as "a war-like relationship with the creative spirit that ultimately resolves into channeling something beyond yourself."</p>
-        <p class="wiki-p"><i>The technical and the spiritual are not in conflict.</i> Huschle builds professionally with advanced AI tools while maintaining an intentionally AI-free music production process. He holds both practices without apology, arguing that this refusal of a false binary is both rare and increasingly relevant as AI democratizes technical execution.</p>
-
-        <h3 class="wiki-h3" id="bio-antiexpert">The anti-expert</h3>
-        <p class="wiki-p">A related dimension of Huschle's identity is what he calls the "anti-expert." Operating without formal credentials in music or programming, he has reframed this not as a deficit but as a different and equally valid form of mastery. It's the ability to know what quality feels like before being able to explain why, the willingness to iterate through elimination, and the capacity to let the work lead.</p>
-        <p class="wiki-p">He has argued this form of expertise is increasingly valuable as AI handles more technical execution, shifting the premium toward taste, instinct, and vision.</p>
+      <div class="bio-section">
+        <p class="bio-section-title">Career</p>
+        <p class="article-text">Huschle joined NumberOne AI in 2024 as a graphic designer. Over two years, the role evolved substantially — he transitioned from traditional graphic design into agentic design, conceiving, designing, and shipping complete digital experiences end-to-end without formal engineering training. He was responsible for the full visual identities of both NumberOne AI and WethosAI.</p>
+        <p class="article-text">His creative philosophy rests on two tenets. <i>Magic is earned</i> — the quality that emerges through sustained, authentic creative commitment. He maintains a daily practice of rising before dawn to work on music. <i>The technical and the spiritual are not in conflict</i> — he builds professionally with advanced AI tools while maintaining an intentionally AI-free music process, and holds both without apology.</p>
+        <p class="article-text">A related dimension of his identity is what he calls the &ldquo;anti-expert&rdquo; — operating without formal credentials in music or programming, reframed not as a deficit but as a different form of mastery: the ability to know what quality feels like before being able to explain why.</p>
       </div>
 
-      <!-- Music -->
-      <div class="wiki-section" id="bio-music">
-        <h2 class="wiki-h2">Music</h2>
-
-        <h3 class="wiki-h3" id="bio-early-work">Early work</h3>
-        <p class="wiki-p">Prior to his solo career, Huschle contributed guitar and lead vocals to Lyla Minor. The group performed around the Seattle area and released two projects: <i>Lyla Minor - EP</i> and <i>Intermezzos, Vol. 1 - EP</i>.</p>
-
-        <h3 class="wiki-h3" id="bio-debut">Debut solo album (forthcoming, 2026)</h3>
-        <p class="wiki-p">Huschle's debut solo album is a twelve-track record described as "a love letter to young adulthood." Written and produced during a period of significant personal transition, including the move from Seattle to California, the evolution of his professional identity, and an ongoing reckoning with questions of love, faith, and creative purpose, the album represents a more exposed and personal body of work than the Lyla Minor recordings.</p>
-        <p class="wiki-p">The album is produced entirely by Huschle in an intentionally AI-free process. He has described this as a values statement: "The resistance to letting AI finish songs is about protecting the discoveries that only happen through struggle and iteration." The album is slated for release in 2026.</p>
+      <div class="bio-section">
+        <p class="bio-section-title">Music</p>
+        <p class="article-text">Prior to his solo career, Huschle contributed guitar and lead vocals to Lyla Minor. The group performed around the Seattle area and released two projects: <i>Lyla Minor - EP</i> and <i>Intermezzos, Vol. 1 - EP</i>.</p>
+        <p class="article-text">His debut solo album is a twelve-track record described as &ldquo;a love letter to young adulthood.&rdquo; Written and produced entirely by Huschle in an intentionally AI-free process, the album is slated for release in 2026. He has described the approach: &ldquo;The resistance to letting AI finish songs is about protecting the discoveries that only happen through struggle and iteration.&rdquo;</p>
       </div>
 
-      <!-- Products -->
-      <div class="wiki-section" id="bio-products">
-        <h2 class="wiki-h2">Products and projects</h2>
-
-        <h3 class="wiki-h3">Prompting People</h3>
-        <p class="wiki-p">Prompting People is a web application designed around collective reflection. One prompt is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next prompt unlocks.</p>
-        <p class="wiki-p">Key mechanics include a "write before you read" system designed to prevent anchoring and preserve authenticity; a collective unlock model in which participation is a group effort rather than individual performance; invitation lineage chains visualized as arcs on a world map; and minimal opt-in public profiles.</p>
-        <p class="wiki-p">Huschle has described the philosophy: "To provide a refuge from reactive internet culture through thoughtful, pattern-level reflection." He has also noted its connection to his broader artistic practice: "Write before you read is the same instinct as keeping the music analog." As of March 2026, the application was described as approximately one to two weeks from shipping.</p>
+      <div class="bio-section">
+        <p class="bio-section-title">Products</p>
+        <p class="article-text">Prompting People is a web application designed around collective reflection. One prompt is published at a time; users write a response before they can read what others wrote. Once the community reaches a response threshold, the next prompt unlocks. He has described the philosophy: &ldquo;A refuge from reactive internet culture through thoughtful, pattern-level reflection.&rdquo;</p>
       </div>
-
-
-
-
-
 
     </div>
   </div>
@@ -2500,6 +2263,7 @@ in the final stages of development.</p></li>
     'changelog': document.getElementById('changelog'),
     'anti-expert': document.getElementById('anti-expert'),
     'miles': document.getElementById('miles'),
+    'youalwaysknow': document.getElementById('youalwaysknow'),
     'magik': document.getElementById('magik'),
     'wethos-role': document.getElementById('wethos-role'),
     'numberone-role': document.getElementById('numberone-role'),
