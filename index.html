@@ -917,6 +917,12 @@
 
         <li class="feed-section">Thoughts</li>
 
+        <li class="feed-item thought" onclick="openArticle('prisms')">
+          <div class="feed-row">
+            <span class="feed-title">Prisms</span>
+          </div>
+        </li>
+
         <li class="feed-item thought" onclick="openArticle('youalwaysknow')">
           <div class="feed-row">
             <span class="feed-title">You already know</span>
@@ -1056,6 +1062,18 @@
         <div class="molecule-card"><img src="lsd4-01.webp" alt=""></div>
         <div class="molecule-card"><img src="lsd3-01.webp" alt=""></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: PRISMS ─────────────────────────── -->
+
+  <div class="article" id="prisms">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">Prisms</h1>
+      <p class="article-text">Artists will often speak of channeling, of receiving something from beyond themselves. What gets less attention is the transcription that follows. Energy arrives as feeling, as unconscious knowing, and then moves through the body, through every experience and instinct that has ever been. It is through this process that we arrive at the output we recognize as creation. We are not the windows light passes through, but rather the prisms that expose its color and radiance.</p>
     </div>
   </div>
 
@@ -1681,6 +1699,10 @@ in the final stages of development.</p></li>
         <li class="changelog-entry"><p>okay and let's revert the wiki bio back to the stylized version too that matches the rest of the site</p></li>
         <li class="changelog-entry"><p>make sure paragraphs have line spcesbetween them</p></li>
         <li class="changelog-entry"><p>change you always know to you already know</p></li>
+        <li class="changelog-entry"><p>push changes</p></li>
+        <li class="changelog-entry"><p>new thought entry titled "prisms" - artists will often speak of channeling, of receiving something from beyond themselves. what gets less attention is the transcription that follows. energy arrives as feeling, as unconscious knowing, and then moves through the body, through every experience and instinct that has ever been. it is through this process that we arrive at the output we recognize as creation. we are not the windows light passes through, but rather the prisms that expose its color and radiance.</p></li>
+        <li class="changelog-entry"><p>should live above you already know</p></li>
+        <li class="changelog-entry"><p>new dreams entry for april 2, 202. caption needs to suggest in a cryptic way that the image is of two friend swho intentiaonally staryed a forest fire</p></li>
       </ol>
     </div>
   </div>
@@ -1719,6 +1741,16 @@ in the final stages of development.</p></li>
     </div>
     <div class="article-body">
       <h1 class="article-title">Dreams</h1>
+
+      <div class="dream-entry">
+        <div class="dream-sketch">
+          <img src="fire-dream.png" alt="dream sketch" style="width:100%;height:auto;display:block;"/>
+        </div>
+        <div class="dream-meta">
+          <span class="dream-phrase">they had discussed it only once.</span>
+          <span class="dream-date">2026.04.02</span>
+        </div>
+      </div>
 
       <div class="dream-entry">
         <div class="dream-sketch">
@@ -2271,7 +2303,8 @@ in the final stages of development.</p></li>
     'residue': document.getElementById('residue'),
     'gig-posters': document.getElementById('gig-posters'),
     'house': document.getElementById('house'),
-    'molecule': document.getElementById('molecule')
+    'molecule': document.getElementById('molecule'),
+    'prisms': document.getElementById('prisms')
   };
 
   /* ─── MURMUR ─────────────────────────────────────────────── */
