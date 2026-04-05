@@ -2380,8 +2380,11 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
 
   let current = null;
 
+  let savedScrollY = 0;
+
   function openArticle(id) {
     if (current) return;
+    savedScrollY = window.scrollY;
     current = id;
     feedPage.classList.add('out');
     setTimeout(() => {
@@ -2401,10 +2404,10 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
         }
       }
     }, 350);
-    history.pushState({ article: id }, '', '#' + id);
+    history.pushState({ article: id, scrollY: savedScrollY }, '', '#' + id);
   }
 
-  function closeArticle() {
+  function _closeArticleVisual(scrollY) {
     if (!current) return;
     const article = articles[current];
     article.classList.remove('in');
@@ -2414,8 +2417,15 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
       feedPage.classList.remove('hidden');
       feedPage.offsetHeight;
       feedPage.classList.remove('out');
+      window.scrollTo(0, scrollY || 0);
       current = null;
     }, 350);
+  }
+
+  function closeArticle() {
+    if (!current) return;
+    const scroll = savedScrollY;
+    _closeArticleVisual(scroll);
     history.pushState(null, '', window.location.pathname);
   }
 
@@ -2431,8 +2441,12 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
   }
 
   window.addEventListener('popstate', (e) => {
-    if (current) closeArticle();
-    else if (e.state && e.state.article) openArticle(e.state.article);
+    if (current) {
+      const scroll = (e.state && e.state.scrollY) || 0;
+      _closeArticleVisual(scroll);
+    } else if (e.state && e.state.article) {
+      openArticle(e.state.article);
+    }
   });
 
   if (window.location.hash) {
