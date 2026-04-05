@@ -1727,6 +1727,8 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
         <li class="changelog-entry"><p>add a hyperlink to lyla minor in that copy and link it here: https://music.apple.com/us/artist/lyla-minor/1753837557</p></li>
         <li class="changelog-entry"><p>wait. the hyperlinks in teh resume section are purple. I like teh style you just applied to the lyla minor link</p></li>
         <li class="changelog-entry"><p>okay and now push everything and make sure you correct any mistakes from pushing before. we are going to be going live with this site</p></li>
+        <li class="changelog-entry"><p>Okay, now I need your help getting this pushed live. I have the domain, and I can provide any information from the DNS. We have it on GitHub, so if we can publish live from GitHub, great. If we have to put it somewhere else, we can do that too.</p></li>
+        <li class="changelog-entry"><p>when I click into a page, let's say one of the thought pages. When I hit the little back button that we have in the UI, it's a smooth transition, but when I click the back button in the browser, there's sort of like a vertical jump in the page that is not the greatest looking.</p></li>
       </ol>
     </div>
   </div>
@@ -2440,11 +2442,22 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
     if (!wasOpen) item.classList.add('stream-open');
   }
 
+  history.replaceState({ article: null, scrollY: 0 }, '', window.location.pathname + window.location.search + window.location.hash);
+
   window.addEventListener('popstate', (e) => {
-    if (current) {
-      const scroll = (e.state && e.state.scrollY) || 0;
-      _closeArticleVisual(scroll);
-    } else if (e.state && e.state.article) {
+    const goingToFeed = !e.state || !e.state.article;
+    if (goingToFeed) {
+      if (current) {
+        _closeArticleVisual((e.state && e.state.scrollY) || 0);
+      } else {
+        // Safety fallback for bfcache restores where current is lost
+        document.querySelectorAll('.article').forEach(a => {
+          a.classList.remove('in', 'entering');
+        });
+        feedPage.classList.remove('hidden', 'out');
+        window.scrollTo(0, (e.state && e.state.scrollY) || 0);
+      }
+    } else if (e.state.article && !current) {
       openArticle(e.state.article);
     }
   });
