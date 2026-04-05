@@ -1732,6 +1732,7 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
         <li class="changelog-entry"><p>Okay, now I need your help getting this pushed live. I have the domain, and I can provide any information from the DNS. We have it on GitHub, so if we can publish live from GitHub, great. If we have to put it somewhere else, we can do that too.</p></li>
         <li class="changelog-entry"><p>when I click into a page, let's say one of the thought pages. When I hit the little back button that we have in the UI, it's a smooth transition, but when I click the back button in the browser, there's sort of like a vertical jump in the page that is not the greatest looking.</p></li>
         <li class="changelog-entry"><p>Okay, I'm now looking at this on mobile now that it's live. When I click into a page and then click the back button in the browser, all it shows me is a blank white page. It doesn't take me back to the home page. I have to actually reload the page for it to show.</p></li>
+        <li class="changelog-entry"><p>We need to make sure that a house is not a home. The image scrolls really smoothly on mobile. Right now it's like it jumps around in a pretty glitchy kind of way. We wanted to feel like a smooth scroll that people can do with their fingers.</p></li>
       </ol>
     </div>
   </div>
@@ -2447,21 +2448,30 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
 
   history.replaceState({ article: null, scrollY: 0 }, '', window.location.pathname + window.location.search + window.location.hash);
 
+  function forceShowFeed(scrollY) {
+    document.querySelectorAll('.article').forEach(a => {
+      a.classList.remove('in', 'entering');
+    });
+    document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
+    feedPage.classList.remove('hidden', 'out');
+    feedPage.style.opacity = '1';
+    requestAnimationFrame(() => { feedPage.style.opacity = ''; });
+    window.scrollTo(0, scrollY || 0);
+    current = null;
+  }
+
   window.addEventListener('popstate', (e) => {
     const goingToFeed = !e.state || !e.state.article;
     if (goingToFeed) {
-      if (current) {
-        _closeArticleVisual((e.state && e.state.scrollY) || 0);
-      } else {
-        // Safety fallback for bfcache restores where current is lost
-        document.querySelectorAll('.article').forEach(a => {
-          a.classList.remove('in', 'entering');
-        });
-        feedPage.classList.remove('hidden', 'out');
-        window.scrollTo(0, (e.state && e.state.scrollY) || 0);
-      }
+      forceShowFeed((e.state && e.state.scrollY) || savedScrollY || 0);
     } else if (e.state.article && !current) {
       openArticle(e.state.article);
+    }
+  });
+
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted && !window.location.hash) {
+      forceShowFeed(0);
     }
   });
 
