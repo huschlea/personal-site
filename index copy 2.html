@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alden Huschle</title>
+<meta name="description" content="Designer, musician, builder. Long Beach, California.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;400;600;700;800;900&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Martian+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E6E4DE;
+    --bg-sub: #DEDCD5;
+    --ink: #141210;
+    --mid: #514F4A;
+    --faded: #8A8780;
+    --ghost: rgba(20, 18, 16, 0.08);
+    --accent: #6A6760;
+    --accent-hover: #4A4844;
+    --accent-ghost: rgba(106, 103, 96, 0.08);
+
+    --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+    --body: 'Spectral', Georgia, serif;
+    --mono: 'Martian Mono', 'Courier New', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 10000;
+  }
+
+  .site {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(2rem, 5vw, 4rem);
+    transition: opacity 0.35s ease;
+    will-change: opacity;
+  }
+
+  .home.out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .home.hidden { display: none; }
+
+  .doors {
+    margin-bottom: auto;
+    margin-top: auto;
+  }
+
+  .door {
+    display: flex;
+    align-items: baseline;
+    gap: 0.08em;
+    padding: clamp(0.55rem, 1.4vw, 1.1rem) 0;
+    border-bottom: 1px solid var(--ghost);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    opacity: 0;
+    animation: doorIn 0.5s ease forwards;
+    will-change: opacity;
+  }
+
+  .door:first-child { border-top: 1px solid var(--ghost); }
+  .door:nth-child(1),
+  .door:nth-child(2),
+  .door:nth-child(3) { animation-delay: 0s; }
+
+  .door:hover { transform: translateX(0.5rem); }
+
+  .door-text {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    transition: color 0.28s ease;
+    font-feature-settings: 'liga' 1, 'kern' 1;
+  }
+
+  .door:hover .door-text { color: var(--accent); }
+
+  .door-dot {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    line-height: 0.92;
+    color: var(--accent);
+  }
+
+  .home-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--ghost);
+    margin-top: clamp(2rem, 4vw, 3rem);
+    opacity: 0;
+    animation: fadeIn 0.5s ease 0s forwards;
+  }
+
+  .home-footer-name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .home-footer-loc {
+    font-family: var(--mono);
+    font-weight: 300;
+    font-size: 0.58rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-top: 0.3rem;
+  }
+
+  .home-footer-right {
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 2rem);
+    align-items: center;
+  }
+
+  .home-footer-right a {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--faded);
+    transition: color 0.22s ease;
+  }
+
+  .home-footer-right a:hover { color: var(--accent); }
+
+.home-footer-email-mobile {
+    display: none;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--faded);
+    margin-top: 0.15rem;
+    transition: color 0.22s ease;
+  }
+
+  .home-footer-email-mobile:hover { color: var(--accent); }
+
+  .detail {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.35s ease 0.05s;
+    will-change: opacity;
+  }
+
+  .detail.entering { display: flex; }
+  .detail.in { display: flex; opacity: 1; }
+
+  .detail-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(1rem, 2vw, 1.5rem) clamp(2rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--ghost);
+  }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0.5rem 0;
+  }
+
+  .back-btn:hover {
+    color: var(--ink);
+  }
+
+  .detail-label {
+    font-family: var(--mono);
+    font-weight: 300;
+    font-size: 0.58rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .detail-body {
+    flex: 1;
+    padding: clamp(2.5rem, 5vw, 5rem) clamp(2rem, 5vw, 4rem);
+  }
+
+  .sentence {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    max-width: 22ch;
+    font-feature-settings: 'liga' 1;
+    text-wrap: balance;
+  }
+
+  .sentence .completion {
+    color: var(--accent);
+    font-weight: 300;
+  }
+
+  .project-list {
+    list-style: none;
+    margin-left: calc(-1 * clamp(2rem, 5vw, 4rem));
+    margin-right: calc(-1 * clamp(2rem, 5vw, 4rem));
+  }
+
+  .project-item {
+    border-top: 1px solid var(--ghost);
+    padding-left: clamp(2rem, 5vw, 4rem);
+    padding-right: clamp(2rem, 5vw, 4rem);
+  }
+
+
+  .proj-thumb {
+    aspect-ratio: 4/3;
+    background: var(--bg-sub);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .proj-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .proj-thumb .ph {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--mono);
+    font-size: 0.42rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .proj-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .project-link {
+    display: grid;
+    grid-template-columns: clamp(140px, 18vw, 220px) 1fr;
+    align-items: center;
+    gap: clamp(1rem, 2.5vw, 2rem);
+    padding: clamp(1.2rem, 2.5vw, 2rem) 0;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+  }
+
+  .project-link:hover { transform: translateX(0.4rem); }
+  .project-link:hover .proj-title { color: var(--accent); }
+
+  .proj-num { display: none; }
+
+  .proj-info { display: flex; flex-direction: column; gap: 0.2rem; }
+
+  .proj-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.6vw, 1.4rem);
+    letter-spacing: -0.005em;
+    line-height: 1.05;
+    transition: color 0.22s ease;
+  }
+
+  .proj-sub {
+    font-family: var(--body);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(0.75rem, 0.85vw, 0.85rem);
+    color: var(--mid);
+    line-height: 1.65;
+    max-width: 50ch;
+    margin-top: 0.2rem;
+  }
+
+  .proj-meta {
+    font-family: var(--mono);
+    font-weight: 300;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+    margin-top: 0.35rem;
+  }
+
+  .proj-action {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+    white-space: nowrap;
+    border: 1px solid var(--ghost);
+    border-radius: 100px;
+    padding: 0.2rem 0.6rem;
+    transition: color 0.22s ease, border-color 0.22s ease;
+  }
+
+  .project-link:hover .proj-action { color: var(--faded); border-color: var(--ghost); }
+
+  .proj-arrow {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .project-link:hover .proj-arrow { transform: translate(3px, -3px); }
+
+  .project-item.soon .project-link { cursor: default; }
+  .project-item.soon .project-link:hover { padding-left: 0; }
+  .project-item.soon .proj-title { color: var(--faded); }
+  .project-item.soon .project-link:hover .proj-title { color: var(--faded); }
+  .project-item.soon .project-link:hover .proj-action { color: var(--faded); }
+
+  .music-list {
+    list-style: none;
+    margin-left: calc(-1 * clamp(2rem, 5vw, 4rem));
+    margin-right: calc(-1 * clamp(2rem, 5vw, 4rem));
+  }
+
+  .m-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .music-item {
+    display: grid;
+    grid-template-columns: clamp(100px, 16vw, 180px) 1fr;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 2rem);
+    padding: clamp(0.8rem, 1.5vw, 1.2rem) clamp(2rem, 5vw, 4rem);
+    border-top: 1px solid var(--ghost);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .music-item:hover { transform: translateX(0.3rem); }
+  .music-item:not(.in-progress):hover { cursor: pointer; }
+  .music-item:not(.in-progress):hover .m-title { color: var(--accent); }
+
+  .music-art {
+    aspect-ratio: 1;
+    background: var(--bg-sub);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .music-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .music-art .ph {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--mono);
+    font-size: 0.42rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .m-info { display: flex; flex-direction: column; gap: 0.15rem; }
+
+  .m-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.6vw, 1.4rem);
+    letter-spacing: -0.005em;
+    line-height: 1.05;
+    transition: color 0.22s ease;
+  }
+
+  .m-artist {
+    font-family: var(--body);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(0.75rem, 0.85vw, 0.85rem);
+    color: var(--mid);
+    line-height: 1.65;
+    margin-top: 0.2rem;
+  }
+
+  .m-year {
+    font-family: var(--mono);
+    font-weight: 300;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    color: var(--faded);
+    margin-top: 0.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .m-action {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid var(--ghost);
+    border-radius: 100px;
+    padding: 0.2rem 0.6rem;
+    transition: color 0.22s ease, border-color 0.22s ease;
+  }
+
+  .music-item:not(.in-progress):hover .m-action { color: var(--faded); border-color: var(--ghost); }
+
+  .m-badge {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+    border: 1px solid var(--ghost);
+    border-radius: 100px;
+    padding: 0.2rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  .dispatch-list {
+    list-style: none;
+    margin-left: calc(-1 * clamp(2rem, 5vw, 4rem));
+    margin-right: calc(-1 * clamp(2rem, 5vw, 4rem));
+  }
+
+  .dispatch {
+    padding: clamp(1.2rem, 2.5vw, 2rem) clamp(2rem, 5vw, 4rem);
+    border-top: 1px solid var(--ghost);
+  }
+
+
+  .dispatch-photo {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 3/2;
+    background: var(--bg-sub);
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dispatch-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .dispatch-photo .ph {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--mono);
+    font-size: 0.42rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faded);
+  }
+
+  .dispatch-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1rem, 1.6vw, 1.3rem);
+    letter-spacing: 0.005em;
+    margin-bottom: 0.6rem;
+    line-height: 1.05;
+  }
+
+  .dispatch-text {
+    font-family: var(--body);
+    font-weight: 300;
+    font-size: clamp(0.85rem, 1.05vw, 0.95rem);
+    line-height: 1.82;
+    color: var(--mid);
+    max-width: 55ch;
+  }
+
+  .detail-footer {
+    padding: clamp(1.5rem, 3vw, 2rem) clamp(2rem, 5vw, 4rem);
+    border-top: 1px solid var(--ghost);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .detail-footer-name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+.detail-footer-links { display: flex; gap: clamp(1rem, 2vw, 2rem); }
+
+  .detail-footer-links a {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--faded);
+    transition: color 0.22s ease;
+  }
+
+  .detail-footer-links a:hover { color: var(--accent); }
+
+  .stagger > * {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    will-change: opacity;
+  }
+
+  .stagger.play > * { opacity: 1; }
+  .stagger.play > *:nth-child(1) { transition-delay: 0.05s; }
+  .stagger.play > *:nth-child(2) { transition-delay: 0.1s; }
+  .stagger.play > *:nth-child(3) { transition-delay: 0.15s; }
+  .stagger.play > *:nth-child(4) { transition-delay: 0.2s; }
+  .stagger.play > *:nth-child(5) { transition-delay: 0.25s; }
+  .stagger.play > *:nth-child(6) { transition-delay: 0.3s; }
+
+  @keyframes doorIn { to { opacity: 1; } }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  @media (max-width: 640px) {
+    .project-link {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .proj-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+    }
+
+    .music-item {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .music-art {
+      width: 100%;
+      aspect-ratio: 1;
+    }
+
+    .home-footer { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .home-footer-name, .detail-footer-name { font-size: 1.2rem; }
+    .proj-title, .m-title, .dispatch-title { font-size: 1.3rem; }
+    .dispatch-text { font-size: 1rem; line-height: 1.75; }
+    .sentence { font-size: 2.075rem; }
+    .proj-thumb, .music-art { margin-bottom: 0.2rem; }
+    .home-footer-right { display: none; }
+    .detail-footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="site">
+
+  <section class="home" id="home">
+    <div class="doors">
+      <div class="door" onclick="openDoor('design')">
+        <span class="door-text">Design is</span>
+      </div>
+      <div class="door" onclick="openDoor('music')">
+        <span class="door-text">Music is</span>
+      </div>
+      <div class="door" onclick="openDoor('iam')">
+        <span class="door-text">I am</span>
+      </div>
+    </div>
+    <div class="home-footer">
+      <div>
+        <p class="home-footer-name">Alden Huschle</p>
+        <p class="home-footer-loc">Long Beach, California</p>
+        <a href="mailto:your@email.com" class="home-footer-email-mobile">Email</a>
+      </div>
+      <div class="home-footer-right">
+        <a href="mailto:your@email.com">Email</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="detail" id="design">
+    <div class="detail-nav">
+      <button class="back-btn" onclick="goHome()">&#8592; Back</button>
+      <span class="detail-label">Design is</span>
+    </div>
+    <div class="detail-body">
+      <h2 class="sentence">Design is <span class="completion">the soul of man found within inanimate objects.</span></h2>
+      <ul class="project-list stagger" id="designList">
+        <li class="project-item">
+          <div class="project-link">
+            <span class="proj-num">01</span>
+            <div class="proj-thumb"><span class="ph">Soon</span></div>
+            <div class="proj-info">
+              <div class="proj-title-row">
+                <span class="proj-title">The Last Questions</span>
+                <span class="proj-action">Coming Soon</span>
+              </div>
+              <span class="proj-sub">A slow, intentional social experience built around one question at a time. Write before you read. Honesty as a mechanic. Built for humans and agents.</span>
+              <span class="proj-meta">Platform &middot; Collective Reflection</span>
+            </div>
+          </div>
+        </li>
+        <li class="project-item">
+          <a class="project-link" href="https://wethos.ai/" target="_blank" rel="noopener">
+            <span class="proj-num">02</span>
+            <div class="proj-thumb"><span class="ph">Img</span></div>
+            <div class="proj-info">
+              <div class="proj-title-row">
+                <span class="proj-title">WethosAI</span>
+                <span class="proj-action">Active</span>
+              </div>
+              <span class="proj-sub">Interpersonal intelligence for enterprises. Brand identity, product design, and the full digital experience. Conceived and shipped end-to-end.</span>
+              <span class="proj-meta">Brand &middot; Product Design &middot; AI Platform</span>
+            </div>
+          </a>
+        </li>
+        <li class="project-item">
+          <a class="project-link" href="https://numberone.ai/" target="_blank" rel="noopener">
+            <span class="proj-num">03</span>
+            <div class="proj-thumb"><span class="ph">Img</span></div>
+            <div class="proj-info">
+              <div class="proj-title-row">
+                <span class="proj-title">NumberOne AI</span>
+                <span class="proj-action">Active</span>
+              </div>
+              <span class="proj-sub">An AI venture studio and incubator. Brand, web presence, and product design for the studio and its entire portfolio.</span>
+              <span class="proj-meta">Brand &middot; Venture Studio &middot; Product Design</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="detail-footer">
+      <span class="detail-footer-name">Alden Huschle</span>
+      <div class="detail-footer-links">
+        <a href="mailto:your@email.com">Email</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="detail" id="music">
+    <div class="detail-nav">
+      <button class="back-btn" onclick="goHome()">&#8592; Back</button>
+      <span class="detail-label">Music is</span>
+    </div>
+    <div class="detail-body">
+      <h2 class="sentence">Music is <span class="completion">the space that reverberates between inquiry and surrender.</span></h2>
+      <ul class="music-list stagger" id="musicList">
+        <li class="music-item in-progress">
+          <div class="music-art"><span class="ph">Art</span></div>
+          <div class="m-info">
+            <div class="m-title-row">
+              <span class="m-title">Debut Solo Album</span>
+              <span class="m-badge">In Progress</span>
+            </div>
+            <span class="m-artist">Alden Huschle</span>
+            <span class="m-year">2026</span>
+          </div>
+        </li>
+        <li class="music-item">
+          <div class="music-art"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/9e/8e/a1/9e8ea136-cf40-6c51-088a-e90a60c453a2/artwork.jpg/600x600bb.jpg" alt="Lyla Minor EP"></div>
+          <div class="m-info">
+            <div class="m-title-row">
+              <span class="m-title">Lyla Minor - EP</span>
+              <a href="https://music.apple.com/us/album/lyla-minor-ep/1754043528" target="_blank" rel="noopener" class="m-action">Released</a>
+            </div>
+            <span class="m-artist">Lyla Minor</span>
+            <span class="m-year">2024</span>
+          </div>
+        </li>
+        <li class="music-item">
+          <div class="music-art"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0f/a5/60/0fa560a2-5d2d-2ecc-7516-6e63335eb622/artwork.jpg/600x600bb.jpg" alt="Intermezzos Vol. 1 EP"></div>
+          <div class="m-info">
+            <div class="m-title-row">
+              <span class="m-title">Intermezzos Vol. 1 - EP</span>
+              <a href="https://music.apple.com/us/album/intermezzos-vol-1-ep/1754047264" target="_blank" rel="noopener" class="m-action">Released</a>
+            </div>
+            <span class="m-artist">Lyla Minor</span>
+            <span class="m-year">2024</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="detail-footer">
+      <span class="detail-footer-name">Alden Huschle</span>
+      <div class="detail-footer-links">
+        <a href="mailto:your@email.com">Email</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="detail" id="iam">
+    <div class="detail-nav">
+      <button class="back-btn" onclick="goHome()">&#8592; Back</button>
+      <span class="detail-label">I am</span>
+    </div>
+    <div class="detail-body">
+      <h2 class="sentence">I am <span class="completion">lovingly (and endlessly) in search of what it's not.</span></h2>
+      <ul class="dispatch-list stagger" id="iamList">
+        <li class="dispatch">
+          <div class="dispatch-photo">
+            <span class="ph">Photo</span>
+          </div>
+          <p class="dispatch-title">The anti-expert</p>
+          <p class="dispatch-text">For most of my adult life, I carried a quiet self-consciousness about not being formally trained in any of the things I do &mdash; not in music theory, not in programming, not in design The shift came when I stopped seeing that as a gap and started seeing it as the point. What I have instead is what I'd call romantic expertise: the ability to know what good feels like before being able to explain why. The willingness to sit with something and chisel away at it until it becomes itself. That is a different and equally valid form of mastery. And it is increasingly relevant as AI handles more execution and the real premium shifts toward taste, instinct, and vision.</p>
+        </li>
+        <li class="dispatch">
+          <p class="dispatch-title">1,200 miles from home</p>
+          <p class="dispatch-text">That's the distance from Seattle to Irvine. I drove it for love. A decision made on instinct rather than calculation. It changed everything. Not because the destination was better, but because the leap itself proved something I needed to know: that I could trust what I felt over what I could plan. Every meaningful thing I've built since has followed that same pattern. Move first. Figure it out in motion.</p>
+        </li>
+        <li class="dispatch">
+          <p class="dispatch-title">Pro magik</p>
+          <p class="dispatch-text">There is, for lack of better words, magic that exists in this world. It shows itself through a relentless dedication to what is ultimately love and being authentic to oneself. I build with the most sophisticated AI tools available and I genuinely believe I channel songs from somewhere beyond myself. I hold both without flinching and without needing to reconcile them. The technical and the spiritual are not in conflict. I live in both, fully, and they make each other more real.</p>
+        </li>
+      </ul>
+    </div>
+    <div class="detail-footer">
+      <span class="detail-footer-name">Alden Huschle</span>
+      <div class="detail-footer-links">
+        <a href="mailto:your@email.com">Email</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const home = document.getElementById('home');
+  const sections = {
+    design: document.getElementById('design'),
+    music: document.getElementById('music'),
+    iam: document.getElementById('iam')
+  };
+  const staggerLists = {
+    design: document.getElementById('designList'),
+    music: document.getElementById('musicList'),
+    iam: document.getElementById('iamList')
+  };
+
+  let current = null;
+
+  function openDoor(id) {
+    if (current) return;
+    current = id;
+    home.classList.add('out');
+    setTimeout(() => {
+      home.classList.add('hidden');
+      const detail = sections[id];
+      detail.classList.add('entering');
+      detail.offsetHeight;
+      detail.classList.add('in');
+      setTimeout(() => { staggerLists[id].classList.add('play'); }, 200);
+    }, 400);
+    history.pushState({ section: id }, '', '#' + id);
+  }
+
+  function goHome() {
+    if (!current) return;
+    const detail = sections[current];
+    const list = staggerLists[current];
+    detail.classList.remove('in');
+    list.classList.remove('play');
+    setTimeout(() => {
+      detail.classList.remove('entering');
+      home.classList.remove('hidden');
+      home.offsetHeight;
+      home.classList.remove('out');
+      current = null;
+    }, 350);
+    history.pushState(null, '', window.location.pathname);
+  }
+
+  window.addEventListener('popstate', (e) => {
+    if (current) goHome();
+    else if (e.state && e.state.section) openDoor(e.state.section);
+  });
+
+  if (window.location.hash) {
+    const id = window.location.hash.slice(1);
+    if (sections[id]) {
+      home.classList.add('out');
+      home.classList.add('hidden');
+      sections[id].classList.add('entering');
+      sections[id].classList.add('in');
+      setTimeout(() => staggerLists[id].classList.add('play'), 100);
+      current = id;
+    }
+  }
+</script>
+
+</body>
+</html>
