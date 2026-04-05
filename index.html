@@ -701,6 +701,8 @@
     cursor: grab;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
   }
 
   .house-strip-body::-webkit-scrollbar { display: none; }
@@ -1729,6 +1731,7 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
         <li class="changelog-entry"><p>okay and now push everything and make sure you correct any mistakes from pushing before. we are going to be going live with this site</p></li>
         <li class="changelog-entry"><p>Okay, now I need your help getting this pushed live. I have the domain, and I can provide any information from the DNS. We have it on GitHub, so if we can publish live from GitHub, great. If we have to put it somewhere else, we can do that too.</p></li>
         <li class="changelog-entry"><p>when I click into a page, let's say one of the thought pages. When I hit the little back button that we have in the UI, it's a smooth transition, but when I click the back button in the browser, there's sort of like a vertical jump in the page that is not the greatest looking.</p></li>
+        <li class="changelog-entry"><p>Okay, I'm now looking at this on mobile now that it's live. When I click into a page and then click the back button in the browser, all it shows me is a blank white page. It doesn't take me back to the home page. I have to actually reload the page for it to show.</p></li>
       </ol>
     </div>
   </div>
@@ -2491,6 +2494,7 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
     var rafId;
 
     el.addEventListener('pointerdown', function(e) {
+      if (e.pointerType === 'touch') return;
       dragging = true;
       startX = e.clientX;
       startScroll = el.scrollLeft;
