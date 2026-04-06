@@ -2423,15 +2423,17 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
     });
     document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
     feedPage.classList.remove('hidden', 'out');
-    feedPage.style.display = '';
-    feedPage.style.opacity = '';
-    window.scrollTo(0, scrollY || 0);
+    feedPage.style.removeProperty('display');
+    feedPage.style.removeProperty('opacity');
     current = null;
+    window.scrollTo(0, scrollY || 0);
   }
 
   function closeArticle() {
     if (!current) return;
-    history.back();
+    var scroll = savedScrollY;
+    showFeed(scroll);
+    history.replaceState(null, '', window.location.pathname);
   }
 
   function openArticleFromStream(el, id) {
@@ -2445,10 +2447,8 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
     if (!wasOpen) item.classList.add('stream-open');
   }
 
-  history.replaceState({ article: null, scrollY: 0 }, '', window.location.pathname + window.location.search + window.location.hash);
-
-  window.addEventListener('popstate', (e) => {
-    const hash = window.location.hash.slice(1);
+  window.addEventListener('popstate', () => {
+    var hash = window.location.hash.slice(1);
     if (!hash) {
       showFeed(savedScrollY || 0);
     } else if (hash && articles[hash] && !current) {
@@ -2457,18 +2457,20 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
   });
 
   window.addEventListener('hashchange', () => {
-    const hash = window.location.hash.slice(1);
-    if (!hash && current) {
-      showFeed(savedScrollY || 0);
-    }
+    var hash = window.location.hash.slice(1);
+    if (!hash) showFeed(savedScrollY || 0);
   });
 
   window.addEventListener('pageshow', (e) => {
-    if (e.persisted) {
-      const hash = window.location.hash.slice(1);
-      if (!hash) showFeed(0);
-    }
+    if (e.persisted && !window.location.hash) showFeed(0);
   });
+
+  // Failsafe: if URL has no hash but feed is not visible, force it
+  setInterval(() => {
+    if (!window.location.hash && feedPage.classList.contains('hidden')) {
+      showFeed(0);
+    }
+  }, 300);
 
   if (window.location.hash) {
     const id = window.location.hash.slice(1);
