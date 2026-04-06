@@ -580,7 +580,7 @@
     position: relative;
     min-height: 260vh;
     overflow-x: hidden;
-    contain: layout;
+    contain: layout paint;
   }
 
   .murmur-word {
@@ -593,10 +593,12 @@
     opacity: var(--op, 0.75);
     color: var(--ink);
     transition: opacity 0.18s ease;
-    will-change: transform;
     animation: murmur-drift var(--dur, 14s) ease-in-out infinite;
     animation-delay: var(--dly, 0s);
+    animation-play-state: paused;
   }
+
+  #murmur.in .murmur-word { animation-play-state: running; }
 
   .murmur-word:hover { opacity: 1; }
 
@@ -773,7 +775,6 @@
     overflow-y: auto;
     perspective: 1200px;
     perspective-origin: 50% 50%;
-    transform: translateZ(0);
   }
 
   .molecule-cards {
@@ -789,7 +790,6 @@
 
   .molecule-card {
     width: min(70vw, 400px);
-    will-change: transform;
     margin: 0;
     padding: 0;
     line-height: 0;
@@ -809,10 +809,12 @@
     clip-path: inset(4px);
   }
 
-  .molecule-card:nth-child(2) { animation: spinCW_b 30s linear infinite; animation-delay: 0s; }
-  .molecule-card:nth-child(3) { animation: spinCW_f 30s linear infinite; animation-delay: -3.75s; }
-  .molecule-card:nth-child(4) { animation: spinCW_b 30s linear infinite; animation-delay: -7.5s; }
-  .molecule-card:nth-child(5) { animation: spinCW_f 30s linear infinite; animation-delay: -11.25s; }
+  .molecule-card:nth-child(2) { animation: spinCW_b 30s linear infinite; animation-delay: 0s; animation-play-state: paused; }
+  .molecule-card:nth-child(3) { animation: spinCW_f 30s linear infinite; animation-delay: -3.75s; animation-play-state: paused; }
+  .molecule-card:nth-child(4) { animation: spinCW_b 30s linear infinite; animation-delay: -7.5s; animation-play-state: paused; }
+  .molecule-card:nth-child(5) { animation: spinCW_f 30s linear infinite; animation-delay: -11.25s; animation-play-state: paused; }
+
+  #molecule.in .molecule-card { animation-play-state: running; }
 
   @keyframes spinCW_b { from { transform: rotateY(0deg) rotateX(-10deg); } to { transform: rotateY(360deg) rotateX(-10deg); } }
   @keyframes spinCW_f { from { transform: rotateY(0deg) rotateX(10deg);  } to { transform: rotateY(360deg) rotateX(10deg);  } }
@@ -1043,10 +1045,10 @@
     <div class="molecule-body">
       <div class="molecule-cards">
         <h1 class="article-title molecule-title">Molecule</h1>
-        <div class="molecule-card"><img src="lsd1-01.webp" alt=""></div>
-        <div class="molecule-card"><img src="lsd2-01.webp" alt=""></div>
-        <div class="molecule-card"><img src="lsd4-01.webp" alt=""></div>
-        <div class="molecule-card"><img src="lsd3-01.webp" alt=""></div>
+        <div class="molecule-card"><img src="lsd1-01.webp" alt="" loading="lazy" decoding="async"></div>
+        <div class="molecule-card"><img src="lsd2-01.webp" alt="" loading="lazy" decoding="async"></div>
+        <div class="molecule-card"><img src="lsd4-01.webp" alt="" loading="lazy" decoding="async"></div>
+        <div class="molecule-card"><img src="lsd3-01.webp" alt="" loading="lazy" decoding="async"></div>
       </div>
     </div>
   </div>
@@ -1857,6 +1859,31 @@ After making all changes, show me:
 4. Confirm the html font-size change
 
 Test these scenarios mentally before finishing: (a) open article → click back button, (b) open article → browser back, (c) open article A → close → scroll feed → open article B → browser back twice, (d) load page directly with #bio in URL.</p></li>
+        <li class="changelog-entry"><p>Performance improvements for the molecule and murmur (themes) pages in index.html. Please make these specific changes and nothing else.
+
+MOLECULE FIXES:
+
+1. Add lazy loading to the molecule images. In the #molecule article, update the four img tags to include loading="lazy" and decoding="async":
+   &lt;img src="lsd1-01.webp" alt="" loading="lazy" decoding="async"&gt;
+   (and the same for lsd2, lsd3, lsd4)
+
+2. Pause molecule animations when the page isn't visible. In the CSS, change the four .molecule-card:nth-child rules so the animation is paused by default, and add a rule that runs it only when the article is active.
+
+3. Remove will-change: transform from .molecule-card, and remove transform: translateZ(0) from .molecule-body. These are unnecessary GPU-promotion hacks that waste memory when the page is idle.
+
+MURMUR FIXES:
+
+4. Add contain: layout paint; to the .murmur-field rule (replacing the existing contain: layout;).
+
+5. Remove will-change: transform from the .murmur-word rule. With 420 elements this was consuming real memory.
+
+6. Pause murmur animations when the article isn't visible. Add .murmur-word animation-play-state: paused and #murmur.in .murmur-word animation-play-state: running.
+
+7. Scale the murmur word count to viewport size instead of a hardcoded 420. Replace const COUNT = 420 with const COUNT = Math.min(420, Math.max(180, Math.floor((W * H) / 2200)));
+
+8. Use a DocumentFragment to batch DOM insertion in initMurmur.
+
+9. Replace the per-span mouseenter/touchend listeners with event delegation on the field element using mouseover (which bubbles) and touchend, with a WeakSet for busy state.</p></li>
       </ol>
     </div>
   </div>
@@ -2451,10 +2478,12 @@ Test these scenarios mentally before finishing: (a) open article → click back 
     const field = document.getElementById('murmurField');
     const W = field.offsetWidth;
     const H = field.offsetHeight;
-    const COUNT = 420;
+    const COUNT = Math.min(420, Math.max(180, Math.floor((W * H) / 2200)));
 
     const pool = [...MURMUR_WORDS].sort(() => Math.random() - 0.5);
     const weights = [300, 400, 400, 700, 800, 800, 900];
+
+    const frag = document.createDocumentFragment();
 
     for (let i = 0; i < COUNT; i++) {
       const span = document.createElement('span');
@@ -2489,23 +2518,32 @@ Test these scenarios mentally before finishing: (a) open article → click back 
         '--dy3:' + amp() + 'px'
       ].join(';');
 
-      let busy = false;
-      const changeWord = () => {
-        if (busy) return;
-        busy = true;
-        span.classList.add('swap');
-        setTimeout(() => {
-          span.textContent = MURMUR_WORDS[Math.floor(Math.random() * MURMUR_WORDS.length)];
-          span.classList.remove('swap');
-          setTimeout(() => { busy = false; }, 200);
-        }, 100);
-      };
-
-      span.addEventListener('mouseenter', changeWord);
-      span.addEventListener('touchend', (e) => { e.preventDefault(); changeWord(); }, { passive: false });
-
-      field.appendChild(span);
+      frag.appendChild(span);
     }
+
+    field.appendChild(frag);
+
+    const busySpans = new WeakSet();
+    function changeWord(span) {
+      if (busySpans.has(span)) return;
+      busySpans.add(span);
+      span.classList.add('swap');
+      setTimeout(() => {
+        span.textContent = MURMUR_WORDS[Math.floor(Math.random() * MURMUR_WORDS.length)];
+        span.classList.remove('swap');
+        setTimeout(() => { busySpans.delete(span); }, 200);
+      }, 100);
+    }
+
+    field.addEventListener('mouseover', (e) => {
+      if (e.target.classList.contains('murmur-word')) changeWord(e.target);
+    });
+    field.addEventListener('touchend', (e) => {
+      if (e.target.classList && e.target.classList.contains('murmur-word')) {
+        e.preventDefault();
+        changeWord(e.target);
+      }
+    }, { passive: false });
   }
 
   let current = null;
