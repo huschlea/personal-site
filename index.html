@@ -1739,6 +1739,8 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
         <li class="changelog-entry"><p>update to copy on debut solo album: while the lyla minor work was collaborative, arranged, negotiated, this project is more exposed. what started as a fragmented labor of love has slowly taken shape into a story that wants to be told. no title yet, no release date beyond 2026. ~13 songs, welcomed and nurtured as they arrive.</p></li>
         <li class="changelog-entry"><p>Push all unpushed changes.</p></li>
         <li class="changelog-entry"><p>Okay, so it's been plenty of time now. I'm sure the pushes have taken effect on the live site, and we are still dealing with the issue where, when we navigate to a page other than the main page and try to go back to it (either via the browser's back button or the back button in the UI), the main page does not load. It's just a blank background. We need to problem-solve this issue and figure it out.</p></li>
+        <li class="changelog-entry"><p>push these changes</p></li>
+        <li class="changelog-entry"><p>There's a bug where navigating back to the home page from an article leaves the page blank until I manually reload. Fix: re-trigger fade-in animations on .feed and .home-footer in showFeed().</p></li>
       </ol>
     </div>
   </div>
@@ -2427,6 +2429,14 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
     feedPage.classList.remove('hidden', 'out');
     feedPage.style.removeProperty('display');
     feedPage.style.removeProperty('opacity');
+    // Re-trigger fade-in animations on feed + footer so they don't stay at opacity:0
+    ['.feed', '.home-footer'].forEach(sel => {
+      const el = feedPage.querySelector(sel);
+      if (!el) return;
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = '';
+    });
     current = null;
     window.scrollTo(0, scrollY || 0);
   }
