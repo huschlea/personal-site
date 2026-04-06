@@ -32,7 +32,7 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html { font-size: 16px; }
+  html { font-size: 100%; }
 
   body {
     background: var(--bg);
@@ -1741,6 +1741,122 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
         <li class="changelog-entry"><p>Okay, so it's been plenty of time now. I'm sure the pushes have taken effect on the live site, and we are still dealing with the issue where, when we navigate to a page other than the main page and try to go back to it (either via the browser's back button or the back button in the UI), the main page does not load. It's just a blank background. We need to problem-solve this issue and figure it out.</p></li>
         <li class="changelog-entry"><p>push these changes</p></li>
         <li class="changelog-entry"><p>There's a bug where navigating back to the home page from an article leaves the page blank until I manually reload. Fix: re-trigger fade-in animations on .feed and .home-footer in showFeed().</p></li>
+        <li class="changelog-entry"><p>I want to make several architectural improvements to index.html. I've diagnosed each issue — please make these specific fixes without touching anything else (no CSS changes, no HTML changes, no rewrites of unrelated code).
+
+FIX 1: Remove the failsafe setInterval.
+It was a bandaid for a bug that's now properly fixed. Delete this entire block:
+
+// Failsafe: if URL has no hash but feed is not visible, force it
+setInterval(() => {
+  if (!window.location.hash && feedPage.classList.contains('hidden')) {
+    showFeed(0);
+  }
+}, 300);
+
+FIX 2: Store scroll position on history state instead of a shared variable.
+Currently savedScrollY is a module-level variable that gets clobbered when opening a second article, so browser back/forward restores the wrong scroll position. Instead:
+- In openArticle, pass the scrollY into pushState's state object (it's already being done) but stop relying on the savedScrollY variable for restoration.
+- In the popstate handler, read scrollY from event.state when available.
+- Keep savedScrollY as a fallback only for the direct closeArticle() button path.
+
+Update the popstate handler to:
+
+window.addEventListener('popstate', (e) => {
+  var hash = window.location.hash.slice(1);
+  var restoreY = (e.state && typeof e.state.scrollY === 'number') ? e.state.scrollY : 0;
+  if (!hash) {
+    // Returning to feed — use the state's scrollY if present
+    if (current) {
+      // Coming back from an article via browser back
+      document.querySelectorAll('.article').forEach(a => a.classList.remove('in', 'entering'));
+      document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
+      feedPage.classList.remove('hidden', 'out');
+      feedPage.style.removeProperty('display');
+      feedPage.style.removeProperty('opacity');
+      ['.feed', '.home-footer'].forEach(sel => {
+        const el = feedPage.querySelector(sel);
+        if (!el) return;
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+      current = null;
+      window.scrollTo(0, restoreY);
+    }
+  } else if (articles[hash] && !current) {
+    _showArticle(hash);
+  }
+});
+
+FIX 3: Separate the visual work of opening an article from the history push.
+Currently popstate calls openArticle, which calls history.pushState, which pollutes the history stack when navigating via forward button. Extract a new internal function _showArticle(id) that does all the visual work (adding classes, initMurmur, changelog word count, scroll to 0) WITHOUT calling pushState. Then openArticle becomes a thin wrapper that calls _showArticle(id) and then calls history.pushState.
+
+Structure:
+
+function _showArticle(id) {
+  current = id;
+  feedPage.classList.add('out');
+  setTimeout(() => {
+    feedPage.classList.add('hidden');
+    const article = articles[id];
+    article.classList.add('entering');
+    if (id === 'murmur') initMurmur();
+    void article.offsetHeight;
+    article.classList.add('in');
+    window.scrollTo(0, 0);
+    if (id === 'changelog') {
+      const content = document.getElementById('changelogContent');
+      const el = document.getElementById('changelogWordCount');
+      if (content && el) {
+        const words = content.textContent.trim().split(/\s+/).filter(w => w.length > 0).length;
+        el.textContent = words.toLocaleString();
+      }
+    }
+  }, 350);
+}
+
+function openArticle(id) {
+  if (current) return;
+  savedScrollY = window.scrollY;
+  _showArticle(id);
+  history.pushState({ article: id, scrollY: savedScrollY }, '', '#' + id);
+}
+
+FIX 4: Deduplicate the initial hash-on-load logic.
+The block that runs at the bottom of the script (starting with `if (window.location.hash)`) manually replicates what openArticle does. Replace it with a version that uses the same code path. Since on initial load we want the article visible immediately without the 350ms transition, use this:
+
+if (window.location.hash) {
+  const id = window.location.hash.slice(1);
+  if (articles[id]) {
+    feedPage.classList.add('out', 'hidden');
+    articles[id].classList.add('entering', 'in');
+    current = id;
+    if (id === 'murmur') initMurmur();
+    if (id === 'changelog') {
+      const content = document.getElementById('changelogContent');
+      const el = document.getElementById('changelogWordCount');
+      if (content && el) {
+        const words = content.textContent.trim().split(/\s+/).filter(w => w.length > 0).length;
+        el.textContent = words.toLocaleString();
+      }
+    }
+  }
+}
+
+Actually leave this as-is — it needs to skip the transition. The dedup isn't worth the complexity here.
+
+FIX 5: Add `void` to the reflow trick in _showArticle.
+The existing code has `article.offsetHeight;` on its own line as a reflow trigger. Change it to `void article.offsetHeight;` so the intent is explicit and minifiers don't strip it.
+
+FIX 6: Change html { font-size: 16px } to html { font-size: 100%; } for accessibility — this respects user browser font-size preferences.
+
+After making all changes, show me:
+1. The updated openArticle + _showArticle functions
+2. The updated popstate handler
+3. Confirm the setInterval is deleted
+4. Confirm the html font-size change
+
+Test these scenarios mentally before finishing: (a) open article → click back button, (b) open article → browser back, (c) open article A → close → scroll feed → open article B → browser back twice, (d) load page directly with #bio in URL.</p></li>
       </ol>
     </div>
   </div>
@@ -2396,9 +2512,7 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
 
   let savedScrollY = 0;
 
-  function openArticle(id) {
-    if (current) return;
-    savedScrollY = window.scrollY;
+  function _showArticle(id) {
     current = id;
     feedPage.classList.add('out');
     setTimeout(() => {
@@ -2406,7 +2520,7 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
       const article = articles[id];
       article.classList.add('entering');
       if (id === 'murmur') initMurmur();
-      article.offsetHeight;
+      void article.offsetHeight;
       article.classList.add('in');
       window.scrollTo(0, 0);
       if (id === 'changelog') {
@@ -2418,6 +2532,12 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
         }
       }
     }, 350);
+  }
+
+  function openArticle(id) {
+    if (current) return;
+    savedScrollY = window.scrollY;
+    _showArticle(id);
     history.pushState({ article: id, scrollY: savedScrollY }, '', '#' + id);
   }
 
@@ -2459,12 +2579,28 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
     if (!wasOpen) item.classList.add('stream-open');
   }
 
-  window.addEventListener('popstate', () => {
+  window.addEventListener('popstate', (e) => {
     var hash = window.location.hash.slice(1);
+    var restoreY = (e.state && typeof e.state.scrollY === 'number') ? e.state.scrollY : 0;
     if (!hash) {
-      showFeed(savedScrollY || 0);
-    } else if (hash && articles[hash] && !current) {
-      openArticle(hash);
+      if (current) {
+        document.querySelectorAll('.article').forEach(a => a.classList.remove('in', 'entering'));
+        document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
+        feedPage.classList.remove('hidden', 'out');
+        feedPage.style.removeProperty('display');
+        feedPage.style.removeProperty('opacity');
+        ['.feed', '.home-footer'].forEach(sel => {
+          const el = feedPage.querySelector(sel);
+          if (!el) return;
+          el.style.animation = 'none';
+          void el.offsetWidth;
+          el.style.animation = '';
+        });
+        current = null;
+        window.scrollTo(0, restoreY);
+      }
+    } else if (articles[hash] && !current) {
+      _showArticle(hash);
     }
   });
 
@@ -2476,13 +2612,6 @@ no title yet, no release date beyond 2026. the songs are written as they arrive.
   window.addEventListener('pageshow', (e) => {
     if (e.persisted && !window.location.hash) showFeed(0);
   });
-
-  // Failsafe: if URL has no hash but feed is not visible, force it
-  setInterval(() => {
-    if (!window.location.hash && feedPage.classList.contains('hidden')) {
-      showFeed(0);
-    }
-  }, 300);
 
   if (window.location.hash) {
     const id = window.location.hash.slice(1);
