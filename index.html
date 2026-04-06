@@ -840,8 +840,8 @@
             <div class="stream-slot">
               <span class="feed-title">Debut solo album</span>
               <div class="stream-choices">
-                <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">Coming soon</span>
-                <span class="stream-choice stream-choice-article" onclick="event.stopPropagation(); openArticleFromStream(this, 'debutalbum')">About</span>
+                <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">In progress</span>
+                <a class="stream-choice" href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" onclick="event.stopPropagation()">Listen</a>
               </div>
             </div>
           </div>
@@ -1884,6 +1884,9 @@ MURMUR FIXES:
 8. Use a DocumentFragment to batch DOM insertion in initMurmur.
 
 9. Replace the per-span mouseenter/touchend listeners with event delegation on the field element using mouseover (which bubbles) and touchend, with a WeakSet for busy state.</p></li>
+        <li class="changelog-entry"><p>push changes</p></li>
+        <li class="changelog-entry"><p>for debut solo album, change coming soon to in progress, and change about to listen and link the following: https://untitled.stream/library/project/1jT9vtJA3TbkuS9cKSJBw</p></li>
+        <li class="changelog-entry"><p>switch listen link to this: https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX</p></li>
       </ol>
     </div>
   </div>
