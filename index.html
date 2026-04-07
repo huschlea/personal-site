@@ -905,7 +905,13 @@
           </div>
         </li>
 
-        <li class="feed-section">Thoughts</li>
+        <li class="feed-section">Observations</li>
+
+        <li class="feed-item thought" onclick="openArticle('whatitisnt')">
+          <div class="feed-row">
+            <span class="feed-title">What it isn't</span>
+          </div>
+        </li>
 
         <li class="feed-item thought" onclick="openArticle('prisms')">
           <div class="feed-row">
@@ -1052,6 +1058,18 @@
         <div class="molecule-card"><img src="lsd4-01.webp" alt="" loading="lazy" decoding="async"></div>
         <div class="molecule-card"><img src="lsd3-01.webp" alt="" loading="lazy" decoding="async"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── ARTICLE: WHAT IT ISN'T ─────────────────────── -->
+
+  <div class="article" id="whatitisnt">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">What it isn't</h1>
+      <p class="article-text">most people are searching for what it is, which confines the search to whatever they can already conceive. an alternative approach is to search for what it isn't. every no is a positive narrowing of the space of possibilities. follow the eliminations long enough and something meaningful starts to remain.</p>
     </div>
   </div>
 
@@ -1892,6 +1910,9 @@ MURMUR FIXES:
         <li class="changelog-entry"><p>push changes</p></li>
         <li class="changelog-entry"><p>on the chsngelog page, there is a horizontal scroll bar that appears on mobile. this should not be</p></li>
         <li class="changelog-entry"><p>push changes</p></li>
+        <li class="changelog-entry"><p>new thought entry: title "what it isn't": most people are searching for what it is, which confines the search to whatever they can already conceive. an alternative approach is to search for what it isn't. every no is a positive narrowing of the space of possibilities. follow the eliminations long enough and something meaningful starts to remain.</p></li>
+        <li class="changelog-entry"><p>when i clcik on the title it's a blank page</p></li>
+        <li class="changelog-entry"><p>change "thoughts" category title to "Obversations"</p></li>
       </ol>
     </div>
   </div>
@@ -2453,7 +2474,8 @@ MURMUR FIXES:
     'gig-posters': document.getElementById('gig-posters'),
     'house': document.getElementById('house'),
     'molecule': document.getElementById('molecule'),
-    'prisms': document.getElementById('prisms')
+    'prisms': document.getElementById('prisms'),
+    'whatitisnt': document.getElementById('whatitisnt')
   };
 
   /* ─── MURMUR ─────────────────────────────────────────────── */
