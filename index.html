@@ -840,7 +840,7 @@
         <li class="feed-item passive progress-70" onclick="toggleStream(this, event)" style="cursor:pointer;">
           <div class="feed-row">
             <div class="stream-slot">
-              <span class="feed-title">Debut solo album</span>
+              <span class="feed-title">untitled_wip-unmixed</span>
               <div class="stream-choices">
                 <span class="stream-choice stream-choice-inactive" onclick="event.stopPropagation()">In progress</span>
                 <a class="stream-choice" href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" onclick="event.stopPropagation()">Listen</a>
@@ -906,6 +906,12 @@
         </li>
 
         <li class="feed-section">Observations</li>
+
+        <li class="feed-item thought" onclick="openArticle('sharingexcitement')">
+          <div class="feed-row">
+            <span class="feed-title">Sharing excitement</span>
+          </div>
+        </li>
 
         <li class="feed-item thought" onclick="openArticle('whatitisnt')">
           <div class="feed-row">
@@ -1061,6 +1067,18 @@
     </div>
   </div>
 
+  <!-- ─── ARTICLE: SHARING EXCITEMENT ─────────────────────── -->
+
+  <div class="article" id="sharingexcitement">
+    <div class="article-nav">
+      <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
+    </div>
+    <div class="article-body">
+      <h1 class="article-title">Sharing excitement</h1>
+      <p class="article-text">excitement is honest signal because its challenging to fake convincingly. when someone else shares your excitement, not politely but genuinely, something shifts. there is a recognition that goes deeper than agreement. it's the relief of being understood without having to explain yourself first.</p>
+    </div>
+  </div>
+
   <!-- ─── ARTICLE: WHAT IT ISN'T ─────────────────────── -->
 
   <div class="article" id="whatitisnt">
@@ -1143,7 +1161,7 @@
       <button class="back-btn" onclick="closeArticle()"><span>Back</span></button>
     </div>
     <div class="article-body">
-      <h1 class="article-title">Debut solo album</h1>
+      <h1 class="article-title">untitled_wip-unmixed</h1>
       <p class="article-text">while the <a href="https://music.apple.com/us/artist/lyla-minor/1753837557" target="_blank" rel="noopener" style="color:inherit;">lyla minor</a> work was collaborative, arranged, negotiated, this project is more exposed. what started as a fragmented labor of love has slowly taken shape into a story that wants to be told.</p>
       <p class="article-text" style="margin-top:1.5rem;">no title yet, no release date beyond 2026. ~13 songs, welcomed and nurtured as they arrive.</p>
     </div>
@@ -1914,6 +1932,9 @@ MURMUR FIXES:
         <li class="changelog-entry"><p>when i clcik on the title it's a blank page</p></li>
         <li class="changelog-entry"><p>change "thoughts" category title to "Obversations"</p></li>
         <li class="changelog-entry"><p>push changes</p></li>
+        <li class="changelog-entry"><p>change "debut solo album" to "untitled_wip-unmixed"</p></li>
+        <li class="changelog-entry"><p>new observation: Title: sharing excitement / copy: excitement is honest signal because its challenging to fake convincingly. when someone else shares your excitement, not politely but genuinely, something shifts. there is a recognition that goes deeper than agreement. it's the relief of being understood without having to explain yourself first.</p></li>
+        <li class="changelog-entry"><p>push changes</p></li>
       </ol>
     </div>
   </div>
@@ -2476,7 +2497,8 @@ MURMUR FIXES:
     'house': document.getElementById('house'),
     'molecule': document.getElementById('molecule'),
     'prisms': document.getElementById('prisms'),
-    'whatitisnt': document.getElementById('whatitisnt')
+    'whatitisnt': document.getElementById('whatitisnt'),
+    'sharingexcitement': document.getElementById('sharingexcitement')
   };
 
   /* ─── MURMUR ─────────────────────────────────────────────── */
