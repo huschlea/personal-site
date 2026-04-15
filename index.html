@@ -62,8 +62,15 @@
   .site {
     min-height: 100vh;
     min-height: 100svh;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(100svh, auto);
+  }
+
+  .site > .feed-page,
+  .site > .article {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   /* ─── FEED PAGE ──────────────────────────────────────── */
@@ -72,8 +79,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    transition: opacity 0.35s ease;
-    will-change: opacity;
+    transition: opacity 0.15s ease;
   }
 
   .feed-page.out { opacity: 0; pointer-events: none; }
@@ -287,8 +293,7 @@
     display: none;
     flex-direction: column;
     opacity: 0;
-    transition: opacity 0.35s ease 0.05s;
-    will-change: opacity;
+    transition: opacity 0.15s ease;
   }
 
   .article.entering { display: flex; }
@@ -1939,6 +1944,13 @@ MURMUR FIXES:
         <li class="changelog-entry"><p>push changes</p></li>
         <li class="changelog-entry"><p>change "sharing excitment" to "shared excitement"</p></li>
         <li class="changelog-entry"><p>push</p></li>
+        <li class="changelog-entry"><p>what is the main font im using?</p></li>
+        <li class="changelog-entry"><p>what weight for big shoulders</p></li>
+        <li class="changelog-entry"><p>i don't like how clicking on a page has a page animation and clicking back doesn't have an animation. I want them to be consistent. I'd prefer the no animation route</p></li>
+        <li class="changelog-entry"><p>is there' any way to make it slightly less abrupt for both. it's almost a bit frightening how fast it is</p></li>
+        <li class="changelog-entry"><p>i can see the home page breifly flash during the crossfade</p></li>
+        <li class="changelog-entry"><p>still doing it</p></li>
+        <li class="changelog-entry"><p>looks great. push it</p></li>
       </ol>
     </div>
   </div>
@@ -2609,10 +2621,10 @@ MURMUR FIXES:
 
   function _showArticle(id) {
     current = id;
+    const article = articles[id];
     feedPage.classList.add('out');
     setTimeout(() => {
       feedPage.classList.add('hidden');
-      const article = articles[id];
       article.classList.add('entering');
       if (id === 'murmur') initMurmur();
       void article.offsetHeight;
@@ -2626,7 +2638,7 @@ MURMUR FIXES:
           el.textContent = words.toLocaleString();
         }
       }
-    }, 350);
+    }, 150);
   }
 
   function openArticle(id) {
@@ -2637,23 +2649,21 @@ MURMUR FIXES:
   }
 
   function showFeed(scrollY) {
-    document.querySelectorAll('.article').forEach(a => {
-      a.classList.remove('in', 'entering');
-    });
+    const leaving = current ? articles[current] : null;
     document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
-    feedPage.classList.remove('hidden', 'out');
-    feedPage.style.removeProperty('display');
-    feedPage.style.removeProperty('opacity');
-    // Re-trigger fade-in animations on feed + footer so they don't stay at opacity:0
-    ['.feed', '.home-footer'].forEach(sel => {
-      const el = feedPage.querySelector(sel);
-      if (!el) return;
-      el.style.animation = 'none';
-      void el.offsetWidth;
-      el.style.animation = '';
-    });
+    if (leaving) leaving.classList.remove('in');
+    setTimeout(() => {
+      document.querySelectorAll('.article').forEach(a => {
+        a.classList.remove('in', 'entering');
+      });
+      feedPage.classList.remove('hidden');
+      feedPage.style.removeProperty('display');
+      feedPage.style.removeProperty('opacity');
+      void feedPage.offsetHeight;
+      feedPage.classList.remove('out');
+      window.scrollTo(0, scrollY || 0);
+    }, 150);
     current = null;
-    window.scrollTo(0, scrollY || 0);
   }
 
   function closeArticle() {
@@ -2678,22 +2688,7 @@ MURMUR FIXES:
     var hash = window.location.hash.slice(1);
     var restoreY = (e.state && typeof e.state.scrollY === 'number') ? e.state.scrollY : 0;
     if (!hash) {
-      if (current) {
-        document.querySelectorAll('.article').forEach(a => a.classList.remove('in', 'entering'));
-        document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
-        feedPage.classList.remove('hidden', 'out');
-        feedPage.style.removeProperty('display');
-        feedPage.style.removeProperty('opacity');
-        ['.feed', '.home-footer'].forEach(sel => {
-          const el = feedPage.querySelector(sel);
-          if (!el) return;
-          el.style.animation = 'none';
-          void el.offsetWidth;
-          el.style.animation = '';
-        });
-        current = null;
-        window.scrollTo(0, restoreY);
-      }
+      if (current) showFeed(restoreY);
     } else if (articles[hash] && !current) {
       _showArticle(hash);
     }
