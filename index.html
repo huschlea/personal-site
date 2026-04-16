@@ -1955,6 +1955,8 @@ MURMUR FIXES:
         <li class="changelog-entry"><p>looks great. push it</p></li>
         <li class="changelog-entry"><p>the horizonal scroll isnt working on house is not a home. also, the little scrool animatiojn is not showing up</p></li>
         <li class="changelog-entry"><p>great. push it</p></li>
+        <li class="changelog-entry"><p>It seems we reintroduced the issue where, when you click on one of the pages (like a blog or observation) and hit the back button, you are taken to a blank background instead of the home page loading automatically.</p></li>
+        <li class="changelog-entry"><p>okay push</p></li>
       </ol>
     </div>
   </div>
@@ -2663,6 +2665,13 @@ MURMUR FIXES:
       feedPage.classList.remove('hidden');
       feedPage.style.removeProperty('display');
       feedPage.style.removeProperty('opacity');
+      ['.feed', '.home-footer'].forEach(sel => {
+        const el = feedPage.querySelector(sel);
+        if (!el) return;
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
       void feedPage.offsetHeight;
       feedPage.classList.remove('out');
       window.scrollTo(0, scrollY || 0);
