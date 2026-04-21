@@ -44,6 +44,7 @@
     overflow-x: hidden;
     min-height: 100vh;
     min-height: 100svh;
+    animation: fadeIn 0.4s ease;
   }
 
   ::selection { background: var(--accent); color: var(--bg); }
@@ -90,9 +91,6 @@
   .feed {
     flex: 1;
     padding: clamp(2rem, 5vw, 4rem);
-    opacity: 0;
-    animation: fadeIn 0.5s ease forwards;
-    will-change: opacity;
   }
 
   .feed-list { list-style: none; }
@@ -170,8 +168,6 @@
     align-items: flex-end;
     padding: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 5vw, 4rem);
     margin-top: clamp(1.5rem, 3vw, 2.5rem);
-    opacity: 0;
-    animation: fadeIn 0.5s ease 0s forwards;
   }
 
   .home-footer-name {
@@ -570,7 +566,7 @@
     }
   }
 
-  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   /* ─── MOBILE ─────────────────────────────────────────── */
 
@@ -1012,14 +1008,14 @@
     <div class="article-body">
       <h1 class="article-title">Gig posters</h1>
       <div class="poster-stack">
-        <img src="poster-shoecraft.png" alt="Fine Arts Shoecraft gig poster" loading="lazy" decoding="async">
-        <img src="poster-bathroom-poets.png" alt="The Bathroom Poets gig poster" loading="lazy" decoding="async">
-        <img src="poster-dull-culprit.png" alt="Dull Culprit gig poster" loading="lazy" decoding="async">
-        <img src="poster-esteb.png" alt="McKenna Esteb gig poster" loading="lazy" decoding="async">
-        <img src="poster-lyla-minor.png" alt="Lyla Minor gig poster" loading="lazy" decoding="async">
-        <img src="poster-little-planet.png" alt="Little Planet gig poster" loading="lazy" decoding="async">
-        <img src="poster-elvis-batchild.png" alt="Elvis Batchild gig poster" loading="lazy" decoding="async">
-        <img src="poster-lyla-minor-2.png" alt="Lyla Minor gig poster" loading="lazy" decoding="async">
+        <img src="poster-shoecraft.png" alt="Fine Arts Shoecraft gig poster" width="1740" height="2174" loading="lazy" decoding="async">
+        <img src="poster-bathroom-poets.png" alt="The Bathroom Poets gig poster" width="955" height="1193" loading="lazy" decoding="async">
+        <img src="poster-dull-culprit.png" alt="Dull Culprit gig poster" width="955" height="1194" loading="lazy" decoding="async">
+        <img src="poster-esteb.png" alt="McKenna Esteb gig poster" width="1737" height="2170" loading="lazy" decoding="async">
+        <img src="poster-lyla-minor.png" alt="Lyla Minor gig poster" width="1302" height="1627" loading="lazy" decoding="async">
+        <img src="poster-little-planet.png" alt="Little Planet gig poster" width="1753" height="2179" loading="lazy" decoding="async">
+        <img src="poster-elvis-batchild.png" alt="Elvis Batchild gig poster" width="1740" height="2174" loading="lazy" decoding="async">
+        <img src="poster-lyla-minor-2.png" alt="Lyla Minor gig poster" width="1740" height="2174" loading="lazy" decoding="async">
       </div>
     </div>
   </div>
@@ -1033,17 +1029,17 @@
     <h1 class="article-title house-strip-title">A house is not a&nbsp;home</h1>
     <div class="house-strip-body" id="houseStripBody">
       <div class="house-strip">
-        <img src="house1.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house2.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house3.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house4.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house5.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house6.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house7.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house8.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house9.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house10.jpeg" alt="" loading="lazy" decoding="async">
-        <img src="house11.jpeg" alt="" loading="lazy" decoding="async">
+        <img src="house1.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house2.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house3.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house4.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house5.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house6.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house7.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house8.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house9.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house10.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
+        <img src="house11.jpeg" alt="" width="2500" height="1750" loading="lazy" decoding="async">
       </div>
     </div>
     <div class="house-swipe-hint" id="houseSwipeHint">
@@ -1066,10 +1062,10 @@
     <div class="molecule-body">
       <div class="molecule-cards">
         <h1 class="article-title molecule-title">Molecule</h1>
-        <div class="molecule-card"><img src="lsd1-01.webp" alt="" loading="lazy" decoding="async"></div>
-        <div class="molecule-card"><img src="lsd2-01.webp" alt="" loading="lazy" decoding="async"></div>
-        <div class="molecule-card"><img src="lsd4-01.webp" alt="" loading="lazy" decoding="async"></div>
-        <div class="molecule-card"><img src="lsd3-01.webp" alt="" loading="lazy" decoding="async"></div>
+        <div class="molecule-card"><img src="lsd1-01.webp" alt="" width="2500" height="2500" loading="lazy" decoding="async"></div>
+        <div class="molecule-card"><img src="lsd2-01.webp" alt="" width="2500" height="2500" loading="lazy" decoding="async"></div>
+        <div class="molecule-card"><img src="lsd4-01.webp" alt="" width="2500" height="2500" loading="lazy" decoding="async"></div>
+        <div class="molecule-card"><img src="lsd3-01.webp" alt="" width="2500" height="2500" loading="lazy" decoding="async"></div>
       </div>
     </div>
   </div>
@@ -1959,6 +1955,8 @@ MURMUR FIXES:
         <li class="changelog-entry"><p>okay push</p></li>
         <li class="changelog-entry"><p>Something is going wrong when I try to go to my personal site live on the
   browser; it takes forever to load and it sits on a black screen</p></li>
+        <li class="changelog-entry"><p>I need you to do a comprehensive audit of this site and figure out why some of the different pages are not able to load, like when I click on a page and then I navigate back. I'll give an example of this: Gig posters. There's almost like a little glitch when I hit the back button. I'm talking about the back button in the browser. I haven't looked at the back button in the actual UI, but it's almost like it glitches and it flashes something that it's not supposed to, but it's definitely not smooth. I'm also having trouble now when I click on the dream section; it doesn't load right away. It's almost like it gets stuck. I need all these pages to load exactly as they're intended to so that when someone lands on the site, they don't think it looks like it was built unprofessionally. This needs to be a comprehensive fix, and I need you to find any of these little bugs that are persisting.</p></li>
+        <li class="changelog-entry"><p>Okay, so I'm specifically seeing a glitch when I navigate to a page, pretty much all the pages it seems, besides the observations, like any of the ones like changelog, Gig posters, "A house is not a home". It seems like any of the pages outside of the observations. When I go to that page and I click the back button inside of the UI, it looks great. The transition looks great, but when I click the back button in the browser, it glitches really briefly and then takes me back, and it's pretty noticeable. It's almost like, for instance, on Gig posters, I can scroll down to the bottom and see the last poster, but then when I click back, the first poster flashes really quickly before I go back.</p></li>
       </ol>
     </div>
   </div>
@@ -1976,7 +1974,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="guillotine-dream.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="guillotine-dream.png" alt="dream sketch" width="2464" height="1856" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
         </div>
         <div class="dream-meta">
           <span class="dream-phrase">manual guillotine.</span>
@@ -1986,7 +1984,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="fire-dream.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="fire-dream.png" alt="dream sketch" width="2464" height="1856" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
         </div>
         <div class="dream-meta">
           <span class="dream-phrase">setting fire to pine.</span>
@@ -1996,7 +1994,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="flight-dream.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="flight-dream.png" alt="dream sketch" width="2464" height="1856" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
         </div>
         <div class="dream-meta">
           <span class="dream-phrase">a flight not taken.</span>
@@ -2006,7 +2004,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="sent-adrift.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="sent-adrift.png" alt="dream sketch" width="2464" height="1856" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
           <svg viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg" style="display:none;">
             <defs>
               <filter id="sk" x="-4%" y="-4%" width="108%" height="108%">
@@ -2297,7 +2295,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="rabbit-hunters-dream.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="rabbit-hunters-dream.png" alt="dream sketch" width="2464" height="1856" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
           <svg viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg" style="display:none;">
             <defs>
               <filter id="sk2" x="-4%" y="-4%" width="108%" height="108%">
@@ -2433,7 +2431,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="seating-dream.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="seating-dream.png" alt="dream sketch" width="1232" height="928" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
         </div>
         <div class="dream-meta">
           <span class="dream-phrase">seating derangement.</span>
@@ -2443,7 +2441,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="culinary-dream.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="culinary-dream.png" alt="dream sketch" width="2464" height="1856" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
         </div>
         <div class="dream-meta">
           <span class="dream-phrase">culinary clutter.</span>
@@ -2453,7 +2451,7 @@ MURMUR FIXES:
 
       <div class="dream-entry">
         <div class="dream-sketch">
-          <img src="field-mentorship-dream.png" alt="dream sketch" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
+          <img src="field-mentorship-dream.png" alt="dream sketch" width="2464" height="1856" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;"/>
         </div>
         <div class="dream-meta">
           <span class="dream-phrase">field mentorship.</span>
@@ -2504,6 +2502,9 @@ MURMUR FIXES:
 </div>
 
 <script>
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
   const feedPage = document.getElementById('feedPage');
   const articles = {
     'bio': document.getElementById('bio'),
@@ -2626,12 +2627,27 @@ MURMUR FIXES:
   let current = null;
 
   let savedScrollY = 0;
+  let showFeedToken = 0;
+
+  function preloadArticleImages(id) {
+    const article = articles[id];
+    if (!article) return;
+    article.querySelectorAll('img[loading="lazy"]').forEach(img => {
+      const src = img.getAttribute('src');
+      if (!src) return;
+      const pre = new Image();
+      pre.decoding = 'async';
+      pre.src = src;
+    });
+  }
 
   function _showArticle(id) {
     current = id;
     const article = articles[id];
+    preloadArticleImages(id);
     feedPage.classList.add('out');
     setTimeout(() => {
+      if (current !== id) return;
       feedPage.classList.add('hidden');
       article.classList.add('entering');
       if (id === 'murmur') initMurmur();
@@ -2660,25 +2676,20 @@ MURMUR FIXES:
     const leaving = current ? articles[current] : null;
     document.querySelectorAll('.feed-item.stream-open').forEach(el => el.classList.remove('stream-open'));
     if (leaving) leaving.classList.remove('in');
+    current = null;
+    const token = ++showFeedToken;
     setTimeout(() => {
+      if (token !== showFeedToken) return;
       document.querySelectorAll('.article').forEach(a => {
         a.classList.remove('in', 'entering');
       });
       feedPage.classList.remove('hidden');
       feedPage.style.removeProperty('display');
       feedPage.style.removeProperty('opacity');
-      ['.feed', '.home-footer'].forEach(sel => {
-        const el = feedPage.querySelector(sel);
-        if (!el) return;
-        el.style.animation = 'none';
-        void el.offsetWidth;
-        el.style.animation = '';
-      });
       void feedPage.offsetHeight;
       feedPage.classList.remove('out');
       window.scrollTo(0, scrollY || 0);
     }, 150);
-    current = null;
   }
 
   function closeArticle() {
@@ -2701,7 +2712,7 @@ MURMUR FIXES:
 
   window.addEventListener('popstate', (e) => {
     var hash = window.location.hash.slice(1);
-    var restoreY = (e.state && typeof e.state.scrollY === 'number') ? e.state.scrollY : 0;
+    var restoreY = (e.state && typeof e.state.scrollY === 'number') ? e.state.scrollY : savedScrollY;
     if (!hash) {
       if (current) showFeed(restoreY);
     } else if (articles[hash] && !current) {
@@ -2724,6 +2735,7 @@ MURMUR FIXES:
       feedPage.classList.add('out', 'hidden');
       articles[id].classList.add('entering', 'in');
       current = id;
+      preloadArticleImages(id);
       if (id === 'murmur') initMurmur();
       if (id === 'changelog') {
         const content = document.getElementById('changelogContent');
