@@ -32,7 +32,6 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   min-height: 100svh;
-  animation: fadeIn 0.4s ease;
 }
 
 ::selection { background: var(--accent); color: var(--bg); }
@@ -547,8 +546,6 @@ body::after {
     font-size: clamp(1rem, 5vw, 1.25rem);
   }
 }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* ─── MOBILE ─────────────────────────────────────────── */
 

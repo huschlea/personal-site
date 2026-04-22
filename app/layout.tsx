@@ -4,14 +4,14 @@ import "./globals.css";
 
 const bigShoulders = Big_Shoulders({
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700", "800", "900"],
+  weight: ["300", "600", "700", "800"],
   variable: "--font-big-shoulders",
   display: "swap",
 });
 
 const spectral = Spectral({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  weight: ["300"],
   style: ["normal", "italic"],
   variable: "--font-spectral",
   display: "swap",
@@ -22,6 +22,7 @@ const novaMono = Nova_Mono({
   weight: ["400"],
   variable: "--font-nova-mono",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
