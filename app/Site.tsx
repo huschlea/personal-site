@@ -45,6 +45,24 @@ export default function Site({ changelog }: { changelog: string[] }) {
       if (el) articles[id] = el;
     }
 
+    // Set up image fade-in on load for all article images
+    const markLoaded = (img: HTMLImageElement) => img.classList.add("loaded");
+    document.querySelectorAll<HTMLImageElement>(".article img").forEach((img) => {
+      if (img.complete && img.naturalWidth > 0) {
+        markLoaded(img);
+      } else {
+        img.addEventListener("load", () => markLoaded(img), { once: true });
+        img.addEventListener("error", () => markLoaded(img), { once: true });
+      }
+    });
+
+    // Promote the first image of each article to eager loading so it's ready
+    // by the time the article is revealed.
+    for (const id of articleIds) {
+      const first = articles[id]?.querySelector<HTMLImageElement>("img");
+      if (first) first.loading = "eager";
+    }
+
     let murmurInitialized = false;
 
     function initMurmur() {
@@ -142,20 +160,44 @@ export default function Site({ changelog }: { changelog: string[] }) {
       });
     }
 
+    const TRANSITION_MS = 280;
+
+    function lockPanelAt(el: HTMLElement, y: number) {
+      el.style.position = "fixed";
+      el.style.top = `-${y}px`;
+      el.style.left = "0";
+      el.style.right = "0";
+    }
+
+    function unlockPanel(el: HTMLElement) {
+      el.style.position = "";
+      el.style.top = "";
+      el.style.left = "";
+      el.style.right = "";
+    }
+
     function _showArticle(id: string) {
       current = id;
       const article = articles[id];
       if (!article) return;
       preloadArticleImages(id);
+
+      // Lock the feed at its current visual position so we can scroll the
+      // document to 0 without any visible jump during the cross-fade.
+      lockPanelAt(feedPage, window.scrollY);
+      window.scrollTo(0, 0);
+
+      // Stage article at opacity 0, then run both transitions together.
+      article.classList.add("entering");
+      if (id === "murmur") initMurmur();
+      void article.offsetHeight;
       feedPage.classList.add("out");
+      article.classList.add("in");
+
       setTimeout(() => {
         if (current !== id) return;
         feedPage.classList.add("hidden");
-        article.classList.add("entering");
-        if (id === "murmur") initMurmur();
-        void article.offsetHeight;
-        article.classList.add("in");
-        window.scrollTo(0, 0);
+        unlockPanel(feedPage);
         if (id === "changelog") {
           const content = document.getElementById("changelogContent");
           const el = document.getElementById("changelogWordCount");
@@ -164,7 +206,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
             el.textContent = words.toLocaleString();
           }
         }
-      }, 150);
+      }, TRANSITION_MS);
     }
 
     function openArticle(id: string) {
@@ -177,21 +219,29 @@ export default function Site({ changelog }: { changelog: string[] }) {
     function showFeed(scrollY: number) {
       const leaving = current ? articles[current] : null;
       document.querySelectorAll(".feed-item.stream-open").forEach((el) => el.classList.remove("stream-open"));
-      if (leaving) leaving.classList.remove("in");
       current = null;
       const token = ++showFeedToken;
+
+      // Make the feed visible-but-invisible at its restored scroll position,
+      // then cross-fade article out and feed in simultaneously.
+      feedPage.classList.remove("hidden");
+      feedPage.style.removeProperty("display");
+      feedPage.style.removeProperty("opacity");
+      lockPanelAt(feedPage, scrollY || 0);
+      void feedPage.offsetHeight;
+      feedPage.classList.remove("out");
+      if (leaving) leaving.classList.remove("in");
+
       setTimeout(() => {
         if (token !== showFeedToken) return;
         document.querySelectorAll(".article").forEach((a) => {
           a.classList.remove("in", "entering");
         });
-        feedPage.classList.remove("hidden");
-        feedPage.style.removeProperty("display");
-        feedPage.style.removeProperty("opacity");
-        void feedPage.offsetHeight;
-        feedPage.classList.remove("out");
+        // Restore document scroll *before* removing the fixed lock so the feed
+        // snaps back into flow already at the right position.
         window.scrollTo(0, scrollY || 0);
-      }, 150);
+        unlockPanel(feedPage);
+      }, TRANSITION_MS);
     }
 
     function closeArticle() {

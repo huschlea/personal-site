@@ -69,7 +69,7 @@ body::after {
   flex: 1;
   display: flex;
   flex-direction: column;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.28s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .feed-page.out { opacity: 0; pointer-events: none; }
@@ -274,8 +274,15 @@ body::after {
   display: none;
   flex-direction: column;
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.28s cubic-bezier(0.2, 0, 0, 1);
 }
+
+.article img {
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.article img.loaded { opacity: 1; }
 
 .article.entering { display: flex; }
 .article.in { display: flex; opacity: 1; }
