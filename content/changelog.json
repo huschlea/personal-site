@@ -517,5 +517,7 @@
   "/Users/aldenhuschle/Downloads/Sharp\\ Trial\\ Fonts/Respira/OTF-Mac/Respira-Black-Trial.otf try with this instead",
   "Okay, I definitely don't like that. What if we used system fonts specifically for Mac, like San Francisco?",
   "I don't like any of these. Revert back to big shoulders as it was before.",
-  "One thing we need to fix is that the imagery on a house is not a home. It doesn't seem like, it feels like each page is loading individually, when really I kind of want it all to load as one super long image (long as in horizontally), and then there's spacing between the images when you view it on mobile. It should look like one long scrollable rectangle. We need to fix whatever is causing that."
+  "One thing we need to fix is that the imagery on a house is not a home. It doesn't seem like, it feels like each page is loading individually, when really I kind of want it all to load as one super long image (long as in horizontally), and then there's spacing between the images when you view it on mobile. It should look like one long scrollable rectangle. We need to fix whatever is causing that.",
+  "Okay, let's push these changes.",
+  "There still appears to be a massive gap between the images on A House Is Not A Home when I look at it on mobile. It's like there's so much white space in between that there should be no white space at all. In fact, maybe it should all be an image."
 ]
