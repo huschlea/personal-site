@@ -346,9 +346,9 @@ body::after {
   margin-top: 1em;
 }
 
-/* ─── CHANGELOG ─────────────────────────────────────── */
+/* ─── PROMPTLOG ──────────────────────────────────────── */
 
-.changelog-meta {
+.promptlog-meta {
   font-family: var(--body);
   font-style: italic;
   font-weight: 300;
@@ -358,23 +358,23 @@ body::after {
   margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
-.changelog-list {
+.promptlog-list {
   list-style: none;
-  counter-reset: changelog;
+  counter-reset: promptlog;
   display: flex;
   flex-direction: column-reverse;
   gap: 1.5rem;
 }
 
-.changelog-entry {
-  counter-increment: changelog;
+.promptlog-entry {
+  counter-increment: promptlog;
   display: grid;
   grid-template-columns: 2.5rem 1fr;
   gap: 0.75rem;
 }
 
-.changelog-entry::before {
-  content: counter(changelog, decimal-leading-zero);
+.promptlog-entry::before {
+  content: counter(promptlog, decimal-leading-zero);
   font-family: var(--body);
   font-style: italic;
   font-weight: 300;
@@ -384,7 +384,7 @@ body::after {
   padding-top: 0.35rem;
 }
 
-.changelog-entry p {
+.promptlog-entry p {
   font-family: var(--body);
   font-weight: 300;
   font-size: clamp(0.85rem, 1.05vw, 0.95rem);
@@ -589,7 +589,7 @@ body::after {
   animation-play-state: paused;
 }
 
-#murmur.in .murmur-word { animation-play-state: running; }
+#themes.in .murmur-word { animation-play-state: running; }
 
 .murmur-word:hover { opacity: 1; }
 

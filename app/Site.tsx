@@ -34,10 +34,10 @@ export default function Site({ changelog }: { changelog: string[] }) {
 
     const feedPage = document.getElementById("feedPage")!;
     const articleIds = [
-      "bio", "lastquestions", "debutalbum", "resume", "changelog",
-      "anti-expert", "miles", "youalwaysknow", "magik", "murmur",
-      "residue", "gig-posters", "house", "molecule", "prisms",
-      "whatitisnt", "sharingexcitement",
+      "bio", "prompting-people", "album-01_wip-unmixed", "resume", "promptlog",
+      "the-anti-expert", "the-leap", "you-already-know", "magic-is-earned", "themes",
+      "dreams", "gig-posters", "a-house-is-not-a-home", "molecule", "prisms",
+      "what-it-isnt", "shared-excitement",
     ];
     const articles: Record<string, HTMLElement> = {};
     for (const id of articleIds) {
@@ -189,7 +189,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
 
       // Stage article at opacity 0, then run both transitions together.
       article.classList.add("entering");
-      if (id === "murmur") initMurmur();
+      if (id === "themes") initMurmur();
       void article.offsetHeight;
       feedPage.classList.add("out");
       article.classList.add("in");
@@ -198,9 +198,9 @@ export default function Site({ changelog }: { changelog: string[] }) {
         if (current !== id) return;
         feedPage.classList.add("hidden");
         unlockPanel(feedPage);
-        if (id === "changelog") {
-          const content = document.getElementById("changelogContent");
-          const el = document.getElementById("changelogWordCount");
+        if (id === "promptlog") {
+          const content = document.getElementById("promptlogContent");
+          const el = document.getElementById("promptlogWordCount");
           if (content && el) {
             const words = content.textContent!.trim().split(/\s+/).filter((w) => w.length > 0).length;
             el.textContent = words.toLocaleString();
@@ -332,10 +332,10 @@ export default function Site({ changelog }: { changelog: string[] }) {
         articles[id].classList.add("entering", "in");
         current = id;
         preloadArticleImages(id);
-        if (id === "murmur") initMurmur();
-        if (id === "changelog") {
-          const content = document.getElementById("changelogContent");
-          const el = document.getElementById("changelogWordCount");
+        if (id === "themes") initMurmur();
+        if (id === "promptlog") {
+          const content = document.getElementById("promptlogContent");
+          const el = document.getElementById("promptlogWordCount");
           if (content && el) {
             const words = content.textContent!.trim().split(/\s+/).filter((w) => w.length > 0).length;
             el.textContent = words.toLocaleString();
@@ -474,7 +474,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
                   <span className="feed-title">Prompting People</span>
                   <div className="stream-choices">
                     <span className="stream-choice stream-choice-inactive" data-stream-inactive>Coming soon</span>
-                    <span className="stream-choice stream-choice-article" data-stream-article="lastquestions">About</span>
+                    <span className="stream-choice stream-choice-article" data-stream-article="prompting-people">About</span>
                   </div>
                 </div>
               </div>
@@ -484,7 +484,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
               <div className="feed-row"><span className="feed-title">Gig posters</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="house">
+            <li className="feed-item thought" data-open="a-house-is-not-a-home">
               <div className="feed-row"><span className="feed-title">A house is not a home</span></div>
             </li>
 
@@ -494,11 +494,11 @@ export default function Site({ changelog }: { changelog: string[] }) {
 
             <li className="feed-section">Observations</li>
 
-            <li className="feed-item thought" data-open="sharingexcitement">
+            <li className="feed-item thought" data-open="shared-excitement">
               <div className="feed-row"><span className="feed-title">Shared excitement</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="whatitisnt">
+            <li className="feed-item thought" data-open="what-it-isnt">
               <div className="feed-row"><span className="feed-title">What it isn't</span></div>
             </li>
 
@@ -506,19 +506,19 @@ export default function Site({ changelog }: { changelog: string[] }) {
               <div className="feed-row"><span className="feed-title">Prisms</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="youalwaysknow">
+            <li className="feed-item thought" data-open="you-already-know">
               <div className="feed-row"><span className="feed-title">You already know</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="anti-expert">
+            <li className="feed-item thought" data-open="the-anti-expert">
               <div className="feed-row"><span className="feed-title">The anti-expert</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="magik">
+            <li className="feed-item thought" data-open="magic-is-earned">
               <div className="feed-row"><span className="feed-title">Magic is earned</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="miles">
+            <li className="feed-item thought" data-open="the-leap">
               <div className="feed-row"><span className="feed-title">The leap</span></div>
             </li>
 
@@ -534,16 +534,16 @@ export default function Site({ changelog }: { changelog: string[] }) {
 
             <li className="feed-section">Other</li>
 
-            <li className="feed-item thought" data-open="murmur">
+            <li className="feed-item thought" data-open="themes">
               <div className="feed-row"><span className="feed-title">Themes</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="residue">
+            <li className="feed-item thought" data-open="dreams">
               <div className="feed-row"><span className="feed-title">Dreams</span></div>
             </li>
 
-            <li className="feed-item thought" data-open="changelog">
-              <div className="feed-row"><span className="feed-title">Changelog</span></div>
+            <li className="feed-item thought" data-open="promptlog">
+              <div className="feed-row"><span className="feed-title">Promptlog</span></div>
             </li>
           </ul>
         </main>
@@ -587,7 +587,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── A HOUSE IS NOT A HOME ─── */}
-      <div className="article" id="house">
+      <div className="article" id="a-house-is-not-a-home">
         <div className="article-nav">
           <button className="back-btn" data-close><span>Back</span></button>
         </div>
@@ -631,7 +631,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── SHARED EXCITEMENT ─── */}
-      <div className="article" id="sharingexcitement">
+      <div className="article" id="shared-excitement">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">Shared excitement</h1>
@@ -640,7 +640,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── WHAT IT ISN'T ─── */}
-      <div className="article" id="whatitisnt">
+      <div className="article" id="what-it-isnt">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">What it isn't</h1>
@@ -658,7 +658,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── THE ANTI-EXPERT ─── */}
-      <div className="article" id="anti-expert">
+      <div className="article" id="the-anti-expert">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">The anti-expert</h1>
@@ -667,7 +667,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── THE LEAP ─── */}
-      <div className="article" id="miles">
+      <div className="article" id="the-leap">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">The leap</h1>
@@ -676,7 +676,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── YOU ALREADY KNOW ─── */}
-      <div className="article" id="youalwaysknow">
+      <div className="article" id="you-already-know">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">You already know</h1>
@@ -685,7 +685,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── PROMPTING PEOPLE ─── */}
-      <div className="article" id="lastquestions">
+      <div className="article" id="prompting-people">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">Prompting People</h1>
@@ -697,7 +697,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── DEBUT SOLO ALBUM ─── */}
-      <div className="article" id="debutalbum">
+      <div className="article" id="album-01_wip-unmixed">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">album-01_wip-unmixed</h1>
@@ -785,22 +785,22 @@ export default function Site({ changelog }: { changelog: string[] }) {
         </div>
       </div>
 
-      {/* ─── CHANGELOG ─── */}
-      <div className="article" id="changelog">
+      {/* ─── PROMPTLOG ─── */}
+      <div className="article" id="promptlog">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
-          <h1 className="article-title">Changelog</h1>
-          <p className="changelog-meta"><span id="changelogWordCount">—</span> words</p>
-          <ol className="changelog-list" id="changelogContent">
+          <h1 className="article-title">Promptlog</h1>
+          <p className="promptlog-meta"><span id="promptlogWordCount">—</span> words</p>
+          <ol className="promptlog-list" id="promptlogContent">
             {changelog.map((entry, i) => (
-              <li key={i} className="changelog-entry"><p>{entry}</p></li>
+              <li key={i} className="promptlog-entry"><p>{entry}</p></li>
             ))}
           </ol>
         </div>
       </div>
 
       {/* ─── DREAMS ─── */}
-      <div className="article" id="residue">
+      <div className="article" id="dreams">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">Dreams</h1>
@@ -838,13 +838,13 @@ export default function Site({ changelog }: { changelog: string[] }) {
       </div>
 
       {/* ─── MURMUR (THEMES) ─── */}
-      <div className="article" id="murmur">
+      <div className="article" id="themes">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="murmur-field" id="murmurField"></div>
       </div>
 
       {/* ─── MAGIC IS EARNED ─── */}
-      <div className="article" id="magik">
+      <div className="article" id="magic-is-earned">
         <div className="article-nav"><button className="back-btn" data-close><span>Back</span></button></div>
         <div className="article-body">
           <h1 className="article-title">Magic is earned</h1>
