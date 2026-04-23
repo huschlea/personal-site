@@ -594,13 +594,11 @@ export default function Site({ changelog }: { changelog: string[] }) {
         <h1 className="article-title house-strip-title">A house is not a&nbsp;home</h1>
         <div className="house-strip-body" id="houseStripBody">
           <div className="house-strip">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
-              <picture key={n}>
-                <source type="image/avif" srcSet={`/optimized/house${n}-800.avif 800w, /optimized/house${n}-1600.avif 1600w, /optimized/house${n}-2500.avif 2500w`} sizes="143vh" />
-                <source type="image/webp" srcSet={`/optimized/house${n}-800.webp 800w, /optimized/house${n}-1600.webp 1600w, /optimized/house${n}-2500.webp 2500w`} sizes="143vh" />
-                <img src={`/house${n}.jpeg`} alt="" width={2500} height={1750} loading="lazy" decoding="async" />
-              </picture>
-            ))}
+            <picture>
+              <source type="image/avif" srcSet="/optimized/house-strip-4500.avif 4500w, /optimized/house-strip-9000.avif 9000w, /optimized/house-strip-16500.avif 16500w" sizes="(max-width: 640px) 1131vw, 817vh" />
+              <source type="image/webp" srcSet="/optimized/house-strip-4500.webp 4500w, /optimized/house-strip-9000.webp 9000w, /optimized/house-strip-16000.webp 16000w" sizes="(max-width: 640px) 1131vw, 817vh" />
+              <img src="/house-strip.jpg" alt="A house is not a home" width={27500} height={1750} loading="eager" decoding="async" />
+            </picture>
           </div>
         </div>
         <div className="house-swipe-hint" id="houseSwipeHint">

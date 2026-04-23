@@ -702,6 +702,12 @@ body::after {
   line-height: 0;
 }
 
+.house-strip picture {
+  display: block;
+  height: 100%;
+  flex-shrink: 0;
+}
+
 .house-swipe-hint {
   display: flex;
   justify-content: center;
