@@ -234,13 +234,14 @@ export default function Site({ changelog }: { changelog: string[] }) {
 
       setTimeout(() => {
         if (token !== showFeedToken) return;
+        // Unlock feed first so it contributes its full height to the document,
+        // then restore scroll, then drop the article from layout. All three
+        // happen in the same tick — the browser paints once, at the end.
+        unlockPanel(feedPage);
+        window.scrollTo(0, scrollY || 0);
         document.querySelectorAll(".article").forEach((a) => {
           a.classList.remove("in", "entering");
         });
-        // Restore document scroll *before* removing the fixed lock so the feed
-        // snaps back into flow already at the right position.
-        window.scrollTo(0, scrollY || 0);
-        unlockPanel(feedPage);
       }, TRANSITION_MS);
     }
 
