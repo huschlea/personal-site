@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Tab = "home" | "work" | "music" | "observations" | "changelog";
+export type Tab = "home" | "work" | "music" | "observations" | "changelog";
 
-const TAB_HASHES: Record<string, Tab> = {
+const PATH_TO_TAB: Record<string, Tab> = {
   "": "home",
   "home": "home",
   "work": "work",
@@ -14,20 +14,25 @@ const TAB_HASHES: Record<string, Tab> = {
   "promptlog": "changelog",
 };
 
-export default function Site({ changelog }: { changelog: string[] }) {
-  const [tab, setTab] = useState<Tab>("home");
+export default function Site({ changelog, initialTab = "home" }: { changelog: string[]; initialTab?: Tab }) {
+  const [tab, setTab] = useState<Tab>(initialTab);
   const mountedRef = useRef(false);
 
-  // Hash-based tab routing
+  // Path-based tab routing (with legacy hash fallback)
   useEffect(() => {
-    const readHash = () => {
-      const raw = window.location.hash.slice(1).toLowerCase();
-      const next = TAB_HASHES[raw];
+    const hash = window.location.hash.slice(1).toLowerCase();
+    if (hash && PATH_TO_TAB[hash]) {
+      const target = PATH_TO_TAB[hash];
+      setTab(target);
+      history.replaceState(null, "", target === "home" ? "/" : `/${target}`);
+    }
+    const readPath = () => {
+      const segment = window.location.pathname.toLowerCase().replace(/^\/+|\/+$/g, "");
+      const next = PATH_TO_TAB[segment];
       if (next) setTab(next);
     };
-    readHash();
-    window.addEventListener("hashchange", readHash);
-    return () => window.removeEventListener("hashchange", readHash);
+    window.addEventListener("popstate", readPath);
+    return () => window.removeEventListener("popstate", readPath);
   }, []);
 
   useEffect(() => {
@@ -35,14 +40,10 @@ export default function Site({ changelog }: { changelog: string[] }) {
       mountedRef.current = true;
       return;
     }
-    const currentHash = window.location.hash.slice(1).toLowerCase();
-    const desiredHash = tab === "home" ? "" : tab;
-    if (currentHash !== desiredHash) {
-      if (tab === "home") {
-        history.pushState(null, "", window.location.pathname + window.location.search);
-      } else {
-        history.pushState(null, "", `#${tab}`);
-      }
+    const currentPath = window.location.pathname.toLowerCase().replace(/\/+$/, "") || "/";
+    const desiredPath = tab === "home" ? "/" : `/${tab}`;
+    if (currentPath !== desiredPath) {
+      history.pushState(null, "", desiredPath);
     }
     window.scrollTo({ top: 0 });
   }, [tab]);
@@ -162,11 +163,39 @@ export default function Site({ changelog }: { changelog: string[] }) {
       {/* ─── MUSIC ─── */}
       {tab === "music" && (
         <section className="v2-panel v2-panel-music">
-          <div className="v2-section">
-            <h2 className="v2-section-title">album-01_wip-unmixed</h2>
-            <p className="v2-section-body v2-release-links">
-              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">Listen to the work in progress →</a>
-            </p>
+          <div className="v2-section v2-music-release">
+            <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-cover v2-cover-placeholder" aria-label="album-01_wip-unmixed">
+              <svg className="v2-cover-placeholder-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" aria-hidden="true">
+                <circle cx="50" cy="50" r="45" fill="currentColor" fillOpacity="0.05" stroke="none" />
+                <circle cx="50" cy="50" r="45" strokeOpacity="0.14" strokeWidth="0.4" />
+                <circle cx="50" cy="50" r="43.5" strokeOpacity="0.035" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="42" strokeOpacity="0.03" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="40.4" strokeOpacity="0.05" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="38.8" strokeOpacity="0.03" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="37.2" strokeOpacity="0.055" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="35.4" strokeOpacity="0.035" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="33.6" strokeOpacity="0.055" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="31.8" strokeOpacity="0.03" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="30" strokeOpacity="0.05" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="28.2" strokeOpacity="0.03" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="26.4" strokeOpacity="0.055" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="24.6" strokeOpacity="0.035" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="22.8" strokeOpacity="0.055" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="21" strokeOpacity="0.03" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="19.3" strokeOpacity="0.05" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="17.7" strokeOpacity="0.035" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="16.3" strokeOpacity="0.12" strokeWidth="0.3" />
+                <circle cx="50" cy="50" r="15.2" strokeOpacity="0.04" strokeWidth="0.2" />
+                <circle cx="50" cy="50" r="7.2" strokeOpacity="0.07" strokeWidth="0.25" />
+                <circle cx="50" cy="50" r="1.1" fill="currentColor" fillOpacity="0.25" stroke="none" />
+              </svg>
+            </a>
+            <div className="v2-music-info">
+              <h2 className="v2-section-title">album-01_wip-unmixed</h2>
+              <p className="v2-section-body v2-release-links">
+                <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">Listen to the work in progress →</a>
+              </p>
+            </div>
           </div>
 
           <div className="v2-section v2-music-release">
