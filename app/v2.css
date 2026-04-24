@@ -131,7 +131,10 @@ body:has(.site-v2) {
 .site-v2 .v2-aside {
   color: var(--v2-faded);
   font-size: 0.95em;
-  margin-top: 0.2em !important;
+}
+
+.site-v2 .v2-section-body.v2-aside {
+  margin-top: 1.2em !important;
 }
 
 .site-v2 .v2-placeholder,
@@ -213,6 +216,53 @@ body:has(.site-v2) {
   font-family: var(--v2-mono);
   font-size: 0.88rem;
   letter-spacing: 0.02em;
+}
+
+/* ─── music release (cover + info) ─── */
+
+.site-v2 .v2-music-release {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.site-v2 .v2-cover {
+  flex-shrink: 0;
+  display: block;
+  width: 240px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  line-height: 0;
+  border: 1px solid rgba(20, 18, 16, 0.09);
+}
+
+.site-v2 .v2-cover img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.site-v2 .v2-music-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.site-v2 .v2-music-release .v2-section-title {
+  margin-bottom: 0.5rem;
+}
+
+.site-v2 .v2-music-release .v2-release-links {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 480px) {
+  .site-v2 .v2-music-release {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+  .site-v2 .v2-cover { width: 100%; max-width: 320px; }
 }
 
 .site-v2 .v2-section-title {

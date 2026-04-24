@@ -103,8 +103,8 @@ export default function Site({ changelog }: { changelog: string[] }) {
             <p>
               Lately I&apos;ve been building{" "}
               <a href="#work" className="v2-link">Prompting People</a>, designing for{" "}
-              <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, and recording my{" "}
-              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">debut solo album</a>.
+              <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, and recording{" "}
+              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>.
             </p>
             <p>
               I grew up in Snoqualmie, WA and currently live in Long Beach, CA.
@@ -169,22 +169,40 @@ export default function Site({ changelog }: { changelog: string[] }) {
             </p>
           </div>
 
-          <div className="v2-section">
-            <h2 className="v2-section-title">Lyla Minor — EP</h2>
-            <p className="v2-section-body v2-release-links">
-              <a href="https://music.apple.com/us/album/lyla-minor-ep/1754043528" target="_blank" rel="noopener" className="v2-link">Apple Music</a>
-              <span className="v2-footer-sep"> / </span>
-              <a href="https://open.spotify.com/album/24py69B0xZhT1V27lXv8us" target="_blank" rel="noopener" className="v2-link">Spotify</a>
-            </p>
+          <div className="v2-section v2-music-release">
+            <a href="https://music.apple.com/us/album/lyla-minor-ep/1754043528" target="_blank" rel="noopener" className="v2-cover">
+              <picture>
+                <source type="image/avif" srcSet="/optimized/cover-lyla-minor-400.avif 400w, /optimized/cover-lyla-minor-800.avif 800w, /optimized/cover-lyla-minor-1600.avif 1600w" sizes="(max-width: 480px) 320px, 240px" />
+                <source type="image/webp" srcSet="/optimized/cover-lyla-minor-400.webp 400w, /optimized/cover-lyla-minor-800.webp 800w, /optimized/cover-lyla-minor-1600.webp 1600w" sizes="(max-width: 480px) 320px, 240px" />
+                <img className="v2-img" src="/cover-lyla-minor.jpg" alt="Lyla Minor EP cover" width={1200} height={1200} loading="lazy" decoding="async" />
+              </picture>
+            </a>
+            <div className="v2-music-info">
+              <h2 className="v2-section-title">Lyla Minor — EP</h2>
+              <p className="v2-section-body v2-release-links">
+                <a href="https://music.apple.com/us/album/lyla-minor-ep/1754043528" target="_blank" rel="noopener" className="v2-link">Apple Music</a>
+                <span className="v2-footer-sep"> / </span>
+                <a href="https://open.spotify.com/album/24py69B0xZhT1V27lXv8us" target="_blank" rel="noopener" className="v2-link">Spotify</a>
+              </p>
+            </div>
           </div>
 
-          <div className="v2-section">
-            <h2 className="v2-section-title">Intermezzos Vol. 1 — EP</h2>
-            <p className="v2-section-body v2-release-links">
-              <a href="https://music.apple.com/us/album/intermezzos-vol-1-ep/1754047264" target="_blank" rel="noopener" className="v2-link">Apple Music</a>
-              <span className="v2-footer-sep"> / </span>
-              <a href="https://open.spotify.com/album/0BDZT0rTYIAtGlzGr10YDl" target="_blank" rel="noopener" className="v2-link">Spotify</a>
-            </p>
+          <div className="v2-section v2-music-release">
+            <a href="https://music.apple.com/us/album/intermezzos-vol-1-ep/1754047264" target="_blank" rel="noopener" className="v2-cover">
+              <picture>
+                <source type="image/avif" srcSet="/optimized/cover-intermezzos-400.avif 400w, /optimized/cover-intermezzos-800.avif 800w, /optimized/cover-intermezzos-1600.avif 1600w" sizes="(max-width: 480px) 320px, 240px" />
+                <source type="image/webp" srcSet="/optimized/cover-intermezzos-400.webp 400w, /optimized/cover-intermezzos-800.webp 800w, /optimized/cover-intermezzos-1600.webp 1600w" sizes="(max-width: 480px) 320px, 240px" />
+                <img className="v2-img" src="/cover-intermezzos.jpg" alt="Intermezzos Vol. 1 EP cover" width={1200} height={1200} loading="lazy" decoding="async" />
+              </picture>
+            </a>
+            <div className="v2-music-info">
+              <h2 className="v2-section-title">Intermezzos Vol. 1 — EP</h2>
+              <p className="v2-section-body v2-release-links">
+                <a href="https://music.apple.com/us/album/intermezzos-vol-1-ep/1754047264" target="_blank" rel="noopener" className="v2-link">Apple Music</a>
+                <span className="v2-footer-sep"> / </span>
+                <a href="https://open.spotify.com/album/0BDZT0rTYIAtGlzGr10YDl" target="_blank" rel="noopener" className="v2-link">Spotify</a>
+              </p>
+            </div>
           </div>
         </section>
       )}
