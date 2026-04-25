@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ResponseJournalSandbox } from "../components/ResponseJournalSandbox";
 
 export type Tab = "home" | "work" | "music" | "observations" | "changelog";
 
@@ -160,6 +161,9 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <p className="v2-section-body v2-aside">
               In the final stages of development.
             </p>
+            <div style={{ marginTop: "clamp(1.5rem, 3vw, 2rem)" }}>
+              <ResponseJournalSandbox />
+            </div>
           </div>
 
           <div className="v2-section">

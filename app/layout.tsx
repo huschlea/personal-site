@@ -36,6 +36,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${bigShoulders.variable} ${spectral.variable} ${novaMono.variable}`}>
+      <head>
+        {/* Geist / Geist Mono / Newsreader — used by the Prompting People sandbox component.
+            Loaded via Google Fonts <link> (not next/font) so the literal family-names resolve
+            inside the component's inline <style> block. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
