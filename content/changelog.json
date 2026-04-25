@@ -635,5 +635,7 @@
   "Seems like we keep getting hung up on the same thing. Are you stuck? Do we need to rethink the approach for this? It doesn't seem like that hard of a request.",
   "So the rectangle's gone, but now there is no sort of middle gradient circle. It's just the floating particles around.",
   "[Image #3]",
-  "Okay, let's push these changes live and see how it looks."
+  "Okay, let's push these changes live and see how it looks.",
+  "It's not performing as smoothly as it should on mobile, specifically the part where there's a sort of digital flash animation that makes the image go black and white and then color again. I can't even see some of that on mobile, but it's definitely not smooth. We need to make sure this is as performant as it possibly can be across all breakpoints and all devices that view it. I don't want it to look, sometimes with animations like this, like when you're scrolling while it's animating, it almost looks a little glitchy. I want it to look as smooth as possible.",
+  "push changes"
 ]

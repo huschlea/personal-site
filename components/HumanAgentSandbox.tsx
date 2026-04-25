@@ -23,7 +23,20 @@ const DOMAIN_RGB: ReadonlyArray<readonly [number, number, number]> = [
 const DOMAIN_NAMES = ['Ideas', 'Relational', 'Action', 'Order'] as const
 
 // ============ ANIMATION CONSTANTS (verbatim from live) ============
-const PARTICLE_COUNT = 700
+// Particle count scales down on touch / narrow viewports so the canvas
+// stays smooth on mobile GPUs. Desktop keeps the original 700.
+const PARTICLE_COUNT_DESKTOP = 700
+const PARTICLE_COUNT_MOBILE = 400
+function getParticleCount() {
+  if (typeof window === 'undefined') return PARTICLE_COUNT_DESKTOP
+  const isCoarse = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+  const isNarrow = window.innerWidth < 700
+  return isCoarse || isNarrow ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP
+}
+// Capping DPR at 2 prevents the canvas backing buffer from ballooning to
+// 3x or 4x on high-DPR phones — particles are soft enough that 2x is
+// indistinguishable from 3x but ~2x cheaper to clear/redraw per frame.
+const MAX_DPR = 2
 
 const SPRING_STIFFNESS = 0.02
 const SPRING_DAMPING = 0.84
@@ -56,6 +69,7 @@ interface Particle {
   baseAngle: number
   orbitSpeed: number
   settled: boolean
+  fill: string
 }
 
 type AnimPhase = 'chaos' | 'organize' | 'swarm' | 'ambient'
@@ -162,9 +176,9 @@ const STYLES = `
 .ha-scan {
   position: absolute;
   left: 0;
+  top: 0;
   width: 100%;
   height: 3px;
-  top: -10%;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -175,10 +189,15 @@ const STYLES = `
   );
   box-shadow: 0 0 8px 2px rgba(96, 165, 250, 0.4);
   border-radius: 2px;
-  transition: top 0.8s ease-in-out;
+  /* GPU-accelerated translate (no layout) instead of animating top. */
+  transform: translate3d(0, calc(var(--ha-inner, 0px) * -0.1 - 3px), 0);
+  transition: transform 0.8s ease-in-out;
   pointer-events: none;
+  will-change: transform;
 }
-.ha-avatar-ring[data-hover="true"] .ha-scan { top: 110%; }
+.ha-avatar-ring[data-hover="true"] .ha-scan {
+  transform: translate3d(0, calc(var(--ha-inner, 0px) * 1.1), 0);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .ha-avatar-wrap,
@@ -233,8 +252,9 @@ function computeLayout(w: number, h: number): VizLayout {
 function initParticles(w: number, h: number): Particle[] {
   const lo = computeLayout(w, h)
   const particles: Particle[] = []
+  const count = getParticleCount()
 
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
+  for (let i = 0; i < count; i++) {
     const di = i % 4
     const c = lo.clusters[di]
 
@@ -244,6 +264,9 @@ function initParticles(w: number, h: number): Particle[] {
     const ta = rand(0, Math.PI * 2)
     const td = Math.pow(Math.random(), 0.5) * lo.clusterR
 
+    const opacity = rand(0.35, 0.75)
+    const [r, g, bb] = DOMAIN_RGB[di]
+
     particles.push({
       x: lo.center.x + Math.cos(sa) * sd,
       y: lo.center.y + Math.sin(sa) * sd,
@@ -252,7 +275,7 @@ function initParticles(w: number, h: number): Particle[] {
       vx: rand(-0.3, 0.3),
       vy: rand(-0.3, 0.3),
       radius: rand(1.5, 3),
-      opacity: rand(0.35, 0.75),
+      opacity,
       domainIndex: di,
       delay: di * 300 + rand(0, 450),
       phaseOffset: rand(0, Math.PI * 2),
@@ -260,6 +283,7 @@ function initParticles(w: number, h: number): Particle[] {
       baseAngle: 0,
       orbitSpeed: rand(0.85, 1.15),
       settled: false,
+      fill: `rgba(${r},${g},${bb},${opacity.toFixed(2)})`,
     })
   }
 
@@ -318,6 +342,9 @@ export function HumanAgentSandbox() {
   const ambientStartRef = useRef(0)
   const avatarLoadedRef = useRef(false)
   const hasAutoPlayedRef = useRef(false)
+  // True while the user is actively scrolling on a touch device — used to
+  // pause the canvas loop so it doesn't fight the scroll thread for paint.
+  const scrollingRef = useRef(false)
 
   const [showLabels, setShowLabels] = useState(false)
   const [showAvatar, setShowAvatar] = useState(false)
@@ -334,6 +361,28 @@ export function HumanAgentSandbox() {
     img.onload = () => {
       avatarLoadedRef.current = true
       setAvatarReady(true)
+    }
+  }, [])
+
+  // Pause the canvas loop while the user is actively scrolling on touch
+  // devices. The 700-particle redraw competes with scroll for the main
+  // thread on mobile and produces visible jank. Skipping draws for the
+  // duration of the scroll keeps scrolling smooth; the loop resumes ~180ms
+  // after the last scroll event.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const isCoarse = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    if (!isCoarse) return
+    let timeout: ReturnType<typeof setTimeout> | null = null
+    const onScroll = () => {
+      scrollingRef.current = true
+      if (timeout) clearTimeout(timeout)
+      timeout = setTimeout(() => { scrollingRef.current = false }, 180)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (timeout) clearTimeout(timeout)
     }
   }, [])
 
@@ -433,7 +482,7 @@ export function HumanAgentSandbox() {
 
     const resize = () => {
       const rect = section.getBoundingClientRect()
-      const dpr = window.devicePixelRatio || 1
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR)
       canvas.width = rect.width * dpr
       canvas.height = rect.height * dpr
       canvas.style.width = `${rect.width}px`
@@ -484,11 +533,12 @@ export function HumanAgentSandbox() {
       if (!running) return
       animRef.current = requestAnimationFrame(tick)
       if (!isVisibleRef.current) return
+      if (scrollingRef.current) return
 
       const lo = layoutRef.current
       if (!lo) return
 
-      const dpr = window.devicePixelRatio || 1
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR)
       const w = canvas.width / dpr
       const h = canvas.height / dpr
       const particles = particlesRef.current
@@ -590,10 +640,9 @@ export function HumanAgentSandbox() {
           p.y = lo.center.y + Math.sin(angle) * r
         }
 
-        const [r, g, b] = DOMAIN_RGB[p.domainIndex]
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.opacity})`
+        ctx.fillStyle = p.fill
         ctx.fill()
       }
 
@@ -619,6 +668,7 @@ export function HumanAgentSandbox() {
 
   const ringSize = layout ? layout.ringRadius * 1.5 : 0
   const ringPad = layout ? Math.max(4, layout.ringRadius * 0.055) : 0
+  const innerSize = ringSize - ringPad * 2
 
   return (
     <>
@@ -644,7 +694,10 @@ export function HumanAgentSandbox() {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <div className="ha-avatar-inner">
+              <div
+                className="ha-avatar-inner"
+                style={{ ['--ha-inner' as string]: `${innerSize}px` }}
+              >
                 <img
                   src={AVATAR_SRC}
                   alt=""
