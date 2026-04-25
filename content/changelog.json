@@ -588,5 +588,22 @@
   "okay maybe give it a little space away from the edges, andthe lines need to be more subtle",
   "okay and there should be a super subtle background on the whole record shape so it stands out a bit from the square behind it",
   "beuaituflk, and now one more changes. I want the url's to be just the pages they represent, for instance, right now Work is /#work. I don't want the hashtag",
-  "okay push changes"
+  "okay push changes",
+  "the Prompting People text in the homepage isn't linking properly to the work page",
+  "the albums on the music page need to specifiy who each project is by. the EP's are by Lyla Minor",
+  "Alden Huschle",
+  "add a tiny bit more spacing between the album title and the artist name",
+  "make it not italicized",
+  "okayv same goes for the labels beneath the items on the work page",
+  "let's add an extremely subtle line separating the nav from the content beneath",
+  "okay and I'm liking how on desktop there's more vertical spcaing between the line and the content beneath than there is between the line and the nav items. it seems like we lose that on mobile breakpoints, the content looks too close to the nav",
+  "does it hold true for music page? On mobile I want the top of the album cover to be in line with there the text is on other pages",
+  "feels like it's still starting a bit hgher than the text on other pages",
+  "it's still not equivalent. don't make me guess, figure it out and make it equivalent",
+  "kill all active rev servers and reboot on 3000",
+  "1",
+  "okay next let's add a tiny bit more horixontal spacing between the nav elements",
+  "split the difference",
+  "okay and let's explore different options for the color we're using as the accent to seaprate hyperlinks. I do like the red for it's legbility, but interested to see what other options we could go with",
+  "okay let's stay with the current, remove the accent page"
 ]

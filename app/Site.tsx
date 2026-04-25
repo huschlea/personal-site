@@ -103,7 +103,14 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
           <div className="v2-prose">
             <p>
               Lately I&apos;ve been building{" "}
-              <a href="#work" className="v2-link">Prompting People</a>, designing for{" "}
+              <a
+                href="/work"
+                className="v2-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTab("work");
+                }}
+              >Prompting People</a>, designing for{" "}
               <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, and recording{" "}
               <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>.
             </p>
@@ -192,6 +199,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             </a>
             <div className="v2-music-info">
               <h2 className="v2-section-title">album-01_wip-unmixed</h2>
+              <p className="v2-section-kicker">Alden Huschle</p>
               <p className="v2-section-body v2-release-links">
                 <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">Listen to the work in progress →</a>
               </p>
@@ -208,6 +216,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             </a>
             <div className="v2-music-info">
               <h2 className="v2-section-title">Lyla Minor — EP</h2>
+              <p className="v2-section-kicker">Lyla Minor</p>
               <p className="v2-section-body v2-release-links">
                 <a href="https://music.apple.com/us/album/lyla-minor-ep/1754043528" target="_blank" rel="noopener" className="v2-link">Apple Music</a>
                 <span className="v2-footer-sep"> / </span>
@@ -226,6 +235,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             </a>
             <div className="v2-music-info">
               <h2 className="v2-section-title">Intermezzos Vol. 1 — EP</h2>
+              <p className="v2-section-kicker">Lyla Minor</p>
               <p className="v2-section-body v2-release-links">
                 <a href="https://music.apple.com/us/album/intermezzos-vol-1-ep/1754047264" target="_blank" rel="noopener" className="v2-link">Apple Music</a>
                 <span className="v2-footer-sep"> / </span>
