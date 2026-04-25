@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ResponseJournalSandbox } from "../components/ResponseJournalSandbox";
+import { HumanAgentSandbox } from "../components/HumanAgentSandbox";
 
 export type Tab = "home" | "work" | "music" | "observations" | "changelog";
 
@@ -175,6 +176,9 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <p className="v2-section-body v2-release-links">
               <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">Live at wethos.ai →</a>
             </p>
+            <div style={{ marginTop: "clamp(0.5rem, 1.2vw, 1rem)" }}>
+              <HumanAgentSandbox />
+            </div>
           </div>
         </section>
       )}
