@@ -111,8 +111,16 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
                   setTab("work");
                 }}
               >Prompting People</a>, designing for{" "}
-              <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, and recording{" "}
-              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>.
+              <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, recording{" "}
+              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>, and{" "}
+              <a
+                href="/observations"
+                className="v2-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTab("observations");
+                }}
+              >observing things</a> along the way.
             </p>
             <p>
               I grew up in Snoqualmie, WA and currently live in Long Beach, CA.
@@ -174,7 +182,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-cover v2-cover-placeholder" aria-label="album-01_wip-unmixed">
               <svg className="v2-cover-placeholder-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" aria-hidden="true">
                 <circle cx="50" cy="50" r="45" fill="currentColor" fillOpacity="0.05" stroke="none" />
-                <circle cx="50" cy="50" r="45" strokeOpacity="0.14" strokeWidth="0.4" />
+                <circle cx="50" cy="50" r="45" strokeOpacity="0.11" strokeWidth="0.35" />
                 <circle cx="50" cy="50" r="43.5" strokeOpacity="0.035" strokeWidth="0.25" />
                 <circle cx="50" cy="50" r="42" strokeOpacity="0.03" strokeWidth="0.25" />
                 <circle cx="50" cy="50" r="40.4" strokeOpacity="0.05" strokeWidth="0.25" />
@@ -191,7 +199,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
                 <circle cx="50" cy="50" r="21" strokeOpacity="0.03" strokeWidth="0.25" />
                 <circle cx="50" cy="50" r="19.3" strokeOpacity="0.05" strokeWidth="0.25" />
                 <circle cx="50" cy="50" r="17.7" strokeOpacity="0.035" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="16.3" strokeOpacity="0.12" strokeWidth="0.3" />
+                <circle cx="50" cy="50" r="16.3" strokeOpacity="0.095" strokeWidth="0.275" />
                 <circle cx="50" cy="50" r="15.2" strokeOpacity="0.04" strokeWidth="0.2" />
                 <circle cx="50" cy="50" r="7.2" strokeOpacity="0.07" strokeWidth="0.25" />
                 <circle cx="50" cy="50" r="1.1" fill="currentColor" fillOpacity="0.25" stroke="none" />
