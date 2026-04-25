@@ -140,6 +140,9 @@ const STYLES = `
   color: ${COLOR_SOFT};
   opacity: 1;
 }
+@media (hover: none) and (pointer: coarse) {
+  .rjs-textarea { font-size: 16px; }
+}
 .rjs-meta-line {
   margin-top: 16px;
   font-family: ${FONT_SANS};

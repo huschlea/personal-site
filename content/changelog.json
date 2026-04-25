@@ -618,5 +618,7 @@
   "we need to remove the edit, delete, public row from the component, and also remove the background shape that it's sitting on. I want it to sit directly on the sirte background",
   "change the word counter to a character counter",
   "needs to have a 800 character max and reflect that in the counter",
+  "push changes",
+  "when I view the journal component in browser on my phone and I click into it to type, the whole screen zooms in. I don't want this to happen I want it to stay in place",
   "push changes"
 ]
