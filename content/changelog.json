@@ -620,5 +620,10 @@
   "needs to have a 800 character max and reflect that in the counter",
   "push changes",
   "when I view the journal component in browser on my phone and I click into it to type, the whole screen zooms in. I don't want this to happen I want it to stay in place",
-  "push changes"
+  "push changes",
+  "instead of placeholder text there, let's jsut have a flashing cursor and people can type if they want",
+  "okay and then we need to increase the size of the serif prompt font. it's awkwardly small on desktop and mobile. Make sure if it it's two lins on mobile it's never an orphan line and has sleek line height spacing",
+  "reduce size by 25%",
+  "I mean't reduce it by 25% of the larger one you just had. In other words, it was almost perfect but it was slightly too big",
+  "cool push changes"
 ]

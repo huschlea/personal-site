@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 const PROMPT_NUMBER = 1
 const QUESTION = 'What do you protect that no one asked you to?'
-const PLACEHOLDER = 'Take your time. Say what you actually notice.'
 const MAX_CHARS = 800
 
 const FONT_SANS = "'Geist', system-ui, -apple-system, sans-serif"
@@ -86,12 +85,16 @@ const STYLES = `
   color: ${COLOR_SOFT};
 }
 .rjs-question {
-  margin-top: 6px;
+  margin-top: 8px;
   font-family: ${FONT_SERIF};
   font-style: italic;
-  font-size: 14px;
-  line-height: 1.375;
+  font-size: 15.5px;
+  line-height: 1.3;
   color: ${COLOR_LOUD};
+  text-wrap: balance;
+}
+@media (min-width: 640px) {
+  .rjs-question { font-size: 17.5px; line-height: 1.28; }
 }
 .rjs-body-scroll {
   flex: 1 1 0%;
@@ -122,26 +125,46 @@ const STYLES = `
 @media (min-width: 640px) {
   .rjs-body-inner { padding: 16px 24px; }
 }
+.rjs-textarea-wrap {
+  position: relative;
+  flex: 1 1 0%;
+  display: flex;
+  min-height: 120px;
+  font-size: 14px;
+  line-height: 1.85;
+}
 .rjs-textarea {
   flex: 1 1 0%;
   width: 100%;
-  min-height: 120px;
   background: transparent;
   border: 0;
   outline: none;
   resize: none;
   font-family: ${FONT_SANS};
-  font-size: 14px;
-  line-height: 1.85;
+  font-size: inherit;
+  line-height: inherit;
   color: ${COLOR_FG_80};
   padding: 0;
 }
-.rjs-textarea::placeholder {
-  color: ${COLOR_SOFT};
-  opacity: 1;
+.rjs-cursor {
+  position: absolute;
+  top: calc((1em * 1.85 - 1.1em) / 2);
+  left: 0;
+  width: 1px;
+  height: 1.1em;
+  background: ${COLOR_FG_80};
+  pointer-events: none;
+  animation: rjs-cursor-blink 1.06s steps(2, jump-none) infinite;
+}
+.rjs-textarea-wrap:focus-within .rjs-cursor {
+  display: none;
+}
+@keyframes rjs-cursor-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
 }
 @media (hover: none) and (pointer: coarse) {
-  .rjs-textarea { font-size: 16px; }
+  .rjs-textarea-wrap { font-size: 16px; }
 }
 .rjs-meta-line {
   margin-top: 16px;
@@ -215,14 +238,16 @@ export function ResponseJournalSandbox() {
 
           <div className="rjs-body-scroll">
             <div className="rjs-body-inner">
-              <textarea
-                className="rjs-textarea"
-                value={body}
-                onChange={(e) => setBody(e.target.value.slice(0, MAX_CHARS))}
-                placeholder={PLACEHOLDER}
-                maxLength={MAX_CHARS}
-                aria-label="Write your response"
-              />
+              <div className="rjs-textarea-wrap">
+                <textarea
+                  className="rjs-textarea"
+                  value={body}
+                  onChange={(e) => setBody(e.target.value.slice(0, MAX_CHARS))}
+                  maxLength={MAX_CHARS}
+                  aria-label="Write your response"
+                />
+                {body.length === 0 && <span className="rjs-cursor" aria-hidden="true" />}
+              </div>
               <p className="rjs-meta-line">
                 {charCount} / {MAX_CHARS} characters · public
               </p>
