@@ -210,10 +210,11 @@ const STYLES = `
   top: 110%;
 }
 
-/* Touch devices: top transitions don't commit to the compositor on
-   iOS Safari for this clipped element, so the scan goes invisible.
-   Override with keyframe animations gated by data-scanned (so the
-   return sweep doesn't fire on initial mount). */
+/* Touch devices: neither top transitions nor filter transitions
+   commit to the compositor reliably on iOS Safari for these elements,
+   so they snap or go invisible. Override with keyframe animations
+   gated by data-scanned (so the return animations don't fire on
+   initial mount). */
 @media (hover: none) and (pointer: coarse) {
   .ha-scan {
     transition: none;
@@ -231,6 +232,24 @@ const STYLES = `
   @keyframes ha-scan-up {
     0%   { top: 110%; }
     100% { top: -10%; }
+  }
+
+  .ha-avatar-img {
+    transition: none;
+  }
+  .ha-avatar-ring[data-hover="true"] .ha-avatar-img {
+    animation: ha-img-desat 0.5s ease forwards;
+  }
+  .ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-avatar-img {
+    animation: ha-img-resat 0.6s ease forwards;
+  }
+  @keyframes ha-img-desat {
+    from { filter: grayscale(0); }
+    to   { filter: grayscale(1); }
+  }
+  @keyframes ha-img-resat {
+    from { filter: grayscale(1); }
+    to   { filter: grayscale(0); }
   }
 }
 
