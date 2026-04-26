@@ -172,15 +172,27 @@ const STYLES = `
   border-radius: 9999px;
   object-fit: cover;
   display: block;
-  /* Identity-valued filter list (not 'none') so Safari can interpolate
-     to the 3-function hover state smoothly instead of snapping. */
   filter: saturate(1) brightness(1) hue-rotate(0deg);
-  transition: filter 0.6s ease 0.3s;
   will-change: filter;
 }
+/* Both filter and scan use keyframe animations rather than transitions —
+   keyframes get committed to the compositor up-front on iOS Safari,
+   which avoids the choppy/snapping behavior of CSS transitions on touch
+   devices. The data-scanned flag gates the un-hover (return) animations
+   so they don't fire on initial mount, only after a scan has played. */
 .ha-avatar-ring[data-hover="true"] .ha-avatar-img {
-  filter: saturate(0.3) brightness(1.15) hue-rotate(10deg);
-  transition: filter 0.3s ease;
+  animation: ha-img-desat 0.4s ease forwards;
+}
+.ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-avatar-img {
+  animation: ha-img-resat 0.6s ease forwards;
+}
+@keyframes ha-img-desat {
+  from { filter: saturate(1) brightness(1) hue-rotate(0deg); }
+  to   { filter: saturate(0.3) brightness(1.15) hue-rotate(10deg); }
+}
+@keyframes ha-img-resat {
+  from { filter: saturate(0.3) brightness(1.15) hue-rotate(10deg); }
+  to   { filter: saturate(1) brightness(1) hue-rotate(0deg); }
 }
 
 .ha-scan {
@@ -202,14 +214,18 @@ const STYLES = `
   pointer-events: none;
 }
 .ha-avatar-ring[data-hover="true"] .ha-scan {
-  /* CSS keyframe animation gets promoted to the compositor up-front by
-     iOS Safari and runs reliably even on touch devices, where inline
-     style transitions on positioning props would silently snap. */
-  animation: ha-scan-sweep 1.4s ease-in-out forwards;
+  animation: ha-scan-down 1.4s ease-in-out forwards;
 }
-@keyframes ha-scan-sweep {
-  0% { top: -10%; }
+.ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-scan {
+  animation: ha-scan-up 1.4s ease-in-out forwards;
+}
+@keyframes ha-scan-down {
+  0%   { top: -10%; }
   100% { top: 110%; }
+}
+@keyframes ha-scan-up {
+  0%   { top: 110%; }
+  100% { top: -10%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -362,6 +378,7 @@ export function HumanAgentSandbox() {
   const [showLabels, setShowLabels] = useState(false)
   const [showAvatar, setShowAvatar] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [hasScanned, setHasScanned] = useState(false)
   const [layout, setLayout] = useState<VizLayout | null>(null)
   const [avatarReady, setAvatarReady] = useState(false)
 
@@ -381,7 +398,10 @@ export function HumanAgentSandbox() {
   useEffect(() => {
     if (!showAvatar || hasAutoPlayedRef.current) return
     hasAutoPlayedRef.current = true
-    const onTimer = setTimeout(() => setIsHovered(true), 900)
+    const onTimer = setTimeout(() => {
+      setIsHovered(true)
+      setHasScanned(true)
+    }, 900)
     const offTimer = setTimeout(() => setIsHovered(false), 2400)
     return () => {
       clearTimeout(onTimer)
@@ -657,9 +677,9 @@ export function HumanAgentSandbox() {
   }, [])
 
   // Avatar sits inside the particle ring with visible breathing room — the
-  // 1.3 factor leaves a clean gap so swarming particles don't visually
+  // 1.25 factor leaves a clean gap so swarming particles don't visually
   // overlap the avatar edge.
-  const ringSize = layout ? layout.ringRadius * 1.3 : 0
+  const ringSize = layout ? layout.ringRadius * 1.25 : 0
   const ringPad = layout ? Math.max(4, layout.ringRadius * 0.055) : 0
 
   return (
@@ -682,8 +702,12 @@ export function HumanAgentSandbox() {
             <div
               className="ha-avatar-ring"
               data-hover={isHovered ? 'true' : 'false'}
+              data-scanned={hasScanned ? 'true' : 'false'}
               style={{ padding: ringPad }}
-              onMouseEnter={() => setIsHovered(true)}
+              onMouseEnter={() => {
+                setIsHovered(true)
+                setHasScanned(true)
+              }}
               onMouseLeave={() => setIsHovered(false)}
             >
               <div className="ha-avatar-inner">
