@@ -637,5 +637,7 @@
   "[Image #3]",
   "Okay, let's push these changes live and see how it looks.",
   "It's not performing as smoothly as it should on mobile, specifically the part where there's a sort of digital flash animation that makes the image go black and white and then color again. I can't even see some of that on mobile, but it's definitely not smooth. We need to make sure this is as performant as it possibly can be across all breakpoints and all devices that view it. I don't want it to look, sometimes with animations like this, like when you're scrolling while it's animating, it almost looks a little glitchy. I want it to look as smooth as possible.",
-  "push changes"
+  "push changes",
+  "Okay, the changes we just made almost seem to make it perform worse on mobile. I don't like how it stops and freezes when I scroll down; that's not what I want. I just don't want it to be glitchy when scrolling. It needs to perform exactly how it does on desktop. It looks great on desktop, so we need to analyze what's going wrong on mobile and make it consistent With desktop being the standard for how it should perform",
+  "Okay, but the scrolling and the freezing was not the only problem. You need to analyze why the animation itself, in its entirety, would be performing worse on mobile. It's glitchy; it's not smooth. The little digital scanner is not even showing up. The images are just flashing from black and white, or the one avatar image is just flashing from black and white to color. It's not like a smooth transition; it looks really bad, and we need to fix that. What is on desktop right now is the standard for how it should work on mobile, and right now they are not the same."
 ]

@@ -26,7 +26,7 @@ const DOMAIN_NAMES = ['Ideas', 'Relational', 'Action', 'Order'] as const
 // Particle count scales down on touch / narrow viewports so the canvas
 // stays smooth on mobile GPUs. Desktop keeps the original 700.
 const PARTICLE_COUNT_DESKTOP = 700
-const PARTICLE_COUNT_MOBILE = 400
+const PARTICLE_COUNT_MOBILE = 300
 function getParticleCount() {
   if (typeof window === 'undefined') return PARTICLE_COUNT_DESKTOP
   const isCoarse = window.matchMedia('(hover: none) and (pointer: coarse)').matches
@@ -98,6 +98,7 @@ const STYLES = `
   position: absolute;
   inset: 0;
   display: block;
+  transform: translateZ(0);
 }
 
 .ha-labels {
@@ -158,6 +159,10 @@ const STYLES = `
   height: 100%;
   border-radius: 9999px;
   overflow: hidden;
+  /* Promote to its own compositor layer so canvas redraws below don't
+     force the avatar/scan to re-rasterize each frame. Critical on mobile. */
+  transform: translateZ(0);
+  will-change: transform;
 }
 .ha-avatar-img {
   width: 100%;
@@ -165,8 +170,11 @@ const STYLES = `
   border-radius: 9999px;
   object-fit: cover;
   display: block;
-  filter: none;
+  /* Identity-valued filter list (not 'none') so Safari can interpolate
+     to the 3-function hover state smoothly instead of snapping. */
+  filter: saturate(1) brightness(1) hue-rotate(0deg);
   transition: filter 0.6s ease 0.3s;
+  will-change: filter;
 }
 .ha-avatar-ring[data-hover="true"] .ha-avatar-img {
   filter: saturate(0.3) brightness(1.15) hue-rotate(10deg);
@@ -178,7 +186,7 @@ const STYLES = `
   left: 0;
   top: 0;
   width: 100%;
-  height: 3px;
+  height: 4px;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -342,9 +350,6 @@ export function HumanAgentSandbox() {
   const ambientStartRef = useRef(0)
   const avatarLoadedRef = useRef(false)
   const hasAutoPlayedRef = useRef(false)
-  // True while the user is actively scrolling on a touch device — used to
-  // pause the canvas loop so it doesn't fight the scroll thread for paint.
-  const scrollingRef = useRef(false)
 
   const [showLabels, setShowLabels] = useState(false)
   const [showAvatar, setShowAvatar] = useState(false)
@@ -361,28 +366,6 @@ export function HumanAgentSandbox() {
     img.onload = () => {
       avatarLoadedRef.current = true
       setAvatarReady(true)
-    }
-  }, [])
-
-  // Pause the canvas loop while the user is actively scrolling on touch
-  // devices. The 700-particle redraw competes with scroll for the main
-  // thread on mobile and produces visible jank. Skipping draws for the
-  // duration of the scroll keeps scrolling smooth; the loop resumes ~180ms
-  // after the last scroll event.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const isCoarse = window.matchMedia('(hover: none) and (pointer: coarse)').matches
-    if (!isCoarse) return
-    let timeout: ReturnType<typeof setTimeout> | null = null
-    const onScroll = () => {
-      scrollingRef.current = true
-      if (timeout) clearTimeout(timeout)
-      timeout = setTimeout(() => { scrollingRef.current = false }, 180)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      if (timeout) clearTimeout(timeout)
     }
   }, [])
 
@@ -533,7 +516,6 @@ export function HumanAgentSandbox() {
       if (!running) return
       animRef.current = requestAnimationFrame(tick)
       if (!isVisibleRef.current) return
-      if (scrollingRef.current) return
 
       const lo = layoutRef.current
       if (!lo) return
