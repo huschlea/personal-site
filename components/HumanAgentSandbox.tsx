@@ -322,7 +322,7 @@ function rand(min: number, max: number) {
 
 function computeLayout(w: number, h: number): VizLayout {
   let visR: number
-  if (w < 640) visR = Math.min(w * 0.78, 380)
+  if (w < 640) visR = Math.min(w * 0.85, 380)
   else if (w < 1024) visR = Math.min(w * 0.42, 360)
   else visR = Math.min(w * 0.26, 320)
 
@@ -337,11 +337,12 @@ function computeLayout(w: number, h: number): VizLayout {
   }
 
   const ringMul = w < 640 ? 0.50 : 0.44
-  // Width safety: ambient particles oscillate to ringR * 1.18 from center.
-  // Clamp visR so even the outermost particles sit inside the canvas with
-  // a horizontal margin — guarantees no clipping at the column edges.
-  const horizMargin = 14
-  const widthLimit = (w / 2 - horizMargin) / (ringMul * 1.18)
+  // Width safety: ambient particles oscillate to roughly ringR * 1.18
+  // from center. Slightly relaxed margins (vs the earlier 14 / 1.18)
+  // let mobile visR push closer to the column edges without affecting
+  // desktop or tablet, where the formula is the limiter anyway.
+  const horizMargin = 8
+  const widthLimit = (w / 2 - horizMargin) / (ringMul * 1.12)
   visR = Math.min(visR, widthLimit)
 
   const ringR = visR * ringMul
