@@ -647,5 +647,6 @@
   "push changes",
   "Okay, the sizing looks good, but the digital scanner effect is still not visible on mobile. I need you to analyze what could possibly be going wrong here, understanding that I can see it clearly on desktop but not on mobile. I'm viewing it in the Safari browser, but it needs to work in any browser. If we can't figure out the fix, then we're just going to have to make it so that effect is not present on mobile. The thing that's confusing to me is that this works for the website that I pulled this from, so we should be able to make it work here.",
   "push",
-  "Okay, we're closer now. I finally see the scanner make its way from the top to the bottom of the avatar, but I don't see it go back up. The transition between the different black and white versions of the image and the color version is super glitchy and it's not smooth. We made progress here, but we're not quite there. Also, the size of this component is still getting cut off ever so slightly at the edges, so we need to reduce the size just a tiny bit, just a little bit."
+  "Okay, we're closer now. I finally see the scanner make its way from the top to the bottom of the avatar, but I don't see it go back up. The transition between the different black and white versions of the image and the color version is super glitchy and it's not smooth. We made progress here, but we're not quite there. Also, the size of this component is still getting cut off ever so slightly at the edges, so we need to reduce the size just a tiny bit, just a little bit.",
+  "push"
 ]
