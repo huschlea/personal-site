@@ -130,7 +130,13 @@ const STYLES = `
   position: absolute;
   pointer-events: none;
   z-index: 30;
-  transform: translate(-50%, -50%);
+  /* GPU promotion lives here (instead of on .ha-avatar-inner) so the
+     scan element animates reliably. iOS Safari has a known bug where
+     positioned children of a clipped + rounded + GPU-promoted parent
+     fail to interpolate; promoting the wrap (which is not clipped)
+     instead keeps canvas paints isolated without that side effect. */
+  transform: translate(-50%, -50%) translateZ(0);
+  will-change: opacity, transform;
   opacity: 0;
   transition: opacity 1.2s ease-out;
 }
@@ -159,10 +165,6 @@ const STYLES = `
   height: 100%;
   border-radius: 9999px;
   overflow: hidden;
-  /* Promote to its own compositor layer so canvas redraws below don't
-     force the avatar/scan to re-rasterize each frame. Critical on mobile. */
-  transform: translateZ(0);
-  will-change: transform;
 }
 .ha-avatar-img {
   width: 100%;
@@ -184,6 +186,7 @@ const STYLES = `
 .ha-scan {
   position: absolute;
   left: 0;
+  top: -10%;
   width: 100%;
   height: 4px;
   background: linear-gradient(
@@ -196,12 +199,17 @@ const STYLES = `
   );
   box-shadow: 0 0 8px 2px rgba(96, 165, 250, 0.4);
   border-radius: 2px;
-  /* iOS Safari refuses to interpolate transform changes on this element
-     (it sits inside overflow:hidden + border-radius + translateZ(0)).
-     Animating top instead. The layout cost on a 4px element inside a
-     GPU-promoted parent is negligible, and Safari interpolates it. */
-  transition: top 0.8s ease-in-out;
   pointer-events: none;
+}
+.ha-avatar-ring[data-hover="true"] .ha-scan {
+  /* CSS keyframe animation gets promoted to the compositor up-front by
+     iOS Safari and runs reliably even on touch devices, where inline
+     style transitions on positioning props would silently snap. */
+  animation: ha-scan-sweep 1.4s ease-in-out forwards;
+}
+@keyframes ha-scan-sweep {
+  0% { top: -10%; }
+  100% { top: 110%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -686,7 +694,7 @@ export function HumanAgentSandbox() {
                   className="ha-avatar-img"
                   draggable={false}
                 />
-                <div className="ha-scan" style={{ top: isHovered ? '110%' : '-10%' }} />
+                <div className="ha-scan" />
               </div>
             </div>
           </div>
