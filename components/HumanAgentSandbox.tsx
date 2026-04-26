@@ -148,15 +148,27 @@ const STYLES = `
   cursor: pointer;
   border-radius: 9999px;
   background: conic-gradient(from 0deg, #3b82f6, #f59e0b, #10b981, #8b5cf6, #3b82f6);
-  transition: box-shadow 0.4s ease;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
 }
-.ha-avatar-ring[data-hover="true"] {
+/* The blue/purple glow lives on a pseudo-element with a static
+   box-shadow whose opacity animates. box-shadow transitions don't
+   commit to the compositor on iOS Safari; opacity always does. */
+.ha-avatar-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
   box-shadow:
     0 0 24px rgba(59, 130, 246, 0.4),
     0 0 48px rgba(139, 92, 246, 0.2);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.ha-avatar-ring[data-hover="true"]::after {
+  opacity: 1;
 }
 
 .ha-avatar-inner {
@@ -241,6 +253,14 @@ const STYLES = `
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+@keyframes ha-glow-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ha-glow-fadeout {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
 
 /* Touch devices: transitions on top, filter, and opacity all fail to
    commit to the compositor on iOS Safari for this element tree, so
@@ -273,6 +293,16 @@ const STYLES = `
   }
   .ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-avatar-img-color {
     animation: ha-color-fadein 0.9s ease forwards;
+  }
+
+  .ha-avatar-ring::after {
+    transition: none;
+  }
+  .ha-avatar-ring[data-hover="true"]::after {
+    animation: ha-glow-fadein 0.5s ease forwards;
+  }
+  .ha-avatar-ring[data-scanned="true"][data-hover="false"]::after {
+    animation: ha-glow-fadeout 0.5s ease forwards;
   }
 }
 
