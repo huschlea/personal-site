@@ -200,16 +200,38 @@ const STYLES = `
   );
   box-shadow: 0 0 8px 2px rgba(96, 165, 250, 0.4);
   border-radius: 2px;
-  /* Transition on top so a mid-sweep hover-release reverses smoothly
-     from wherever the scan currently is (vs keyframes, which snap to
-     the from-keyframe value). GPU promotion lives on .ha-avatar-wrap,
-     so this interpolates correctly on iOS Safari now. */
+  /* Desktop: transition on top so mid-sweep hover-release reverses
+     smoothly from the current position. */
   transition: top 1.1s ease-in-out;
   pointer-events: none;
   will-change: top;
 }
 .ha-avatar-ring[data-hover="true"] .ha-scan {
   top: 110%;
+}
+
+/* Touch devices: top transitions don't commit to the compositor on
+   iOS Safari for this clipped element, so the scan goes invisible.
+   Override with keyframe animations gated by data-scanned (so the
+   return sweep doesn't fire on initial mount). */
+@media (hover: none) and (pointer: coarse) {
+  .ha-scan {
+    transition: none;
+  }
+  .ha-avatar-ring[data-hover="true"] .ha-scan {
+    animation: ha-scan-down 1.1s ease-in-out forwards;
+  }
+  .ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-scan {
+    animation: ha-scan-up 1.1s ease-in-out forwards;
+  }
+  @keyframes ha-scan-down {
+    0%   { top: -10%; }
+    100% { top: 110%; }
+  }
+  @keyframes ha-scan-up {
+    0%   { top: 110%; }
+    100% { top: -10%; }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -367,6 +389,7 @@ export function HumanAgentSandbox() {
   const [showLabels, setShowLabels] = useState(false)
   const [showAvatar, setShowAvatar] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [hasScanned, setHasScanned] = useState(false)
   const [layout, setLayout] = useState<VizLayout | null>(null)
   const [avatarReady, setAvatarReady] = useState(false)
 
@@ -386,7 +409,10 @@ export function HumanAgentSandbox() {
   useEffect(() => {
     if (!showAvatar || hasAutoPlayedRef.current) return
     hasAutoPlayedRef.current = true
-    const onTimer = setTimeout(() => setIsHovered(true), 900)
+    const onTimer = setTimeout(() => {
+      setIsHovered(true)
+      setHasScanned(true)
+    }, 900)
     const offTimer = setTimeout(() => setIsHovered(false), 2400)
     return () => {
       clearTimeout(onTimer)
@@ -687,8 +713,12 @@ export function HumanAgentSandbox() {
             <div
               className="ha-avatar-ring"
               data-hover={isHovered ? 'true' : 'false'}
+              data-scanned={hasScanned ? 'true' : 'false'}
               style={{ padding: ringPad }}
-              onMouseEnter={() => setIsHovered(true)}
+              onMouseEnter={() => {
+                setIsHovered(true)
+                setHasScanned(true)
+              }}
               onMouseLeave={() => setIsHovered(false)}
             >
               <div className="ha-avatar-inner">
