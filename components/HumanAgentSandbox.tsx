@@ -166,22 +166,30 @@ const STYLES = `
   border-radius: 9999px;
   overflow: hidden;
 }
+/* Two stacked <img> layers — a static grayscale copy underneath and a
+   color copy on top whose opacity is animated. Filter interpolation
+   on iOS Safari is unreliable, but opacity interpolation is bulletproof
+   on every browser. The second <img> shares the cached asset so it
+   doesn't double network cost. */
 .ha-avatar-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   border-radius: 9999px;
   object-fit: cover;
   display: block;
-  /* Single-function grayscale is GPU-accelerated on iOS Safari (multi-
-     function filter chains fall back to the CPU thread and stutter).
-     Transitions, not keyframes, so a mid-hover release interpolates
-     smoothly from the element's current state instead of snapping. */
-  filter: grayscale(0);
-  transition: filter 0.5s ease;
-  will-change: filter;
 }
-.ha-avatar-ring[data-hover="true"] .ha-avatar-img {
+.ha-avatar-img-gray {
   filter: grayscale(1);
+}
+.ha-avatar-img-color {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  will-change: opacity;
+}
+.ha-avatar-ring[data-hover="true"] .ha-avatar-img-color {
+  opacity: 0;
 }
 
 .ha-scan {
@@ -221,13 +229,13 @@ const STYLES = `
   0%   { top: 110%; }
   100% { top: -10%; }
 }
-@keyframes ha-img-desat {
-  from { filter: grayscale(0); }
-  to   { filter: grayscale(1); }
+@keyframes ha-color-fadeout {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
-@keyframes ha-img-resat {
-  from { filter: grayscale(1); }
-  to   { filter: grayscale(0); }
+@keyframes ha-color-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes ha-wrap-fadein {
   from { opacity: 0; }
@@ -257,14 +265,14 @@ const STYLES = `
     animation: ha-scan-up 1.1s ease-in-out forwards;
   }
 
-  .ha-avatar-img {
+  .ha-avatar-img-color {
     transition: none;
   }
-  .ha-avatar-ring[data-hover="true"] .ha-avatar-img {
-    animation: ha-img-desat 0.9s ease forwards;
+  .ha-avatar-ring[data-hover="true"] .ha-avatar-img-color {
+    animation: ha-color-fadeout 0.9s ease forwards;
   }
-  .ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-avatar-img {
-    animation: ha-img-resat 0.9s ease forwards;
+  .ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-avatar-img-color {
+    animation: ha-color-fadein 0.9s ease forwards;
   }
 }
 
@@ -760,7 +768,14 @@ export function HumanAgentSandbox() {
                   src={AVATAR_SRC}
                   alt=""
                   aria-hidden="true"
-                  className="ha-avatar-img"
+                  className="ha-avatar-img ha-avatar-img-gray"
+                  draggable={false}
+                />
+                <img
+                  src={AVATAR_SRC}
+                  alt=""
+                  aria-hidden="true"
+                  className="ha-avatar-img ha-avatar-img-color"
                   draggable={false}
                 />
                 <div className="ha-scan" />

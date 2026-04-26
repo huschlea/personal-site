@@ -653,5 +653,6 @@
   "The floating particles are still getting cut off at the edge on desktop. Potentially on other breakpoints too, but definitely on desktop, so we need to fix this.",
   "now the digital scanner is invisible on mobile again. it needs to look exactly like it does on desktop, desktio is looking perfect right now",
   "it' so close! It's just that the animation cycle is not smooth on mobile. It flashes absurptul between the stages ofr color, black and white, back to color, whereas on desktop is it smooth and polished",
-  "So it seems like the issue is that on mobile the image is not fading. It's not fading in, and it's not fading between transitions when the digital scanner animation is taking place. I can see this happening clearly on desktop, but it is not happening at all on mobile."
+  "So it seems like the issue is that on mobile the image is not fading. It's not fading in, and it's not fading between transitions when the digital scanner animation is taking place. I can see this happening clearly on desktop, but it is not happening at all on mobile.",
+  "Okay, now I see the initial fade in of the image, but it seems to be missing a subtle fade when it goes from when the digital scanner is transitioning it from different visual states, like it goes from the normal color version to the black and white after the scanner goes down and then back to color. On the desktop, there seems to be some subtle fade animation that is smoothing that out and making it easier on the eye, which is still not visible on mobile."
 ]
