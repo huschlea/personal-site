@@ -210,12 +210,43 @@ const STYLES = `
   top: 110%;
 }
 
-/* Touch devices: neither top transitions nor filter transitions
-   commit to the compositor reliably on iOS Safari for these elements,
-   so they snap or go invisible. Override with keyframe animations
-   gated by data-scanned (so the return animations don't fire on
-   initial mount). */
+/* Keyframes registered at top level (not inside the media query) —
+   iOS Safari sometimes fails to register @keyframes nested inside
+   @media, leading to animations that snap instead of interpolate. */
+@keyframes ha-scan-down {
+  0%   { top: -10%; }
+  100% { top: 110%; }
+}
+@keyframes ha-scan-up {
+  0%   { top: 110%; }
+  100% { top: -10%; }
+}
+@keyframes ha-img-desat {
+  from { filter: grayscale(0); }
+  to   { filter: grayscale(1); }
+}
+@keyframes ha-img-resat {
+  from { filter: grayscale(1); }
+  to   { filter: grayscale(0); }
+}
+@keyframes ha-wrap-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Touch devices: transitions on top, filter, and opacity all fail to
+   commit to the compositor on iOS Safari for this element tree, so
+   they snap or stay invisible. Override with keyframe animations.
+   data-scanned gates the return animations so they don't fire on
+   initial mount. */
 @media (hover: none) and (pointer: coarse) {
+  .ha-avatar-wrap {
+    transition: none;
+  }
+  .ha-avatar-wrap[data-show="true"] {
+    animation: ha-wrap-fadein 1.2s ease-out forwards;
+  }
+
   .ha-scan {
     transition: none;
   }
@@ -225,31 +256,15 @@ const STYLES = `
   .ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-scan {
     animation: ha-scan-up 1.1s ease-in-out forwards;
   }
-  @keyframes ha-scan-down {
-    0%   { top: -10%; }
-    100% { top: 110%; }
-  }
-  @keyframes ha-scan-up {
-    0%   { top: 110%; }
-    100% { top: -10%; }
-  }
 
   .ha-avatar-img {
     transition: none;
   }
   .ha-avatar-ring[data-hover="true"] .ha-avatar-img {
-    animation: ha-img-desat 0.5s ease forwards;
+    animation: ha-img-desat 0.9s ease forwards;
   }
   .ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-avatar-img {
-    animation: ha-img-resat 0.6s ease forwards;
-  }
-  @keyframes ha-img-desat {
-    from { filter: grayscale(0); }
-    to   { filter: grayscale(1); }
-  }
-  @keyframes ha-img-resat {
-    from { filter: grayscale(1); }
-    to   { filter: grayscale(0); }
+    animation: ha-img-resat 0.9s ease forwards;
   }
 }
 
