@@ -172,27 +172,16 @@ const STYLES = `
   border-radius: 9999px;
   object-fit: cover;
   display: block;
-  filter: saturate(1) brightness(1) hue-rotate(0deg);
+  /* Single-function grayscale is GPU-accelerated on iOS Safari (multi-
+     function filter chains fall back to the CPU thread and stutter).
+     Transitions, not keyframes, so a mid-hover release interpolates
+     smoothly from the element's current state instead of snapping. */
+  filter: grayscale(0);
+  transition: filter 0.5s ease;
   will-change: filter;
 }
-/* Both filter and scan use keyframe animations rather than transitions —
-   keyframes get committed to the compositor up-front on iOS Safari,
-   which avoids the choppy/snapping behavior of CSS transitions on touch
-   devices. The data-scanned flag gates the un-hover (return) animations
-   so they don't fire on initial mount, only after a scan has played. */
 .ha-avatar-ring[data-hover="true"] .ha-avatar-img {
-  animation: ha-img-desat 0.4s ease forwards;
-}
-.ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-avatar-img {
-  animation: ha-img-resat 0.6s ease forwards;
-}
-@keyframes ha-img-desat {
-  from { filter: saturate(1) brightness(1) hue-rotate(0deg); }
-  to   { filter: saturate(0.3) brightness(1.15) hue-rotate(10deg); }
-}
-@keyframes ha-img-resat {
-  from { filter: saturate(0.3) brightness(1.15) hue-rotate(10deg); }
-  to   { filter: saturate(1) brightness(1) hue-rotate(0deg); }
+  filter: grayscale(1);
 }
 
 .ha-scan {
@@ -211,21 +200,16 @@ const STYLES = `
   );
   box-shadow: 0 0 8px 2px rgba(96, 165, 250, 0.4);
   border-radius: 2px;
+  /* Transition on top so a mid-sweep hover-release reverses smoothly
+     from wherever the scan currently is (vs keyframes, which snap to
+     the from-keyframe value). GPU promotion lives on .ha-avatar-wrap,
+     so this interpolates correctly on iOS Safari now. */
+  transition: top 1.1s ease-in-out;
   pointer-events: none;
+  will-change: top;
 }
 .ha-avatar-ring[data-hover="true"] .ha-scan {
-  animation: ha-scan-down 1.4s ease-in-out forwards;
-}
-.ha-avatar-ring[data-scanned="true"][data-hover="false"] .ha-scan {
-  animation: ha-scan-up 1.4s ease-in-out forwards;
-}
-@keyframes ha-scan-down {
-  0%   { top: -10%; }
-  100% { top: 110%; }
-}
-@keyframes ha-scan-up {
-  0%   { top: 110%; }
-  100% { top: -10%; }
+  top: 110%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -244,9 +228,9 @@ function rand(min: number, max: number) {
 
 function computeLayout(w: number, h: number): VizLayout {
   let visR: number
-  if (w < 640) visR = Math.min(w * 0.92, 500)
-  else if (w < 1024) visR = Math.min(w * 0.5, 440)
-  else visR = Math.min(w * 0.34, 500)
+  if (w < 640) visR = Math.min(w * 0.78, 380)
+  else if (w < 1024) visR = Math.min(w * 0.42, 360)
+  else visR = Math.min(w * 0.26, 320)
 
   const minGap = 28
   const labelGap = 18
@@ -258,9 +242,14 @@ function computeLayout(w: number, h: number): VizLayout {
     visR = (maxExtent - labelOffset) / 0.42
   }
 
-  // Mobile gets a moderately larger ring than desktop. Split the
-  // difference between the original (0.44) and the previous (0.55).
   const ringMul = w < 640 ? 0.50 : 0.44
+  // Width safety: ambient particles oscillate to ringR * 1.18 from center.
+  // Clamp visR so even the outermost particles sit inside the canvas with
+  // a horizontal margin — guarantees no clipping at the column edges.
+  const horizMargin = 14
+  const widthLimit = (w / 2 - horizMargin) / (ringMul * 1.18)
+  visR = Math.min(visR, widthLimit)
+
   const ringR = visR * ringMul
   const center = { x: w / 2, y: h / 2 }
   const gridSpacing = visR * 0.28
@@ -378,7 +367,6 @@ export function HumanAgentSandbox() {
   const [showLabels, setShowLabels] = useState(false)
   const [showAvatar, setShowAvatar] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-  const [hasScanned, setHasScanned] = useState(false)
   const [layout, setLayout] = useState<VizLayout | null>(null)
   const [avatarReady, setAvatarReady] = useState(false)
 
@@ -398,10 +386,7 @@ export function HumanAgentSandbox() {
   useEffect(() => {
     if (!showAvatar || hasAutoPlayedRef.current) return
     hasAutoPlayedRef.current = true
-    const onTimer = setTimeout(() => {
-      setIsHovered(true)
-      setHasScanned(true)
-    }, 900)
+    const onTimer = setTimeout(() => setIsHovered(true), 900)
     const offTimer = setTimeout(() => setIsHovered(false), 2400)
     return () => {
       clearTimeout(onTimer)
@@ -702,12 +687,8 @@ export function HumanAgentSandbox() {
             <div
               className="ha-avatar-ring"
               data-hover={isHovered ? 'true' : 'false'}
-              data-scanned={hasScanned ? 'true' : 'false'}
               style={{ padding: ringPad }}
-              onMouseEnter={() => {
-                setIsHovered(true)
-                setHasScanned(true)
-              }}
+              onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               <div className="ha-avatar-inner">
