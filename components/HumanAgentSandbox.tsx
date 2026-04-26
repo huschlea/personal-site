@@ -184,7 +184,6 @@ const STYLES = `
 .ha-scan {
   position: absolute;
   left: 0;
-  top: 0;
   width: 100%;
   height: 4px;
   background: linear-gradient(
@@ -197,12 +196,12 @@ const STYLES = `
   );
   box-shadow: 0 0 8px 2px rgba(96, 165, 250, 0.4);
   border-radius: 2px;
-  /* The transform itself is set inline from JS as concrete pixel values
-     (toggled on hover). Two literal pixel values interpolate cleanly on
-     iOS Safari, where calc(var(...)) inside a transform often snaps. */
-  transition: transform 0.8s ease-in-out;
+  /* iOS Safari refuses to interpolate transform changes on this element
+     (it sits inside overflow:hidden + border-radius + translateZ(0)).
+     Animating top instead. The layout cost on a 4px element inside a
+     GPU-promoted parent is negligible, and Safari interpolates it. */
+  transition: top 0.8s ease-in-out;
   pointer-events: none;
-  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -235,8 +234,9 @@ function computeLayout(w: number, h: number): VizLayout {
     visR = (maxExtent - labelOffset) / 0.42
   }
 
-  // Bigger ring on mobile so the avatar fills more of the column.
-  const ringMul = w < 640 ? 0.55 : 0.44
+  // Mobile gets a moderately larger ring than desktop. Split the
+  // difference between the original (0.44) and the previous (0.55).
+  const ringMul = w < 640 ? 0.50 : 0.44
   const ringR = visR * ringMul
   const center = { x: w / 2, y: h / 2 }
   const gridSpacing = visR * 0.28
@@ -648,14 +648,11 @@ export function HumanAgentSandbox() {
     }
   }, [])
 
-  const ringSize = layout ? layout.ringRadius * 1.5 : 0
+  // Avatar sits inside the particle ring with visible breathing room — the
+  // 1.3 factor leaves a clean gap so swarming particles don't visually
+  // overlap the avatar edge.
+  const ringSize = layout ? layout.ringRadius * 1.3 : 0
   const ringPad = layout ? Math.max(4, layout.ringRadius * 0.055) : 0
-  const innerSize = ringSize - ringPad * 2
-  const scanFromY = -4
-  const scanToY = innerSize + 4
-  const scanTransform = isHovered
-    ? `translate3d(0, ${scanToY}px, 0)`
-    : `translate3d(0, ${scanFromY}px, 0)`
 
   return (
     <>
@@ -689,7 +686,7 @@ export function HumanAgentSandbox() {
                   className="ha-avatar-img"
                   draggable={false}
                 />
-                <div className="ha-scan" style={{ transform: scanTransform }} />
+                <div className="ha-scan" style={{ top: isHovered ? '110%' : '-10%' }} />
               </div>
             </div>
           </div>
