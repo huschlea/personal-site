@@ -88,7 +88,7 @@ const STYLES = `
 .ha-root {
   position: relative;
   width: 100%;
-  height: 460px;
+  height: 420px;
   background: transparent;
 }
 @media (min-width: 640px) { .ha-root { height: 500px; } }
@@ -197,14 +197,12 @@ const STYLES = `
   );
   box-shadow: 0 0 8px 2px rgba(96, 165, 250, 0.4);
   border-radius: 2px;
-  /* GPU-accelerated translate (no layout) instead of animating top. */
-  transform: translate3d(0, calc(var(--ha-inner, 0px) * -0.1 - 3px), 0);
+  /* The transform itself is set inline from JS as concrete pixel values
+     (toggled on hover). Two literal pixel values interpolate cleanly on
+     iOS Safari, where calc(var(...)) inside a transform often snaps. */
   transition: transform 0.8s ease-in-out;
   pointer-events: none;
   will-change: transform;
-}
-.ha-avatar-ring[data-hover="true"] .ha-scan {
-  transform: translate3d(0, calc(var(--ha-inner, 0px) * 1.1), 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -237,7 +235,9 @@ function computeLayout(w: number, h: number): VizLayout {
     visR = (maxExtent - labelOffset) / 0.42
   }
 
-  const ringR = visR * 0.44
+  // Bigger ring on mobile so the avatar fills more of the column.
+  const ringMul = w < 640 ? 0.55 : 0.44
+  const ringR = visR * ringMul
   const center = { x: w / 2, y: h / 2 }
   const gridSpacing = visR * 0.28
   const clusterR = visR * 0.14
@@ -651,6 +651,11 @@ export function HumanAgentSandbox() {
   const ringSize = layout ? layout.ringRadius * 1.5 : 0
   const ringPad = layout ? Math.max(4, layout.ringRadius * 0.055) : 0
   const innerSize = ringSize - ringPad * 2
+  const scanFromY = -4
+  const scanToY = innerSize + 4
+  const scanTransform = isHovered
+    ? `translate3d(0, ${scanToY}px, 0)`
+    : `translate3d(0, ${scanFromY}px, 0)`
 
   return (
     <>
@@ -676,10 +681,7 @@ export function HumanAgentSandbox() {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <div
-                className="ha-avatar-inner"
-                style={{ ['--ha-inner' as string]: `${innerSize}px` }}
-              >
+              <div className="ha-avatar-inner">
                 <img
                   src={AVATAR_SRC}
                   alt=""
@@ -687,7 +689,7 @@ export function HumanAgentSandbox() {
                   className="ha-avatar-img"
                   draggable={false}
                 />
-                <div className="ha-scan" />
+                <div className="ha-scan" style={{ transform: scanTransform }} />
               </div>
             </div>
           </div>
