@@ -553,7 +553,7 @@ export default function Site({ changelog }: { changelog: string[] }) {
             <p className="home-footer-loc">Alden Huschle</p>
           </div>
           <div className="home-footer-right">
-            <a href="mailto:huschledesign@gmail.com">contact</a>
+            <a href="mailto:alden@aldenhuschle.com">contact</a>
           </div>
         </footer>
       </div>

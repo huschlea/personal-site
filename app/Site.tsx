@@ -130,7 +130,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
           </div>
 
           <div className="v2-footer-links">
-            <a href="mailto:huschledesign@gmail.com">Email</a>
+            <a href="mailto:alden@aldenhuschle.com">Email</a>
             <span className="v2-footer-sep"> / </span>
             <a href="https://www.instagram.com/aldenhuschle/" target="_blank" rel="noopener">IG</a>
             <span className="v2-footer-sep"> / </span>
