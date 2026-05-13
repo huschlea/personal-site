@@ -85,6 +85,10 @@ const STYLES = `
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* Stable stacking context so iOS Safari doesn't tear down the
+     compositing layer on scroll, which is what causes SVG filters
+     to re-rasterize and visibly flash. */
+  isolation: isolate;
 }
 
 .dcs-wrap .dcs-filters {
@@ -239,6 +243,10 @@ const STYLES = `
   border: 1.6px solid var(--block-color);
   border-radius: 2px;
   background: color-mix(in srgb, var(--block-color) 16%, transparent);
+  filter: url(#dcs-pen-paper-fine);
+  /* Hint eager rasterization so iOS Safari doesn't lazy-defer the
+     filter compute until the element scrolls into view. */
+  will-change: filter;
   pointer-events: none;
   z-index: 0;
 }
@@ -342,12 +350,6 @@ export function DixonScheduleSandbox() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [bar, setBar] = useState({ visible: false, width: 0, offset: 0 });
   const [active, setActive] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -481,14 +483,7 @@ export function DixonScheduleSandbox() {
           </defs>
         </svg>
 
-        <div
-          className="schedule__scroll"
-          ref={scrollRef}
-          style={{
-            opacity: ready ? 1 : 0,
-            transition: "opacity 280ms ease-out",
-          }}
-        >
+        <div className="schedule__scroll" ref={scrollRef}>
           <div className="schedule__board">
             <svg
               className="schedule__sketch"

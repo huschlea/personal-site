@@ -673,5 +673,7 @@
   "I actually don't see the change on my dev server",
   "Okay, go ahead and push live.",
   "I feel like somehow the calendar loading is messing with the visual component for WethosAI. It's making it glitch out. I just don't understand: the visual component for prompting people and for WethosAI is always just there on the page. They don't flash into existence. The calendar is still doing that, and I really want it to just live there. I don't want it to flash onto the screen and reload every time I scroll up or down.",
-  "push it"
+  "push it",
+  "Okay, that seems to be working better. I still can catch it flashing a little bit. I see it flash a tiny bit. Wondering if we can just eliminate that entirely, and then also we seem to have lost the hand-drawn look to the colored cards. I think we can have it all.",
+  "did you push?"
 ]
