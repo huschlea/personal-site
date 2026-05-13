@@ -105,7 +105,8 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
         <section className="v2-panel v2-panel-home">
           <div className="v2-prose">
             <p>
-              Lately I&apos;ve been building{" "}
+              Lately I&apos;ve been recording{" "}
+              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>, building{" "}
               <a
                 href="/work"
                 className="v2-link"
@@ -114,8 +115,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
                   setTab("work");
                 }}
               >Prompting People</a>, designing for{" "}
-              <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, recording{" "}
-              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>, and{" "}
+              <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, and{" "}
               <a
                 href="/observations"
                 className="v2-link"
