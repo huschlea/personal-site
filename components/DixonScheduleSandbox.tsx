@@ -85,11 +85,6 @@ const STYLES = `
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Paint isolation so the schedule's filter work doesn't invalidate
-     the rest of the page on scroll. (content-visibility: auto would
-     skip more aggressively but causes a visible pop on mobile when
-     scrolling into view, which we want to avoid here.) */
-  contain: paint;
 }
 
 .dcs-wrap .dcs-filters {
@@ -244,7 +239,6 @@ const STYLES = `
   border: 1.6px solid var(--block-color);
   border-radius: 2px;
   background: color-mix(in srgb, var(--block-color) 16%, transparent);
-  filter: url(#dcs-pen-paper-fine);
   pointer-events: none;
   z-index: 0;
 }

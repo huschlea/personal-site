@@ -671,5 +671,7 @@
   "Okay, and then for each one of the additions to my work section, the descriptions, it's like:\n- Side project makes sense for prompting people.\n- Client work makes sense for Dixon.\n- NumberOne AI company feels a little weird under Wethos. What's the equivalent for the other, like a place where I'm working?",
   "Do In-house",
   "I actually don't see the change on my dev server",
-  "Okay, go ahead and push live."
+  "Okay, go ahead and push live.",
+  "I feel like somehow the calendar loading is messing with the visual component for WethosAI. It's making it glitch out. I just don't understand: the visual component for prompting people and for WethosAI is always just there on the page. They don't flash into existence. The calendar is still doing that, and I really want it to just live there. I don't want it to flash onto the screen and reload every time I scroll up or down.",
+  "push it"
 ]
