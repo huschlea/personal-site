@@ -684,5 +684,7 @@
   "\"Snoqualmie, WA\" and make the line thinner beneath it",
   "You can actually make the underline a little thicker, but make it a little bit transparent.",
   "Something about the transition to the new image feels a little weird. It's almost like there's a flash that I see on the border of the image. And actually, let's make that line thinner. I'm not liking how it looks right now.",
-  "okay push"
+  "okay push",
+  "Need to make sure you can only see the original image when the page loads. Right now I'm seeing a flash of the new one.",
+  "push"
 ]

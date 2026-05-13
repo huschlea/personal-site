@@ -200,10 +200,9 @@ body:has(.site-v2) {
   object-position: bottom;
 }
 
-.site-v2 .v2-feature-image-default { z-index: 2; }
-.site-v2 .v2-feature-image-egg { z-index: 1; }
-.site-v2 .v2-feature-image-egg-active .v2-feature-image-default { z-index: 1; }
-.site-v2 .v2-feature-image-egg-active .v2-feature-image-egg { z-index: 2; }
+.site-v2 .v2-feature-image-egg { visibility: hidden; }
+.site-v2 .v2-feature-image-egg-active .v2-feature-image-default { visibility: hidden; }
+.site-v2 .v2-feature-image-egg-active .v2-feature-image-egg { visibility: visible; }
 
 .site-v2 .v2-easter-trigger {
   cursor: pointer;

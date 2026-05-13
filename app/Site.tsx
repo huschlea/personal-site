@@ -155,7 +155,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <picture className="v2-feature-image-pic v2-feature-image-egg">
               <source type="image/avif" srcSet="/optimized/home-easter-800.avif 800w, /optimized/home-easter-1600.avif 1600w, /optimized/home-easter-2500.avif 2500w" sizes="(max-width: 768px) 100vw, 620px" />
               <source type="image/webp" srcSet="/optimized/home-easter-800.webp 800w, /optimized/home-easter-1600.webp 1600w, /optimized/home-easter-2500.webp 2500w" sizes="(max-width: 768px) 100vw, 620px" />
-              <img className="v2-img" src="/home-easter.jpg" alt="" width={4032} height={3024} loading="eager" decoding="async" />
+              <img src="/home-easter.jpg" alt="" width={4032} height={3024} loading="eager" decoding="async" />
             </picture>
           </div>
         </section>
