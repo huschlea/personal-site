@@ -663,5 +663,6 @@
   "spin up a dev server so I can see this",
   "Okay, so I see it there, and it's still missing some things.\n- First of all, even on desktop breakpoints, it's still operating like it gets cut off, and you have to swipe to see it. That's not how it is on the Dixon site, and we need it to operate the same way here. On desktop, you should be able to see the full schedule.\n- It seems like the colored cards that are housing each element (like each class) did not retain their sort of hand-drawn look and feel.",
   "Okay, and let's make sure this isn't negatively impacting the performance of the site. It feels like it's scrolling a little bit. I don't know, like, a little bit. It's not scrolling as smoothly now that this is there.",
-  "okay let's push this live"
+  "okay let's push this live",
+  "Remove the last sentence from the Dixon Creative Center description and then push again."
 ]

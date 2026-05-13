@@ -186,7 +186,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <h2 className="v2-section-title">Dixon Creative Center</h2>
             <p className="v2-section-kicker">Client work</p>
             <p className="v2-section-body">
-              Dixon Creative Center is a creative center in Long Beach. The site is built around a facade-as-interface conceit: a hand-drawn pen-and-paper world where every surface speaks the same visual language. The weekly schedule below is one piece of that world, dropped in here in its native skin.
+              Dixon Creative Center is a creative center in Long Beach. The site is built around a facade-as-interface conceit: a hand-drawn pen-and-paper world where every surface speaks the same visual language.
             </p>
             <p className="v2-section-body v2-release-links">
               <a href="https://dixoncreativecenter.com/" target="_blank" rel="noopener" className="v2-link">Live at dixoncreativecenter.com →</a>
