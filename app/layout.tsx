@@ -46,6 +46,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap"
         />
+        {/* Atkinson Hyperlegible + Gloria Hallelujah — used by the Dixon Creative Center
+            schedule sandbox component. Same loading pattern as Geist above. */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloria+Hallelujah&display=swap"
+        />
       </head>
       <body>{children}</body>
     </html>

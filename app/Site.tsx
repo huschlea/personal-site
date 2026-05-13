@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ResponseJournalSandbox } from "../components/ResponseJournalSandbox";
 import { HumanAgentSandbox } from "../components/HumanAgentSandbox";
+import { DixonScheduleSandbox } from "../components/DixonScheduleSandbox";
 
 export type Tab = "home" | "work" | "music" | "observations" | "changelog";
 
@@ -178,6 +179,20 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             </p>
             <div style={{ marginTop: "clamp(0.5rem, 1.2vw, 1rem)" }}>
               <HumanAgentSandbox />
+            </div>
+          </div>
+
+          <div className="v2-section">
+            <h2 className="v2-section-title">Dixon Creative Center</h2>
+            <p className="v2-section-kicker">Client work</p>
+            <p className="v2-section-body">
+              Dixon Creative Center is a creative center in Long Beach. The site is built around a facade-as-interface conceit: a hand-drawn pen-and-paper world where every surface speaks the same visual language. The weekly schedule below is one piece of that world, dropped in here in its native skin.
+            </p>
+            <p className="v2-section-body v2-release-links">
+              <a href="https://dixoncreativecenter.com/" target="_blank" rel="noopener" className="v2-link">Live at dixoncreativecenter.com →</a>
+            </p>
+            <div style={{ marginTop: "clamp(1.5rem, 3vw, 2rem)" }}>
+              <DixonScheduleSandbox />
             </div>
           </div>
         </section>
