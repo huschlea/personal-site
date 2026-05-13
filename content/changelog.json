@@ -664,5 +664,8 @@
   "Okay, so I see it there, and it's still missing some things.\n- First of all, even on desktop breakpoints, it's still operating like it gets cut off, and you have to swipe to see it. That's not how it is on the Dixon site, and we need it to operate the same way here. On desktop, you should be able to see the full schedule.\n- It seems like the colored cards that are housing each element (like each class) did not retain their sort of hand-drawn look and feel.",
   "Okay, and let's make sure this isn't negatively impacting the performance of the site. It feels like it's scrolling a little bit. I don't know, like, a little bit. It's not scrolling as smoothly now that this is there.",
   "okay let's push this live",
-  "Remove the last sentence from the Dixon Creative Center description and then push again."
+  "Remove the last sentence from the Dixon Creative Center description and then push again.",
+  "okay, and then just locally here, before we push, I want to see what it looks like if we either remove the background color from the schedule component or make it the same as the background color on the website",
+  "I like that much better now. The one thing I want to see is: right now, when I look at this on my site, especially on the phone, I go to work. I scroll down, and when I get to this section, for a brief moment the calendar is not there, and then it suddenly pops into existence. I would love it if it was already loaded.",
+  "Push live."
 ]

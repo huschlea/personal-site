@@ -85,13 +85,11 @@ const STYLES = `
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* The schedule has ~50 SVG-filtered elements (feTurbulence is
-     CPU-heavy). content-visibility: auto skips all paint/layout work
-     when the schedule is offscreen, so page-level scrolling never
-     touches it. contain-intrinsic-size reserves space so there's no
-     layout shift when it scrolls into view. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 760px;
+  /* Paint isolation so the schedule's filter work doesn't invalidate
+     the rest of the page on scroll. (content-visibility: auto would
+     skip more aggressively but causes a visible pop on mobile when
+     scrolling into view, which we want to avoid here.) */
+  contain: paint;
 }
 
 .dcs-wrap .dcs-filters {
@@ -504,14 +502,6 @@ export function DixonScheduleSandbox() {
               preserveAspectRatio="none"
               aria-hidden="true"
             >
-              <defs>
-                <clipPath id="dcs-schedule-paper">
-                  <path d="M3,4 C42,2 110,3 197,5 C198,40 196,92 197,126 C140,128 78,127 3,126 C2,92 4,40 3,4 Z" />
-                </clipPath>
-              </defs>
-              <g clipPath="url(#dcs-schedule-paper)">
-                <rect x="0" y="0" width="200" height="130" fill="#f6f1e8" />
-              </g>
               <path
                 filter="url(#dcs-pen-paper-fine)"
                 d="M3,4 C42,2 110,3 197,5 C198,40 196,92 197,126 C140,128 78,127 3,126 C2,92 4,40 3,4 Z"
