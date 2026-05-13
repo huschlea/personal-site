@@ -170,7 +170,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
 
           <div className="v2-section">
             <h2 className="v2-section-title">WethosAI</h2>
-            <p className="v2-section-kicker">NumberOne AI company</p>
+            <p className="v2-section-kicker">In-house</p>
             <p className="v2-section-body">
               WethosAI is one of the companies incubated inside NumberOne AI. I lead brand, website, and marketing design. An AI-forward identity built from scratch, shipped with emerging tools so the surface area of the work can move as fast as the product.
             </p>
