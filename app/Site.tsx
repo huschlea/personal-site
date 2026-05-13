@@ -19,6 +19,7 @@ const PATH_TO_TAB: Record<string, Tab> = {
 
 export default function Site({ changelog, initialTab = "home" }: { changelog: string[]; initialTab?: Tab }) {
   const [tab, setTab] = useState<Tab>(initialTab);
+  const [eggActive, setEggActive] = useState(false);
   const mountedRef = useRef(false);
 
   // Path-based tab routing (with legacy hash fallback)
@@ -126,7 +127,14 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
               >observing things</a> along the way.
             </p>
             <p>
-              I grew up in Snoqualmie, WA and currently live in Long Beach, CA.
+              I grew up in{" "}
+              <span
+                className="v2-easter-trigger"
+                onClick={() => setEggActive((a) => !a)}
+              >
+                Snoqualmie, WA
+              </span>{" "}
+              and currently live in Long Beach, CA.
             </p>
           </div>
 
@@ -138,11 +146,16 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <a href="https://x.com/aldenhuschle" target="_blank" rel="noopener">X</a>
           </div>
 
-          <div className="v2-feature-image">
-            <picture>
+          <div className={`v2-feature-image${eggActive ? " v2-feature-image-egg-active" : ""}`}>
+            <picture className="v2-feature-image-pic v2-feature-image-default">
               <source type="image/avif" srcSet="/optimized/home-feature-800.avif 800w, /optimized/home-feature-1600.avif 1600w, /optimized/home-feature-2500.avif 2500w" sizes="(max-width: 768px) 100vw, 620px" />
               <source type="image/webp" srcSet="/optimized/home-feature-800.webp 800w, /optimized/home-feature-1600.webp 1600w, /optimized/home-feature-2500.webp 2500w" sizes="(max-width: 768px) 100vw, 620px" />
               <img className="v2-img" src="/home-feature.jpg" alt="" width={3024} height={1684} loading="eager" decoding="async" />
+            </picture>
+            <picture className="v2-feature-image-pic v2-feature-image-egg">
+              <source type="image/avif" srcSet="/optimized/home-easter-800.avif 800w, /optimized/home-easter-1600.avif 1600w, /optimized/home-easter-2500.avif 2500w" sizes="(max-width: 768px) 100vw, 620px" />
+              <source type="image/webp" srcSet="/optimized/home-easter-800.webp 800w, /optimized/home-easter-1600.webp 1600w, /optimized/home-easter-2500.webp 2500w" sizes="(max-width: 768px) 100vw, 620px" />
+              <img className="v2-img" src="/home-easter.jpg" alt="" width={4032} height={3024} loading="eager" decoding="async" />
             </picture>
           </div>
         </section>

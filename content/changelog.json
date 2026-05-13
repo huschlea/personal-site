@@ -677,5 +677,12 @@
   "Okay, that seems to be working better. I still can catch it flashing a little bit. I see it flash a tiny bit. Wondering if we can just eliminate that entirely, and then also we seem to have lost the hand-drawn look to the colored cards. I think we can have it all.",
   "did you push?",
   "switch the order of the description on the homepage of the thing. I want it to be: Lately I've been recording an album, building prompts for people, designing for NumberOne AI, and observing things along the way. Retaining all the links, of course",
-  "push"
+  "push",
+  "IMG_2990OK, next let's add a fun little Easter egg. I want to take this image and make it so that whenever someone hovers over the words \"don't call me Washington\" or clicks it on mobile, the image changes to the image that we have on the home page. I want you to make it so that it fits within that same shape that we have for the image on the home page. This one that I'm giving you is a little taller, so I only want to retain the bottom of the image. If you cut any of it off, cut off from the top down.",
+  "Why did you add text saying \"don't call me Washington\"? That's weird.",
+  "Okay, instead of making it hoverable, I want to just add a thin line underneath Snoqualmie, Washington, and then when people click it, it'll switch. I don't want the faded transition. I want it to be sharp and snappy.",
+  "\"Snoqualmie, WA\" and make the line thinner beneath it",
+  "You can actually make the underline a little thicker, but make it a little bit transparent.",
+  "Something about the transition to the new image feels a little weird. It's almost like there's a flash that I see on the border of the image. And actually, let's make that line thinner. I'm not liking how it looks right now.",
+  "okay push"
 ]
