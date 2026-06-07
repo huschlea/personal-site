@@ -594,7 +594,7 @@ body:has(.site-v2) {
   font-family: var(--v2-display);
   font-weight: 500;
   font-size: clamp(1rem, 1.14vw, 1.09rem);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   color: var(--v2-ink);
   margin-bottom: 0.8rem;
   text-shadow: 0.012em 0 0 currentColor;
