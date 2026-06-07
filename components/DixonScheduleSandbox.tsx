@@ -187,7 +187,7 @@ const STYLES = `
   padding-bottom: 6px;
   font-family: ${FONT_HAND};
   font-size: 18px;
-  letter-spacing: 0;
+  letter-spacing: -0.005em;
   color: var(--ink);
   text-align: center;
   filter: url(#dcs-pen-paper);
@@ -259,7 +259,7 @@ const STYLES = `
   font-size: 14px;
   font-weight: 400;
   line-height: 1.02;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color: var(--ink);
   -webkit-text-stroke: 0.3px currentColor;
   text-wrap: balance;

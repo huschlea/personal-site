@@ -387,7 +387,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
           </div>
 
           <div className="v2-section">
-            <h2 className="v2-section-title">A house is not a home</h2>
+            <h2 className="v2-section-title">A House Is Not a Home</h2>
             <p className="v2-section-kicker">Side project</p>
             <p className="v2-section-body">
               A collection of images from Snoqualmie, WA, and Seattle, WA, pieced together into a horizontal composition of contrast.
