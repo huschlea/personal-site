@@ -593,11 +593,11 @@ body:has(.site-v2) {
 .site-v2 .v2-section-title {
   font-family: var(--v2-display);
   font-weight: 500;
-  font-size: clamp(1rem, 1.14vw, 1.09rem);
-  letter-spacing: -0.01em;
+  font-size: clamp(0.97rem, 1.11vw, 1.06rem);
+  letter-spacing: -0.005em;
   color: var(--v2-ink);
   margin-bottom: 0.8rem;
-  text-shadow: 0.012em 0 0 currentColor;
+  text-shadow: 0.008em 0 0 rgba(20, 18, 16, 0.5);
   text-transform: none;
 }
 
@@ -2071,7 +2071,7 @@ body:has(.site-v2) {
   .site-v2 .v2-prose,
   .site-v2 .v2-section-body { font-size: 0.9rem; }
   .site-v2 .v2-footer-links { font-size: 0.78rem; }
-  .site-v2 .v2-section-title { font-size: 0.98rem; }
+  .site-v2 .v2-section-title { font-size: 0.95rem; }
   .site-v2 .v2-section-kicker { font-size: 0.88rem; }
   .site-v2 .v2-changelog-entry p { font-size: 0.9rem; }
   .site-v2 .v2-panel-portal {
