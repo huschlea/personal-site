@@ -1,43 +1,132 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { ResponseJournalSandbox } from "../components/ResponseJournalSandbox";
 import { HumanAgentSandbox } from "../components/HumanAgentSandbox";
 import { DixonScheduleSandbox } from "../components/DixonScheduleSandbox";
+import { ClientPortalPanel } from "../components/ClientPortalPanel";
 
-export type Tab = "home" | "work" | "music" | "observations" | "changelog";
+export type Tab = "home" | "design" | "music" | "observations" | "changelog" | "portal";
 
 const PATH_TO_TAB: Record<string, Tab> = {
   "": "home",
   "home": "home",
-  "work": "work",
+  "design": "design",
+  "work": "design",
   "music": "music",
   "observations": "observations",
   "changelog": "changelog",
   "promptlog": "changelog",
+  "portal": "portal",
+  "client-portal": "portal",
 };
+
+const GIG_POSTERS = [
+  { name: "lyla-minor-2", alt: "Lyla Minor gig poster", width: 1740, height: 2174, large: "1740" },
+  { name: "elvis-batchild", alt: "Elvis Batchild gig poster", width: 1740, height: 2174, large: "1740" },
+  { name: "little-planet", alt: "Little Planet gig poster", width: 1753, height: 2179, large: "1753" },
+  { name: "lyla-minor", alt: "Lyla Minor gig poster", width: 1302, height: 1627, large: "1302" },
+  { name: "esteb", alt: "McKenna Esteb gig poster", width: 1737, height: 2170, large: "1737" },
+  { name: "dull-culprit", alt: "Dull Culprit gig poster", width: 955, height: 1194, large: "955" },
+  { name: "bathroom-poets", alt: "The Bathroom Poets gig poster", width: 955, height: 1193, large: "955" },
+  { name: "shoecraft", alt: "Fine Arts Shoecraft gig poster", width: 1740, height: 2174, large: "1740" },
+] as const;
+
+const CLIENT_PORTAL_PASSWORD = "portal";
+
+function UpRightArrow() {
+  return (
+    <svg
+      className="v2-link-arrow"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.2"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M3.25 8.75 8.75 3.25" />
+      <path d="M4.25 3.25h4.5v4.5" />
+    </svg>
+  );
+}
 
 export default function Site({ changelog, initialTab = "home" }: { changelog: string[]; initialTab?: Tab }) {
   const [tab, setTab] = useState<Tab>(initialTab);
   const [eggActive, setEggActive] = useState(false);
+  const [houseHintHidden, setHouseHintHidden] = useState(false);
+  const [portalUnlocked, setPortalUnlocked] = useState(false);
+  const [portalGateOpen, setPortalGateOpen] = useState(initialTab === "portal");
+  const [portalPassword, setPortalPassword] = useState("");
+  const [portalPasswordError, setPortalPasswordError] = useState<string | null>(null);
   const mountedRef = useRef(false);
+  const houseStripRef = useRef<HTMLDivElement>(null);
+
+  const openPortalGate = () => {
+    setPortalPassword("");
+    setPortalPasswordError(null);
+    setPortalGateOpen(true);
+  };
+
+  const closePortalGate = () => {
+    setPortalGateOpen(false);
+    setPortalPassword("");
+    setPortalPasswordError(null);
+    if (!portalUnlocked && tab === "portal") setTab("home");
+  };
+
+  const submitPortalPassword = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (portalPassword.trim() !== CLIENT_PORTAL_PASSWORD) {
+      setPortalPasswordError("That password does not look right.");
+      return;
+    }
+
+    setPortalUnlocked(true);
+    setPortalGateOpen(false);
+    setPortalPassword("");
+    setPortalPasswordError(null);
+    setTab("portal");
+  };
+
+  const requestPortalAccess = () => {
+    if (portalUnlocked) {
+      setTab("portal");
+      return;
+    }
+    openPortalGate();
+  };
 
   // Path-based tab routing (with legacy hash fallback)
   useEffect(() => {
     const hash = window.location.hash.slice(1).toLowerCase();
     if (hash && PATH_TO_TAB[hash]) {
       const target = PATH_TO_TAB[hash];
-      setTab(target);
-      history.replaceState(null, "", target === "home" ? "/" : `/${target}`);
+      if (target === "portal" && !portalUnlocked) {
+        setTab(target);
+        setPortalGateOpen(true);
+        history.replaceState(null, "", "/portal");
+      } else {
+        setTab(target);
+        history.replaceState(null, "", target === "home" ? "/" : `/${target}`);
+      }
     }
     const readPath = () => {
       const segment = window.location.pathname.toLowerCase().replace(/^\/+|\/+$/g, "");
       const next = PATH_TO_TAB[segment];
-      if (next) setTab(next);
+      if (!next) return;
+      if (next === "portal" && !portalUnlocked) {
+        setTab(next);
+        setPortalGateOpen(true);
+        return;
+      }
+      setTab(next);
     };
     window.addEventListener("popstate", readPath);
     return () => window.removeEventListener("popstate", readPath);
-  }, []);
+  }, [portalUnlocked]);
 
   useEffect(() => {
     if (!mountedRef.current) {
@@ -64,6 +153,79 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
     });
   }, [tab]);
 
+  useEffect(() => {
+    if (tab !== "design") return;
+    const strip = houseStripRef.current;
+    if (!strip) return;
+    setHouseHintHidden(false);
+
+    let dragging = false;
+    let startX = 0;
+    let startScroll = 0;
+    let velX = 0;
+    let lastX = 0;
+    let lastT = 0;
+    let rafId = 0;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      dragging = true;
+      startX = e.clientX;
+      startScroll = strip.scrollLeft;
+      lastX = e.clientX;
+      lastT = Date.now();
+      velX = 0;
+      strip.classList.add("v2-dragging");
+      strip.setPointerCapture(e.pointerId);
+      cancelAnimationFrame(rafId);
+      e.preventDefault();
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!dragging) return;
+      const now = Date.now();
+      const dt = Math.max(1, now - lastT);
+      velX = (e.clientX - lastX) / dt;
+      lastX = e.clientX;
+      lastT = now;
+      strip.scrollLeft = startScroll - (e.clientX - startX);
+    };
+
+    const onEndDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      strip.classList.remove("v2-dragging");
+
+      let v = -velX * 16;
+      const coast = () => {
+        if (Math.abs(v) < 0.3) return;
+        strip.scrollLeft += v;
+        v *= 0.92;
+        rafId = requestAnimationFrame(coast);
+      };
+      coast();
+    };
+
+    const hideHint = () => setHouseHintHidden(true);
+
+    strip.addEventListener("pointerdown", onPointerDown);
+    strip.addEventListener("pointermove", onPointerMove);
+    strip.addEventListener("pointerup", onEndDrag);
+    strip.addEventListener("pointercancel", onEndDrag);
+    strip.addEventListener("pointerdown", hideHint, { once: true });
+    strip.addEventListener("scroll", hideHint, { once: true });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      strip.removeEventListener("pointerdown", onPointerDown);
+      strip.removeEventListener("pointermove", onPointerMove);
+      strip.removeEventListener("pointerup", onEndDrag);
+      strip.removeEventListener("pointercancel", onEndDrag);
+      strip.removeEventListener("pointerdown", hideHint);
+      strip.removeEventListener("scroll", hideHint);
+    };
+  }, [tab]);
+
   return (
     <div className="site site-v2">
       <nav className="v2-tabs">
@@ -74,10 +236,10 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
           Alden Huschle
         </button>
         <button
-          className={`v2-tab ${tab === "work" ? "v2-tab-active" : ""}`}
-          onClick={() => setTab("work")}
+          className={`v2-tab ${tab === "design" ? "v2-tab-active" : ""}`}
+          onClick={() => setTab("design")}
         >
-          Work
+          Design
         </button>
         <button
           className={`v2-tab ${tab === "music" ? "v2-tab-active" : ""}`}
@@ -92,12 +254,6 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
           >
             Observations
           </button>
-          <button
-            className={`v2-tab ${tab === "changelog" ? "v2-tab-active" : ""}`}
-            onClick={() => setTab("changelog")}
-          >
-            Changelog
-          </button>
         </span>
       </nav>
 
@@ -106,17 +262,17 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
         <section className="v2-panel v2-panel-home">
           <div className="v2-prose">
             <p>
-              Lately I&apos;ve been recording{" "}
+              Lately I&apos;ve been leading design at{" "}
+              <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">WethosAI</a>, recording{" "}
               <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>, building{" "}
               <a
-                href="/work"
+                href="/design"
                 className="v2-link"
                 onClick={(e) => {
                   e.preventDefault();
-                  setTab("work");
+                  setTab("design");
                 }}
-              >Prompting People</a>, designing for{" "}
-              <a href="https://numberone.ai/" target="_blank" rel="noopener" className="v2-link">NumberOne AI</a>, and{" "}
+              >Prompting People</a>, and{" "}
               <a
                 href="/observations"
                 className="v2-link"
@@ -139,11 +295,15 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
           </div>
 
           <div className="v2-footer-links">
-            <a href="mailto:alden@aldenhuschle.com">Email</a>
+            <a
+              href="/alden-huschle-resume-june-2026.pdf"
+              target="_blank"
+              rel="noopener"
+            >
+              Resume
+            </a>
             <span className="v2-footer-sep"> / </span>
-            <a href="https://www.instagram.com/aldenhuschle/" target="_blank" rel="noopener">IG</a>
-            <span className="v2-footer-sep"> / </span>
-            <a href="https://x.com/aldenhuschle" target="_blank" rel="noopener">X</a>
+            <a href="mailto:alden@aldenhuschle.com">Contact</a>
           </div>
 
           <div className={`v2-feature-image${eggActive ? " v2-feature-image-egg-active" : ""}`}>
@@ -161,9 +321,9 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
         </section>
       )}
 
-      {/* ─── WORK ─── */}
-      {tab === "work" && (
-        <section className="v2-panel v2-panel-work">
+      {/* ─── DESIGN ─── */}
+      {tab === "design" && (
+        <section className="v2-panel v2-panel-design">
           <div className="v2-section">
             <h2 className="v2-section-title">Prompting People</h2>
             <p className="v2-section-kicker">Side project</p>
@@ -188,7 +348,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
               WethosAI is one of the companies incubated inside NumberOne AI. I lead brand, website, and marketing design. An AI-forward identity built from scratch, shipped with emerging tools so the surface area of the work can move as fast as the product.
             </p>
             <p className="v2-section-body v2-release-links">
-              <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">Live at wethos.ai →</a>
+              <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">Live at wethos.ai <UpRightArrow /></a>
             </p>
             <div style={{ marginTop: "clamp(0.5rem, 1.2vw, 1rem)" }}>
               <HumanAgentSandbox />
@@ -202,50 +362,144 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
               Dixon Creative Center is a creative center in Long Beach. The site is built around a facade-as-interface conceit: a hand-drawn pen-and-paper world where every surface speaks the same visual language.
             </p>
             <p className="v2-section-body v2-release-links">
-              <a href="https://dixoncreativecenter.com/" target="_blank" rel="noopener" className="v2-link">Live at dixoncreativecenter.com →</a>
+              <a href="https://dixoncreativecenter.com/" target="_blank" rel="noopener" className="v2-link">Live at dixoncreativecenter.com <UpRightArrow /></a>
             </p>
             <div style={{ marginTop: "clamp(1.5rem, 3vw, 2rem)" }}>
               <DixonScheduleSandbox />
             </div>
           </div>
+
+          <div className="v2-section">
+            <h2 className="v2-section-title">Gig posters</h2>
+            <p className="v2-section-kicker">Client work</p>
+            <p className="v2-section-body">
+              A set of show posters made for Seattle&apos;s music scene circa 2022, designed to bring a distinct visual identity to each bill.
+            </p>
+            <div className="v2-poster-grid">
+              {GIG_POSTERS.map((poster) => (
+                <picture key={poster.name}>
+                  <source type="image/avif" srcSet={`/optimized/poster-${poster.name}-800.avif 800w, /optimized/poster-${poster.name}-${poster.large}.avif ${poster.large}w`} sizes="(max-width: 759px) 100vw, 250px" />
+                  <source type="image/webp" srcSet={`/optimized/poster-${poster.name}-800.webp 800w, /optimized/poster-${poster.name}-${poster.large}.webp ${poster.large}w`} sizes="(max-width: 759px) 100vw, 250px" />
+                  <img className="v2-img" src={`/poster-${poster.name}.png`} alt={poster.alt} width={poster.width} height={poster.height} loading="lazy" decoding="async" />
+                </picture>
+              ))}
+            </div>
+          </div>
+
+          <div className="v2-section">
+            <h2 className="v2-section-title">A house is not a home</h2>
+            <p className="v2-section-kicker">Side project</p>
+            <p className="v2-section-body">
+              A collection of images from Snoqualmie, WA, and Seattle, WA, pieced together into a horizontal composition of contrast.
+            </p>
+            <div className="v2-house-body" ref={houseStripRef} aria-label="A house is not a home image strip">
+              <div className="v2-house-strip">
+                <picture>
+                  <source type="image/avif" srcSet="/optimized/house-strip-4500.avif 4500w, /optimized/house-strip-9000.avif 9000w, /optimized/house-strip-16500.avif 16500w" sizes="(max-width: 640px) 3304px, 6608px" />
+                  <source type="image/webp" srcSet="/optimized/house-strip-4500.webp 4500w, /optimized/house-strip-9000.webp 9000w, /optimized/house-strip-16000.webp 16000w" sizes="(max-width: 640px) 3304px, 6608px" />
+                  <img className="v2-img" src="/house-strip.jpg" alt="A house is not a home" width={16500} height={1050} loading="lazy" decoding="async" />
+                </picture>
+              </div>
+            </div>
+            <div className={`v2-house-hint${houseHintHidden ? " v2-house-hint-hidden" : ""}`} aria-hidden="true">
+              <svg viewBox="0 0 56 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="15" y1="12" x2="4" y2="12" />
+                <polyline points="9,7 4,12 9,17" />
+                <circle cx="28" cy="12" r="3" fill="currentColor" stroke="none" />
+                <line x1="41" y1="12" x2="52" y2="12" />
+                <polyline points="47,7 52,12 47,17" />
+              </svg>
+            </div>
+          </div>
         </section>
+      )}
+
+      {/* ─── CLIENT PORTAL ─── */}
+      {tab === "portal" && portalUnlocked && <ClientPortalPanel />}
+
+      {portalGateOpen && (
+        <div className="v2-password-backdrop" role="presentation" onClick={closePortalGate}>
+          <form
+            aria-labelledby="v2-password-title"
+            aria-modal="true"
+            className="v2-password-modal"
+            onClick={(event) => event.stopPropagation()}
+            onSubmit={submitPortalPassword}
+            role="dialog"
+          >
+            <h2 id="v2-password-title">Sign In</h2>
+            <div className="v2-password-label">
+              <label htmlFor="v2-portal-email">Email</label>
+              <input id="v2-portal-email" autoFocus autoComplete="email" inputMode="email" type="email" />
+            </div>
+            <div className="v2-password-label">
+              <div className="v2-password-label-row">
+                <label htmlFor="v2-portal-password">Password</label>
+                <a href="mailto:alden@aldenhuschle.com">Forgot your password?</a>
+              </div>
+              <input
+                autoComplete="current-password"
+                id="v2-portal-password"
+                type="password"
+                value={portalPassword}
+                onChange={(event) => {
+                  setPortalPassword(event.target.value);
+                  setPortalPasswordError(null);
+                }}
+              />
+            </div>
+            {portalPasswordError && <p className="v2-password-error">{portalPasswordError}</p>}
+            <label className="v2-password-remember">
+              <input defaultChecked type="checkbox" />
+              <span>Remember me on this device</span>
+            </label>
+            <div className="v2-password-actions">
+              <button className="v2-password-primary" type="submit">
+                Sign in
+              </button>
+            </div>
+            <div className="v2-password-divider">
+              <span>OR</span>
+            </div>
+            <div className="v2-password-providers" aria-label="Client sign-in options">
+              <button className="v2-password-provider" type="button">
+                <svg className="v2-password-provider-icon" viewBox="0 0 18 18" aria-hidden="true">
+                  <path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615Z" />
+                  <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.258c-.806.54-1.837.859-3.048.859-2.344 0-4.328-1.583-5.036-3.711H.957v2.332A9 9 0 0 0 9 18Z" />
+                  <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A9 9 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" />
+                  <path fill="#EA4335" d="M9 3.58c1.322 0 2.508.455 3.44 1.347l2.022-2.022C13.463 1.475 11.43 0 9 0A9 9 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" />
+                </svg>
+                <span>Sign in with Google</span>
+              </button>
+              <button className="v2-password-provider" type="button">
+                <svg className="v2-password-provider-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" aria-hidden="true">
+                  <circle cx="9" cy="9" r="3" />
+                  <path d="M11.5 11.5 21 21" />
+                  <path d="m16 16 2.2-2.2" />
+                  <path d="m19 19 2-2" />
+                </svg>
+                <span>Sign in with passkey</span>
+              </button>
+            </div>
+            <p className="v2-password-contact">
+              Not a client yet? <a href="mailto:alden@aldenhuschle.com">Contact me.</a>
+            </p>
+          </form>
+        </div>
       )}
 
       {/* ─── MUSIC ─── */}
       {tab === "music" && (
         <section className="v2-panel v2-panel-music">
           <div className="v2-section v2-music-release">
-            <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-cover v2-cover-placeholder" aria-label="album-01_wip-unmixed">
-              <svg className="v2-cover-placeholder-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" aria-hidden="true">
-                <circle cx="50" cy="50" r="45" fill="currentColor" fillOpacity="0.05" stroke="none" />
-                <circle cx="50" cy="50" r="45" strokeOpacity="0.11" strokeWidth="0.35" />
-                <circle cx="50" cy="50" r="43.5" strokeOpacity="0.035" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="42" strokeOpacity="0.03" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="40.4" strokeOpacity="0.05" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="38.8" strokeOpacity="0.03" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="37.2" strokeOpacity="0.055" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="35.4" strokeOpacity="0.035" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="33.6" strokeOpacity="0.055" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="31.8" strokeOpacity="0.03" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="30" strokeOpacity="0.05" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="28.2" strokeOpacity="0.03" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="26.4" strokeOpacity="0.055" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="24.6" strokeOpacity="0.035" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="22.8" strokeOpacity="0.055" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="21" strokeOpacity="0.03" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="19.3" strokeOpacity="0.05" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="17.7" strokeOpacity="0.035" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="16.3" strokeOpacity="0.095" strokeWidth="0.275" />
-                <circle cx="50" cy="50" r="15.2" strokeOpacity="0.04" strokeWidth="0.2" />
-                <circle cx="50" cy="50" r="7.2" strokeOpacity="0.07" strokeWidth="0.25" />
-                <circle cx="50" cy="50" r="1.1" fill="currentColor" fillOpacity="0.25" stroke="none" />
-              </svg>
+            <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-cover" aria-label="album-01_wip-unmixed">
+              <img className="v2-img" src="/cover-unmixed.png" alt="album-01_wip-unmixed cover" width={1254} height={1254} loading="lazy" decoding="async" />
             </a>
             <div className="v2-music-info">
               <h2 className="v2-section-title">album-01_wip-unmixed</h2>
               <p className="v2-section-kicker">Alden Huschle</p>
               <p className="v2-section-body v2-release-links">
-                <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">Listen to the work in progress →</a>
+                <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">Listen to the work in progress <UpRightArrow /></a>
               </p>
             </div>
           </div>

@@ -16,7 +16,7 @@
 
   --display: var(--font-big-shoulders), 'Big Shoulders Display', 'Arial Narrow', sans-serif;
   --body: var(--font-spectral), 'Spectral', Georgia, serif;
-  --mono: var(--font-nova-mono), 'Nova Mono', 'Courier New', monospace;
+  --mono: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }

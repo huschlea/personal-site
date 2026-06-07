@@ -7,7 +7,7 @@ const QUESTION = 'What do you protect that no one asked you to?'
 const MAX_CHARS = 800
 
 const FONT_SANS = "'Geist', system-ui, -apple-system, sans-serif"
-const FONT_MONO = "'Geist Mono', ui-monospace, 'SF Mono', Consolas, monospace"
+const FONT_MONO = FONT_SANS
 const FONT_SERIF = "'Newsreader', Georgia, 'Times New Roman', serif"
 
 const COLOR_BORDER = 'rgba(0, 0, 0, 0.08)'
