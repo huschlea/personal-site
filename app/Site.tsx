@@ -404,9 +404,9 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <div className="v2-house-body" ref={houseStripRef} aria-label="A house is not a home image strip">
               <div className="v2-house-strip">
                 <picture>
-                  <source type="image/avif" srcSet="/optimized/house-strip-4500.avif 4500w, /optimized/house-strip-9000.avif 9000w, /optimized/house-strip-16500.avif 16500w" sizes="(max-width: 640px) 3304px, 6608px" />
-                  <source type="image/webp" srcSet="/optimized/house-strip-4500.webp 4500w, /optimized/house-strip-9000.webp 9000w, /optimized/house-strip-16000.webp 16000w" sizes="(max-width: 640px) 3304px, 6608px" />
-                  <img className="v2-img v2-house-img" src="/house-strip.jpg" alt="A house is not a home" width={16500} height={1050} loading="eager" fetchPriority="high" decoding="async" />
+                  <source type="image/avif" srcSet="/optimized/house-strip-4500.avif 4500w, /optimized/house-strip-9000.avif 9000w, /optimized/house-strip-12000.avif 12000w" sizes="(max-width: 640px) 3304px, 6608px" />
+                  <source type="image/webp" srcSet="/optimized/house-strip-4500.webp 4500w, /optimized/house-strip-9000.webp 9000w" sizes="(max-width: 640px) 3304px, 6608px" />
+                  <img className="v2-img v2-house-img" src="/house-strip.jpg" alt="A house is not a home" width={12000} height={763} loading="eager" fetchPriority="high" decoding="async" />
                 </picture>
               </div>
             </div>
