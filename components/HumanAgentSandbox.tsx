@@ -91,8 +91,11 @@ const STYLES = `
   height: 420px;
   background: transparent;
 }
-@media (min-width: 640px) { .ha-root { height: 500px; } }
-@media (min-width: 1024px) { .ha-root { height: 540px; } }
+/* Height hugs the visualization (a ~380px-tall ring centered in the canvas).
+   Taller canvases left a large dead gap above the ring; 450px keeps it above
+   both the layout rescale floor (~440px) and the particle-orbit clip threshold
+   (~422px), so the viz neither shrinks nor clips. */
+@media (min-width: 640px) { .ha-root { height: 450px; } }
 
 .ha-canvas {
   position: absolute;
