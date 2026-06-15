@@ -658,6 +658,12 @@ body:has(.site-v2) {
   width: 100%;
   height: auto;
   display: block;
+  /* Pin each poster to its own GPU layer so it's rasterized once and blitted
+     during scroll, instead of re-sampled every frame. Without this, the heavily
+     downscaled high-frequency posters (dense star field, repeating lens pattern)
+     shimmer/flicker as they move sub-pixel on scroll. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 @media (min-width: 760px) {
