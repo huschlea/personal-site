@@ -1,10 +1,14 @@
 "use client";
 
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ResponseJournalSandbox } from "../components/ResponseJournalSandbox";
 import { HumanAgentSandbox } from "../components/HumanAgentSandbox";
 import { DixonScheduleSandbox } from "../components/DixonScheduleSandbox";
 import { ClientPortalPanel } from "../components/ClientPortalPanel";
+
+// Runs before paint on the client; falls back to useEffect during SSR to avoid
+// React's "useLayoutEffect does nothing on the server" warning.
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export type Tab = "home" | "design" | "music" | "observations" | "changelog" | "portal";
 
@@ -141,14 +145,19 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
     window.scrollTo({ top: 0 });
   }, [tab]);
 
-  // Image fade-in on load
-  useEffect(() => {
-    const markLoaded = (img: HTMLImageElement) => img.classList.add("v2-loaded");
+  // Image fade-in. Runs before paint (layout effect) so images that are already
+  // cached/complete are revealed instantly — no fade — instead of re-running the
+  // fade-in every time a panel remounts on a tab switch. Only images still
+  // arriving over the network fade in, which is the intended first-load touch.
+  useIsoLayoutEffect(() => {
     document.querySelectorAll<HTMLImageElement>(".site-v2 .v2-img").forEach((img) => {
-      if (img.complete && img.naturalWidth > 0) markLoaded(img);
-      else {
-        img.addEventListener("load", () => markLoaded(img), { once: true });
-        img.addEventListener("error", () => markLoaded(img), { once: true });
+      if (img.classList.contains("v2-loaded")) return;
+      if (img.complete && img.naturalWidth > 0) {
+        img.classList.add("v2-instant", "v2-loaded");
+      } else {
+        const reveal = () => img.classList.add("v2-loaded");
+        img.addEventListener("load", reveal, { once: true });
+        img.addEventListener("error", reveal, { once: true });
       }
     });
   }, [tab]);
@@ -325,6 +334,20 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
       {tab === "design" && (
         <section className="v2-panel v2-panel-design">
           <div className="v2-section">
+            <h2 className="v2-section-title">WethosAI</h2>
+            <p className="v2-section-kicker">In-house</p>
+            <p className="v2-section-body">
+              WethosAI is one of the companies incubated inside NumberOne AI. I lead brand, website, and marketing design. An AI-forward identity built from scratch, shipped with emerging tools so the surface area of the work can move as fast as the product.
+            </p>
+            <p className="v2-section-body v2-release-links">
+              <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">Live at wethos.ai <UpRightArrow /></a>
+            </p>
+            <div style={{ marginTop: "clamp(0.5rem, 1.2vw, 1rem)" }}>
+              <HumanAgentSandbox />
+            </div>
+          </div>
+
+          <div className="v2-section">
             <h2 className="v2-section-title">Prompting People</h2>
             <p className="v2-section-kicker">Side project</p>
             <p className="v2-section-body">
@@ -338,20 +361,6 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             </p>
             <div style={{ marginTop: "clamp(1.5rem, 3vw, 2rem)" }}>
               <ResponseJournalSandbox />
-            </div>
-          </div>
-
-          <div className="v2-section">
-            <h2 className="v2-section-title">WethosAI</h2>
-            <p className="v2-section-kicker">In-house</p>
-            <p className="v2-section-body">
-              WethosAI is one of the companies incubated inside NumberOne AI. I lead brand, website, and marketing design. An AI-forward identity built from scratch, shipped with emerging tools so the surface area of the work can move as fast as the product.
-            </p>
-            <p className="v2-section-body v2-release-links">
-              <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">Live at wethos.ai <UpRightArrow /></a>
-            </p>
-            <div style={{ marginTop: "clamp(0.5rem, 1.2vw, 1rem)" }}>
-              <HumanAgentSandbox />
             </div>
           </div>
 
@@ -397,7 +406,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
                 <picture>
                   <source type="image/avif" srcSet="/optimized/house-strip-4500.avif 4500w, /optimized/house-strip-9000.avif 9000w, /optimized/house-strip-16500.avif 16500w" sizes="(max-width: 640px) 3304px, 6608px" />
                   <source type="image/webp" srcSet="/optimized/house-strip-4500.webp 4500w, /optimized/house-strip-9000.webp 9000w, /optimized/house-strip-16000.webp 16000w" sizes="(max-width: 640px) 3304px, 6608px" />
-                  <img className="v2-img" src="/house-strip.jpg" alt="A house is not a home" width={16500} height={1050} loading="lazy" decoding="async" />
+                  <img className="v2-img v2-house-img" src="/house-strip.jpg" alt="A house is not a home" width={16500} height={1050} loading="eager" fetchPriority="high" decoding="async" />
                 </picture>
               </div>
             </div>

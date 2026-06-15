@@ -675,6 +675,11 @@ body:has(.site-v2) {
 
 .site-v2 .v2-img.v2-loaded { opacity: 1; }
 
+/* Cached images get revealed before paint with no transition, so revisiting a
+   tab doesn't replay the fade-in. Wins over the .v2-house-img 0.9s transition
+   on specificity (three classes vs two). */
+.site-v2 .v2-img.v2-instant { transition: none; }
+
 /* ─── house strip ─── */
 
 .site-v2 .v2-house-hint {
@@ -718,6 +723,9 @@ body:has(.site-v2) {
   width: min(1120px, calc(100vw - (2 * var(--v2-pad))));
   max-width: calc(100vw - (2 * var(--v2-pad)));
   transform: translateX(-50%);
+  background:
+    linear-gradient(90deg, rgba(20, 18, 16, 0.035), rgba(20, 18, 16, 0.018)),
+    var(--v2-bg);
 }
 
 .site-v2 .v2-house-body::-webkit-scrollbar { display: none; }
@@ -741,6 +749,10 @@ body:has(.site-v2) {
   display: block;
   pointer-events: none;
   user-select: none;
+}
+
+.site-v2 .v2-house-img {
+  transition: opacity 0.9s cubic-bezier(0.2, 0, 0, 1);
 }
 
 /* ─── molecule (simplified: static 2x2 grid in v2) ─── */
