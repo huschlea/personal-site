@@ -270,18 +270,11 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
       {tab === "home" && (
         <section className="v2-panel v2-panel-home">
           <div className="v2-prose">
+            <p>I&apos;m interested in creating resonance.</p>
             <p>
               Lately I&apos;ve been leading design at{" "}
               <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">WethosAI</a>, recording{" "}
-              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>, building{" "}
-              <a
-                href="/design"
-                className="v2-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setTab("design");
-                }}
-              >Prompting People</a>, and{" "}
+              <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-link">an album</a>, and{" "}
               <a
                 href="/observations"
                 className="v2-link"
