@@ -270,7 +270,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
       {tab === "home" && (
         <section className="v2-panel v2-panel-home">
           <div className="v2-prose">
-            <p>I&apos;m interested in crafting resonance.</p>
+            <p>I&apos;m interested in things that resonate over time.</p>
             <p>
               Lately I&apos;ve been leading design at{" "}
               <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">WethosAI</a>, recording{" "}
