@@ -709,5 +709,6 @@
   "remove the bio on the homepage. only keep the resume and contact",
   "keep the image, but put the resume contact beneath it",
   "image needs to be closer to the nav",
-  "push"
+  "push",
+  "Hide the Observations tab as well, and then push that."
 ]

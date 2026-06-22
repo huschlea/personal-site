@@ -255,14 +255,6 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
         >
           Music
         </button>
-        <span className="v2-tab-group">
-          <button
-            className={`v2-tab ${tab === "observations" ? "v2-tab-active" : ""}`}
-            onClick={() => setTab("observations")}
-          >
-            Observations
-          </button>
-        </span>
       </nav>
 
       {/* ─── HOME ─── */}
