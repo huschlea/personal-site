@@ -710,5 +710,14 @@
   "keep the image, but put the resume contact beneath it",
   "image needs to be closer to the nav",
   "push",
-  "Hide the Observations tab as well, and then push that."
+  "Hide the Observations tab as well, and then push that.",
+  "take the space of the hero image on the homepage and create a simple, minimal interactive element that is comprised of many squares shifting around and creating unique structures. get the dev server up on an unused server so i can see",
+  "create an outline where the boundary of the rectangle is, and mkae sure the squres move as smoothly as possible, right now they waver a bit",
+  "actually i dont like this. take the line that sits under the nav and duplicate it beneath itself repeatedly until it reaches the resume/contact. make it so the lines get progressively further apart vertically the farther they get from the nav",
+  "needs to space out evenly and progressively from the top nav, right now there's an awkwardly large gap below the nav",
+  "a couple less lines, no same spacing between two lines, always progressing",
+  "less lines and needs to start off more spread out at the top",
+  "less lines",
+  "let's actually keep the image that's in place now and make sure it loads as quickly as it can",
+  "okay push"
 ]

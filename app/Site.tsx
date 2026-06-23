@@ -264,7 +264,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <picture className="v2-feature-image-pic v2-feature-image-default">
               <source type="image/avif" srcSet="/optimized/home-feature-800.avif 800w, /optimized/home-feature-1600.avif 1600w, /optimized/home-feature-2500.avif 2500w" sizes="(max-width: 768px) 100vw, 620px" />
               <source type="image/webp" srcSet="/optimized/home-feature-800.webp 800w, /optimized/home-feature-1600.webp 1600w, /optimized/home-feature-2500.webp 2500w" sizes="(max-width: 768px) 100vw, 620px" />
-              <img className="v2-img" src="/home-feature.jpg" alt="" width={3024} height={1684} loading="eager" decoding="async" />
+              <img className="v2-img" src="/home-feature.jpg" alt="" width={3024} height={1684} loading="eager" fetchPriority="high" decoding="async" />
             </picture>
           </div>
 
