@@ -725,5 +725,9 @@
   "Change title to Trust as relief",
   "push",
   "change \"trusting the perspective of a stranger\" to \"trusting a stranger.\" and change title to Trusting a stranger",
+  "push",
+  "change to \"comes with earned trust from a stranger\". change title to Trusting strangers",
+  "does that last sentence read correctly?",
+  "okay go with trust earned by a stranger, leave the design outoput be",
   "push"
 ]
