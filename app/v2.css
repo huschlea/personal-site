@@ -3,11 +3,11 @@
 */
 
 body:has(.site-v2) {
-  background: #FDFDFB;
+  background: #FEFEFD;
 }
 
 .site-v2 {
-  --v2-bg: #FDFDFB;
+  --v2-bg: #FEFEFD;
   --v2-ink: #141210;
   --v2-mid: #3F3D39;
   --v2-faded: #8F8C84;
