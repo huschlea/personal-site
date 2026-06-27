@@ -626,10 +626,25 @@ export function HumanAgentSandbox() {
     if (!ctx) return
 
     let running = true
+    let lastNow = 0
 
     const tick = (now: number) => {
       if (!running) return
       animRef.current = requestAnimationFrame(tick)
+
+      // Tab-resume guard: a backgrounded tab pauses (or throttles) rAF while the
+      // wall clock keeps running, so on return `now` has jumped ahead by however
+      // long we were away. The ambient orbit is a function of absolute time, so
+      // without this it snaps to a desynced, scrambled ring — and barely
+      // recovers afterward, since the orbit speed is tiny. Push the time anchors
+      // past the gap so all time-based motion resumes exactly where it paused.
+      if (lastNow && now - lastNow > 200) {
+        const gap = now - lastNow
+        phaseStartRef.current += gap
+        ambientStartRef.current += gap
+      }
+      lastNow = now
+
       if (!isVisibleRef.current) return
 
       const lo = layoutRef.current
