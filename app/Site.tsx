@@ -297,7 +297,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <h2 className="v2-section-title">WethosAI</h2>
             <p className="v2-section-kicker">In-house</p>
             <p className="v2-section-body">
-              WethosAI is an executive decision intelligence company incubated inside NumberOne AI. I lead brand, website, and marketing design. An AI-forward identity built from scratch so the surface area of the work can move as fast as the product.
+              WethosAI is an executive decision intelligence company incubated inside NumberOne AI. I lead brand and web design with an AI-forward identity built from scratch so the surface area of the work can move as fast as the product.
             </p>
             <p className="v2-section-body v2-release-links">
               <a href="https://wethos.ai/" target="_blank" rel="noopener" className="v2-link">Live at wethos.ai <UpRightArrow /></a>
