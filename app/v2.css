@@ -101,7 +101,10 @@ body:has(.site-v2) {
   max-width: var(--v2-col);
   margin: 0 auto;
   text-align: left;
-  animation: v2-fade 0.35s cubic-bezier(0.2, 0, 0, 1) both;
+  /* Let the entrance transform fall back to `none` after it finishes. Keeping
+     the final keyframe filled leaves the entire (very tall) panel on a GPU
+     layer, which can flash when its separately composited images scroll. */
+  animation: v2-fade 0.35s cubic-bezier(0.2, 0, 0, 1);
 }
 
 @keyframes v2-fade {

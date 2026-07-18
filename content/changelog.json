@@ -742,5 +742,8 @@
   "change \"born from\" to \"born out of\"",
   "I think the background color on my site is slightly too creamy. I want it to be a little bit closer to white.",
   "push",
-  "did that include the copy that too?"
+  "did that include the copy that too?",
+  "change \"WethosAI is one of the companies incubated inside NumberOne AI. I lead brand, website, and marketing design. An AI-forward identity built from scratch, shipped with emerging tools so the surface area of the work can move as fast as the product.\" to \"WethosAI is an executive decision intelligence company incubated inside NumberOne AI. I lead brand, website, and marketing design. An AI-forward identity built from scratch so the surface area of the work can move as fast as the product.\"",
+  "this image is a bit glitchy when scrolling. it almost looks like t flashes slightly. can you fix this?",
+  "push both changes live"
 ]
