@@ -1,0 +1,134 @@
+[
+  {
+    "id": "0001",
+    "date": "2026-07-25",
+    "title": "Artifact first, schemas second",
+    "essence": "Design the reference assets to portfolio standard first, then extract the architecture from what worked. No schema before an artifact earns it."
+  },
+  {
+    "id": "0002",
+    "date": "2026-07-25",
+    "title": "The vertical slice is a blog campaign release tool",
+    "essence": "Prove the system through one deep slice: a finished article in, a coordinated campaign out. The event kit is cut so the slice can go all the way down."
+  },
+  {
+    "id": "0003",
+    "date": "2026-07-25",
+    "title": "One demonstration brand; no reconstructed brands",
+    "essence": "One fully designed brand slots into the system. Brand-agnosticism is proven at the package seam, not by inventing or reconstructing a second brand."
+  },
+  {
+    "id": "0004",
+    "date": "2026-07-25",
+    "title": "Code-native production is the doctrine",
+    "essence": "Visual systems, composition, and validation are authored in code. AI assists interpretation; it never makes a visual decision."
+  },
+  {
+    "id": "0005",
+    "date": "2026-07-25",
+    "title": "Nine entities, three layers, no workflow engine",
+    "essence": "The domain model trims to nine entities and three layers. Workflow is a state enum, not an engine."
+  },
+  {
+    "id": "0006",
+    "date": "2026-07-25",
+    "title": "The Ledger: project provenance separate from product provenance",
+    "essence": "The process gets its own provenance: immutable decision records, a machine event log, kept failures, and publish flags that fail closed."
+  },
+  {
+    "id": "0007",
+    "date": "2026-07-26",
+    "title": "Substack-first format contract",
+    "essence": "Formats are contracts. Every master is designed crop-proof against the publishing platform's real surfaces, with protected zones as insurance."
+  },
+  {
+    "id": "0008",
+    "date": "2026-07-26",
+    "title": "Generated imagery inside a code-owned composition",
+    "essence": "Generated imagery enters as raw material only. A deterministic treatment chain owns the look; raw model output never ships."
+  },
+  {
+    "id": "0009",
+    "date": "2026-07-26",
+    "title": "One world per era; three finalists go to a render test",
+    "essence": "Series coherence demands one material world per era. Candidate worlds are judged from treated renders, never from concepts."
+  },
+  {
+    "id": "0010",
+    "date": "2026-07-26",
+    "title": "Blog heroes carry no article title",
+    "essence": "Heroes are visual only. The platform already renders the headline; the image does its own work."
+  },
+  {
+    "id": "0011",
+    "date": "2026-07-26",
+    "title": "The hero world is CAST",
+    "essence": "Twelve rolls settle the world: soft shadows of unseen constructed forms on white plaster. Every rule in the grammar was earned by a specific failure."
+  },
+  {
+    "id": "0012",
+    "date": "2026-07-27",
+    "title": "The quote card reference is the statement register",
+    "essence": "The quote card is the statement register: the words alone, set large on a wash of the article's own hero. No brand furniture."
+  },
+  {
+    "id": "0013",
+    "date": "2026-07-27",
+    "title": "Quote emphasis may be editorial",
+    "essence": "Emphasis becomes a hierarchy: the source's own bold wins, a human-approved editorial span may follow, otherwise the line sets whole."
+  },
+  {
+    "id": "0014",
+    "date": "2026-07-27",
+    "title": "The in-article slot is the closing ad",
+    "essence": "Restyled prose never earns an in-article slot. Every post closes with an ad instead; charts demote to a conditional form."
+  },
+  {
+    "id": "0015",
+    "date": "2026-07-28",
+    "title": "The closing ad, final form",
+    "essence": "Twenty-one rounds settle the ad. Type is sized for the smallest real render, and browser-measured metrics are recorded so geometry re-renders deterministically."
+  },
+  {
+    "id": "0016",
+    "date": "2026-07-28",
+    "title": "Extraction from the frozen baseline",
+    "essence": "The signed work freezes as history and the capability is re-derived beside it. Byte-identical reproduction of the signed sets is the first regression gate."
+  },
+  {
+    "id": "0017",
+    "date": "2026-07-28",
+    "title": "The brand package schema is extracted",
+    "essence": "The schema is extracted from the working package and records what the system actually consumes. The four schemas written before any artifact existed retire."
+  },
+  {
+    "id": "0018",
+    "date": "2026-07-29",
+    "title": "The brand intelligence layer",
+    "essence": "The brand's mind becomes versioned data: a dated strategy snapshot with its source pinned by hash, and open questions recorded instead of inferred."
+  },
+  {
+    "id": "0019",
+    "date": "2026-07-29",
+    "title": "Source emphasis wins only when structural",
+    "essence": "Source emphasis wins only when it partitions the line. Micro-stress falls to human judgment; split serves antithesis, whole ink serves momentum."
+  },
+  {
+    "id": "0020",
+    "date": "2026-07-29",
+    "title": "Production integration replaces the synthetic proof",
+    "essence": "The synthetic portability proof is replaced by consumption: the capability ships into a live product, while the system's repo stays the canonical home."
+  },
+  {
+    "id": "0021",
+    "date": "2026-07-29",
+    "title": "Emphasis is computed, never proposed",
+    "essence": "The model stops proposing emphasis entirely; emphasis is computed from the sentence itself. The failure mode is deleted instead of the device."
+  },
+  {
+    "id": "0022",
+    "date": "2026-07-30",
+    "title": "The reliability doctrine",
+    "essence": "Model choice is an engineering decision. Rejections name their evidence, failures persist their records, fixes require reproduction, and demos are preflighted."
+  }
+]
