@@ -1,0 +1,238 @@
+/* ─── the press story: desktop-only full-bleed stage ─── */
+
+.site-ds.ds-story-mode {
+  padding: 0;
+}
+
+.site-ds .ds-story-home {
+  position: fixed;
+  top: clamp(1.2rem, 2vw, 1.8rem);
+  left: clamp(1.5rem, 3vw, 2.5rem);
+  z-index: 30;
+}
+
+.site-ds .ds-stage-wrap {
+  position: relative;
+  /* one 130vh stretch per beat, plus room to arrive and leave */
+  height: calc(8 * 130vh + 50vh);
+}
+
+.site-ds .ds-stage-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.site-ds .ds-stage-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── the title beat ─── */
+
+.site-ds .ds-title-block {
+  position: absolute;
+  top: 24vh;
+  left: clamp(2rem, 8vw, 9rem);
+  width: min(440px, 38vw);
+  transition: opacity 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.site-ds .ds-title-block .ds-body { margin-top: 0.4rem; }
+
+.site-ds .ds-title-gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.site-ds .ds-scroll-cue {
+  margin-top: 2.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ds-faded);
+}
+
+/* ─── caption steps ─── */
+
+.site-ds .ds-cap {
+  position: absolute;
+  right: clamp(2rem, 6vw, 7rem);
+  width: 360px;
+  padding-left: 1.2rem;
+  border-left: 1px solid rgba(20, 18, 16, 0.14);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.45s cubic-bezier(0.2, 0, 0, 1), transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.site-ds .ds-cap-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-ds .ds-cap-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-faded);
+  margin-bottom: 0.5rem;
+}
+
+.site-ds .ds-cap-title {
+  font-size: 1.02rem;
+  font-weight: 500;
+  color: var(--ds-ink);
+  text-shadow: 0.008em 0 0 rgba(20, 18, 16, 0.5);
+  margin-bottom: 0.55rem;
+}
+
+.site-ds .ds-cap-body {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--ds-mid);
+  background: rgba(254, 254, 253, 0.82);
+  text-wrap: pretty;
+}
+
+/* ─── the floor below the drawing ─── */
+
+.site-ds .ds-story-floor {
+  padding: clamp(3rem, 6vw, 5rem) var(--ds-pad) clamp(4rem, 8vw, 6rem);
+}
+
+/* the boot frame while the chooser decides */
+.ds-boot {
+  min-height: 100svh;
+  background: #fefefd;
+}
+
+/* nine beats */
+.site-ds .ds-stage-wrap-9 {
+  height: calc(9 * 130vh + 50vh);
+}
+
+/* ─── structured layer panels ─── */
+
+.site-ds .ds-cap-panel {
+  width: 420px;
+  background: rgba(254, 254, 253, 0.94);
+  padding: 1.1rem 0 1.1rem 1.2rem;
+}
+
+.site-ds .ds-cap-section {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-faded);
+  margin: 1rem 0 0.45rem;
+}
+
+.site-ds .ds-cap-panel .ds-cap-section:first-of-type {
+  margin-top: 0.8rem;
+}
+
+.site-ds .ds-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.site-ds .ds-chip {
+  font-size: 0.78rem;
+  color: var(--ds-mid);
+  border: 1px solid rgba(20, 18, 16, 0.16);
+  border-radius: 0;
+  padding: 0.18rem 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.site-ds .ds-cap-concepts {
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  color: var(--ds-faded);
+}
+
+.site-ds .ds-tree {
+  font-family: 'SF Mono', ui-monospace, Menlo, monospace;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--ds-mid);
+  background: rgba(20, 18, 16, 0.025);
+  border: 1px solid rgba(20, 18, 16, 0.08);
+  border-radius: 0;
+  padding: 0.8rem 0.9rem;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* ─── the explorer end state ─── */
+
+.site-ds .ds-explorer-chips {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1.4rem, 3vh, 2.2rem);
+  transform: translateX(-50%) translateY(16px);
+  display: flex;
+  gap: 0.45rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s cubic-bezier(0.2, 0, 0, 1), transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+  z-index: 20;
+}
+
+.site-ds .ds-explore-on .ds-explorer-chips {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.site-ds .ds-explorer-chip {
+  font-family: var(--ds-sans);
+  font-size: 0.82rem;
+  color: var(--ds-mid);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(20, 18, 16, 0.18);
+  border-radius: 0;
+  padding: 0.42rem 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  box-shadow: 0 1px 2px rgba(23, 23, 26, 0.04);
+}
+
+.site-ds .ds-explorer-chip:hover { border-color: rgba(20, 18, 16, 0.45); color: var(--ds-ink); }
+
+.site-ds .ds-explorer-chip-on {
+  border-color: rgba(20, 18, 16, 0.65);
+  color: var(--ds-ink);
+}
+
+.site-ds .ds-explorer-num {
+  color: var(--ds-faded);
+  font-size: 0.7rem;
+  margin-right: 0.4rem;
+}
+
+.site-ds .ds-explorer-panel {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  right: clamp(2rem, 6vw, 7rem);
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #fefefd;
+  border-left: 1px solid rgba(20, 18, 16, 0.14);
+  padding: 1.1rem 0 1.1rem 1.2rem;
+  z-index: 15;
+  animation: ds-panel-in 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes ds-panel-in {
+  from { opacity: 0; transform: translateY(calc(-50% + 8px)); }
+  to   { opacity: 1; transform: translateY(-50%); }
+}

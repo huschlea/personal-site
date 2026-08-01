@@ -1,0 +1,514 @@
+/* ─── /design-system: standalone hidden page ───────────────────
+   Same material as the v2 site (paper, ink, hairlines, system stack), scoped
+   under .site-ds. The wide sections are allowed to break the 520px column;
+   prose never does. */
+
+body:has(.site-ds) {
+  background: #fefefd;
+}
+
+.site-ds {
+  --ds-bg: #fefefd;
+  --ds-ink: #141210;
+  --ds-mid: #3f3d39;
+  --ds-faded: #8f8c84;
+  --ds-ghost: rgba(20, 18, 16, 0.08);
+  --ds-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+             'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --ds-col: 520px;
+  --ds-mid-col: 720px;
+  --ds-wide-col: 1060px;
+  --ds-pad: clamp(1.5rem, 4vw, 2.5rem);
+
+  background: var(--ds-bg);
+  min-height: 100svh;
+  font-family: var(--ds-sans);
+  color: var(--ds-ink);
+  letter-spacing: -0.005em;
+  /* globals.css (the legacy site) lowercases everything at the body level;
+     reset it here the same way .site-v2 does. */
+  text-transform: none;
+  padding: clamp(2.25rem, 5vw, 3.5rem) var(--ds-pad) clamp(4rem, 8vw, 6rem);
+  animation: ds-fade 0.35s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes ds-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.site-ds .ds-col { max-width: var(--ds-col); margin: 0 auto; }
+.site-ds .ds-mid { max-width: var(--ds-mid-col); margin: 0 auto; }
+.site-ds .ds-wide { max-width: var(--ds-wide-col); margin: 0 auto; }
+
+/* ─── header + arrival ─── */
+
+.site-ds .ds-top {
+  max-width: var(--ds-wide-col);
+  margin: 0 auto clamp(2.5rem, 6vw, 4rem);
+}
+
+.site-ds .ds-home {
+  font-size: clamp(0.95rem, 1vw, 1rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ds-faded);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-ds .ds-home:hover { color: var(--ds-ink); }
+
+.site-ds .ds-title {
+  font-size: clamp(1.3rem, 1.8vw, 1.55rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.9rem;
+  text-shadow: 0.008em 0 0 rgba(20, 18, 16, 0.5);
+}
+
+.site-ds .ds-lead {
+  font-size: clamp(1rem, 1.15vw, 1.08rem);
+  line-height: 1.5;
+  color: var(--ds-ink);
+  margin-bottom: 0.9rem;
+}
+
+.site-ds .ds-body {
+  font-size: clamp(0.95rem, 1vw, 1rem);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--ds-mid);
+  text-wrap: pretty;
+}
+
+.site-ds .ds-eyebrow {
+  font-size: clamp(0.78rem, 0.84vw, 0.82rem);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  color: var(--ds-faded);
+  margin: 0 0 1rem;
+}
+
+/* ─── the build / the taste ─── */
+
+.site-ds .ds-duo {
+  max-width: var(--ds-wide-col);
+  margin: clamp(3rem, 6vw, 4.5rem) auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+}
+
+/* ─── the map ─── */
+
+.site-ds .ds-wide {
+  margin-top: clamp(3.5rem, 7vw, 5rem);
+}
+
+.site-ds .ds-map-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.site-ds .ds-map-flow {
+  display: block;
+  width: 100%;
+  min-width: 880px;
+  height: auto;
+}
+
+.site-ds .ds-map-flow text {
+  font-family: var(--ds-sans);
+  letter-spacing: -0.005em;
+  pointer-events: none;
+}
+
+.site-ds .ds-map-ordinal {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  fill: var(--ds-faded);
+}
+
+.site-ds .ds-map-title { font-size: 13.5px; fill: rgba(20, 18, 16, 0.82); }
+.site-ds .ds-map-line { font-size: 11px; fill: rgba(20, 18, 16, 0.48); }
+.site-ds .ds-map-faint { font-size: 10.5px; fill: rgba(20, 18, 16, 0.34); }
+
+.site-ds .ds-region-box,
+.site-ds .ds-region-loop {
+  fill: none;
+  stroke: rgba(20, 18, 16, 0.32);
+  stroke-width: 1;
+  transition: stroke 0.15s ease, fill 0.15s ease;
+}
+
+.site-ds .ds-map-region { cursor: pointer; outline: none; }
+
+.site-ds .ds-map-region:focus-visible {
+  outline: 1px solid rgba(20, 18, 16, 0.55);
+  outline-offset: 3px;
+}
+
+.site-ds .ds-map-region:hover .ds-region-box,
+.site-ds .ds-map-region:hover .ds-region-loop {
+  stroke: rgba(20, 18, 16, 0.55);
+}
+
+.site-ds .ds-map-region-active .ds-region-box {
+  stroke: rgba(20, 18, 16, 0.75);
+  fill: rgba(20, 18, 16, 0.025);
+}
+
+.site-ds .ds-map-region-active .ds-region-loop {
+  stroke: rgba(20, 18, 16, 0.75);
+}
+
+.site-ds .ds-strand { fill: none; stroke: rgba(20, 18, 16, 0.16); stroke-width: 1; }
+.site-ds .ds-seam { stroke: rgba(20, 18, 16, 0.4); stroke-width: 1; stroke-dasharray: 3 4; }
+.site-ds .ds-hairline { stroke: rgba(20, 18, 16, 0.1); stroke-width: 1; }
+.site-ds .ds-engine-ring { fill: none; stroke: rgba(20, 18, 16, 0.18); stroke-width: 1; }
+.site-ds .ds-engine-dot { fill: rgba(20, 18, 16, 0.55); }
+.site-ds .ds-gate-node { fill: #fefefd; stroke: rgba(20, 18, 16, 0.55); stroke-width: 1; }
+.site-ds .ds-window-dot { fill: rgba(20, 18, 16, 0.16); }
+.site-ds .ds-skeleton { fill: rgba(20, 18, 16, 0.035); stroke: rgba(20, 18, 16, 0.1); stroke-width: 1; }
+.site-ds .ds-loop-head { fill: none; stroke: rgba(20, 18, 16, 0.32); stroke-width: 1; }
+
+.site-ds .ds-legend {
+  font-size: 0.82rem;
+  color: var(--ds-faded);
+  margin-top: 0.9rem;
+}
+
+/* ─── strata candidate ─── */
+
+.site-ds .ds-strata {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.site-ds .ds-stratum {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: baseline;
+  gap: 0.8rem;
+  text-align: left;
+  font-family: var(--ds-sans);
+  background: none;
+  border: 1px solid rgba(20, 18, 16, 0.32);
+  padding: 0.9rem 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.site-ds .ds-stratum-in-progress { border-style: dashed; }
+.site-ds .ds-stratum-conceptual { border-style: dotted; }
+
+.site-ds .ds-stratum:hover { border-color: rgba(20, 18, 16, 0.55); }
+
+.site-ds .ds-stratum-active {
+  border-color: rgba(20, 18, 16, 0.75);
+  background: rgba(20, 18, 16, 0.025);
+}
+
+.site-ds .ds-stratum-ordinal { font-size: 0.72rem; color: var(--ds-faded); }
+.site-ds .ds-stratum-name { font-size: 0.97rem; color: var(--ds-ink); }
+.site-ds .ds-stratum-def { font-size: 0.86rem; color: var(--ds-faded); }
+
+/* ─── detail panel ─── */
+
+.site-ds .ds-panel {
+  margin-top: clamp(1.6rem, 3vw, 2.4rem);
+  padding-top: clamp(1.2rem, 2vw, 1.6rem);
+  border-top: 1px solid rgba(20, 18, 16, 0.07);
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(2rem, 4vw, 3.5rem);
+  animation: ds-panel-fade 0.15s ease;
+}
+
+@keyframes ds-panel-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.site-ds .ds-panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+
+.site-ds .ds-panel-ordinal { font-size: 0.72rem; color: var(--ds-faded); }
+.site-ds .ds-panel-name {
+  font-size: clamp(0.97rem, 1.11vw, 1.06rem);
+  font-weight: 500;
+  text-shadow: 0.008em 0 0 rgba(20, 18, 16, 0.5);
+}
+
+.site-ds .ds-status {
+  font-size: 0.72rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--ds-faded);
+}
+
+.site-ds .ds-subsystems {
+  list-style: none;
+  padding: 0;
+  margin: 1.1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.site-ds .ds-subsystems li {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ds-mid);
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.site-ds .ds-dot {
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.site-ds .ds-dot-live { background: rgba(20, 18, 16, 0.6); }
+.site-ds .ds-dot-in-progress {
+  background:
+    linear-gradient(90deg, rgba(20, 18, 16, 0.6) 50%, transparent 50%);
+  border: 1px solid rgba(20, 18, 16, 0.45);
+}
+.site-ds .ds-dot-conceptual { border: 1px solid rgba(20, 18, 16, 0.45); }
+
+.site-ds .ds-subsystem-name { color: var(--ds-ink); }
+
+.site-ds .ds-panel-trajectory {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  border-left: 1px solid rgba(20, 18, 16, 0.07);
+  padding-left: clamp(1.2rem, 2.5vw, 2rem);
+}
+
+.site-ds .ds-traj-label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--ds-faded);
+  margin-bottom: 0.15rem;
+}
+
+.site-ds .ds-traj-value {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ds-mid);
+}
+
+/* ─── registry ─── */
+
+.site-ds .ds-mid {
+  margin-top: clamp(3.5rem, 7vw, 5rem);
+}
+
+.site-ds .ds-registry {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.site-ds .ds-registry li {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  gap: 0.35rem 2rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  border-top: 1px solid rgba(20, 18, 16, 0.07);
+}
+
+.site-ds .ds-registry li:last-child {
+  border-bottom: 1px solid rgba(20, 18, 16, 0.07);
+}
+
+.site-ds .ds-registry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-ds .ds-registry-name { font-size: 0.95rem; color: var(--ds-ink); }
+
+.site-ds .ds-registry-line {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ds-mid);
+}
+
+/* ─── the record + chat ─── */
+
+.site-ds .ds-record {
+  margin-top: clamp(3.5rem, 7vw, 5rem);
+}
+
+.site-ds .ds-chat {
+  margin-top: 1.4rem;
+}
+
+.site-ds .ds-chat-form {
+  display: flex;
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+.site-ds .ds-chat-form input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--ds-sans);
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  color: var(--ds-ink);
+  background: none;
+  border: 1px solid rgba(20, 18, 16, 0.18);
+  padding: 0.55rem 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.site-ds .ds-chat-form input::placeholder { color: var(--ds-faded); }
+
+.site-ds .ds-chat-form input:focus {
+  outline: none;
+  border-color: rgba(20, 18, 16, 0.45);
+}
+
+.site-ds .ds-chat-form button {
+  font-family: var(--ds-sans);
+  font-size: 0.9rem;
+  color: var(--ds-ink);
+  background: none;
+  border: 1px solid rgba(20, 18, 16, 0.18);
+  padding: 0 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.site-ds .ds-chat-form button:hover:not(:disabled) { border-color: rgba(20, 18, 16, 0.45); }
+.site-ds .ds-chat-form button:disabled { opacity: 0.45; cursor: default; }
+
+.site-ds .ds-chat-form input:disabled {
+  opacity: 0.55;
+}
+
+.site-ds .ds-chat-note {
+  font-size: 0.82rem;
+  color: var(--ds-faded);
+  margin-top: 0.6rem;
+}
+
+.site-ds .ds-chat-log {
+  margin-top: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.site-ds .ds-exchange-q {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
+.site-ds .ds-exchange-a {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ds-mid);
+  margin-top: 0.35rem;
+  white-space: pre-wrap;
+}
+
+.site-ds .ds-exchange-failed { color: var(--ds-faded); }
+
+/* ─── the ledger record ─── */
+
+.site-ds .ds-ledger {
+  list-style: none;
+  padding: 1.5rem 0 0;
+  margin: 1.6rem 0 0;
+  border-top: 1px solid rgba(20, 18, 16, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.site-ds .ds-ledger-entry {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 0.8rem;
+  align-items: baseline;
+}
+
+.site-ds .ds-ledger-num {
+  font-size: 0.72rem;
+  color: var(--ds-faded);
+}
+
+.site-ds .ds-ledger-entry p {
+  font-size: clamp(0.95rem, 1vw, 1rem);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--ds-mid);
+  overflow-wrap: break-word;
+}
+
+.site-ds .ds-ledger-date {
+  font-size: 0.72rem;
+  letter-spacing: 0.025em;
+  color: var(--ds-faded);
+  margin-right: 0.35rem;
+}
+
+.site-ds .ds-ledger-title { color: var(--ds-ink); }
+
+.site-ds .ds-footnote {
+  font-size: 0.82rem;
+  color: var(--ds-faded);
+  margin-top: 2rem;
+}
+
+/* ─── mobile ─── */
+
+@media (max-width: 760px) {
+  .site-ds .ds-duo { grid-template-columns: 1fr; gap: 2.25rem; }
+  .site-ds .ds-panel { grid-template-columns: 1fr; gap: 1.6rem; }
+  .site-ds .ds-panel-trajectory {
+    border-left: none;
+    border-top: 1px solid rgba(20, 18, 16, 0.07);
+    padding-left: 0;
+    padding-top: 1.1rem;
+  }
+  .site-ds .ds-registry li { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .site-ds .ds-body,
+  .site-ds .ds-registry-line,
+  .site-ds .ds-exchange-q,
+  .site-ds .ds-exchange-a { font-size: 0.9rem; }
+  .site-ds .ds-ledger-entry p { font-size: 0.9rem; }
+  .site-ds .ds-stratum-def { display: none; }
+}
+
+/* Transparent hit areas: unfilled SVG shapes only catch clicks on their
+   strokes, so every region carries an explicit invisible target. */
+.site-ds .ds-hit {
+  fill: rgba(20, 18, 16, 0);
+  stroke: none;
+}
