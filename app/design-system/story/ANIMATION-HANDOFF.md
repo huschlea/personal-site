@@ -37,7 +37,7 @@ Everything lives in `assembly.ts` inside `mountAssembly`.
 The drawing is canvas, so the "IDs" are the named world constants: `BI`,
 `COMPILE`, `DL`, `HALL`, `SPINE`, `STATIONS` (workflow stops), `CHECKPOINTS`,
 `REC`, `PARTS`, `RB` (renderer bank), `BENCH`, `WIN` (Design OS), `APIS`,
-`MCP`, `PLINTH`, `OUTPUTS`, `SHELF` (signed releases), `NOTES` (release
+`MCP`, `PLINTH`, `SHELF` (signed releases), `NOTES` (release
 notes), `SEAT` (feedback loop), `BUS_Y`, `BUS_X1`, `REVIEW`, `REL_LINE`,
 `FAN_X`, `GOV`. Route through these, never through literals, and relocations
 will not break the animation.
@@ -50,7 +50,7 @@ slugs. One circuit: request enters from the interface through a governance
 gate into the intake mouth; becomes a chip on the belt; context assembly
 pulls the recipe; interpreter checkpoint flickers; render lights only that
 recipe's renderers via the manifold; validate occasionally throws the rust
-moment; out through the exporters and a gate; an outputs tile brightens; a
+moment; out through the exporters and a gate; a
 register row writes itself into signed releases; the Slack and Gmail marks
 pulse on release notes; a slug rides the evidence bus left, ticks a meter,
 reaches the feedback loop; the findings artery pulses up into brand

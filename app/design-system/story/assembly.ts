@@ -69,13 +69,15 @@ const VIEWS: View[] = [
   { x: 120, y: 128, w: 360, h: 515, pad: 0.06, maxZoom: 2.1 }, // 1 brand intelligence
   { x: 120, y: 578, w: 360, h: 435, pad: 0.06, maxZoom: 2.1 }, // 2 design language
   { x: 505, y: 128, w: 890, h: 855, pad: 0.04, maxZoom: 1.65 },// 3 production
-  { x: 1370, y: 140, w: 640, h: 1030, pad: 0.05, maxZoom: 1.7 }, // 4 interface, foot included
+  { x: 1370, y: 140, w: 640, h: 930, pad: 0.05, maxZoom: 1.8 }, // 4 interface, foot included
   /* governance frames its whole domain: the boundary and the release chain it
      signs, out to the notes card's right edge, so no card is cut mid-face */
-  { x: 430, y: 80, w: 1560, h: 970, pad: 0.03 },               // 5 governance
+  /* extra world above the boundary pushes the frame down clear of the home
+     link, and the bottom reaches past the register so nothing is cut */
+  { x: 430, y: 30, w: 1560, h: 1040, pad: 0.03 },              // 5 governance
   /* the evidence chain: seat, bus, meters, the feed's corner. Anchored to the
      bottom so the dimmed system above is the context, not bare paper below. */
-  { x: 60, y: 830, w: 1410, h: 330, pad: 0.05, anchor: "bottom" }, // 6 observability
+  { x: 140, y: 830, w: 1330, h: 330, pad: 0.04, anchor: "bottom" }, // 6 observability
   { x: 60, y: 60, w: 1950, h: 1120, pad: 0.03 },               // 7 the whole system
 ];
 
@@ -143,10 +145,12 @@ const PART_DEFS = ["headline", "body", "quote", "credit", "lockup", "image", "gr
    release is made of outputs, so the register lives directly under the card
    that fills it, and the announcement beside the register. Tighter cards, no
    underfilled stretches, and the world's floor rises to ~1150. */
-const WIN = { x: 1490, y: 160, w: 500, h: 280 };
-const APIS = { x: 1490, y: 476, w: 500, h: 132 };
-const MCP = { x: 1490, y: 648, w: 500, h: 150 };
-const PLINTH = { x: 1490, y: 838, w: 500, h: 60 };
+const WIN = { x: 1490, y: 160, w: 500, h: 290 };
+const APIS = { x: 1490, y: 488, w: 500, h: 146 };
+const MCP = { x: 1490, y: 672, w: 500, h: 154 };
+const PLINTH = { x: 1490, y: 862, w: 500, h: 60 };
+/* the outputs card is gone from the board, its room given to the release
+   chain; the constant stays only because the dormant drawRun references it */
 const OUTPUTS = { x: 1490, y: 938, w: 500, h: 88 };
 const GOV = { x: 480, y: 128, w: 940, h: 902 };
 // where the dispatch fans out to the three surfaces, inside the governed line
@@ -162,7 +166,7 @@ const BUS_Y = 1100;
    releases, the register links to release notes, and governance reaches across
    to sign, crossing the bus at a joint on the way. They meet in the world, not
    on the diagram. */
-const REL_Y = 1058, REL_H = 92;
+const REL_Y = 960, REL_H = 92;
 const REL_LINE = REL_Y + REL_H / 2;
 const SHELF = { x: 1490, y: REL_Y, w: 240, h: REL_H };
 const NOTES = { x: 1750, y: REL_Y, w: 240, h: REL_H };
@@ -336,6 +340,10 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
     const tt = t * inkMul;
     if (tt <= 0.02) return;
     const p = toScreen(wx, wy);
+    /* glyphs land on the device-pixel grid: sub-pixel vertical drift under a
+       moving camera is the quiver, so a row steps whole pixels or holds still */
+    p.x = Math.round(p.x * dpr) / dpr;
+    p.y = Math.round(p.y * dpr) / dpr;
     const size = (o?.size ?? 10.5) * p.s;
     if (size < 4) return;
     const family = o?.mono
@@ -1144,12 +1152,23 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       ctx!.beginPath(); ctx!.moveTo(a.x, a.y); ctx!.lineTo(b.x, b.y); ctx!.stroke();
       // where the knowledge is written: the row ends at the card's right edge
       BI_MARKS.forEach((m, i) => markTile(m, BI.x + BI.w - 22 - (BI_MARKS.length - 1 - i) * MARK_GAP, BI.y + 26, t));
-      // the compile step
+      // the compile step, its content centred, its products worn as pills
       card(COMPILE.x, COMPILE.y, COMPILE.w, COMPILE.h, t);
-      text("compile", COMPILE.x + 18, COMPILE.y + 20, t, { size: 9.5, caps: true, alpha: 0.6, weight: "500", track: true });
-      (["bundles", "search index", "types", "agent context"] as const).forEach((nm, i) => {
-        text(nm, COMPILE.x + 18 + [0, 43, 102, 135][i], COMPILE.y + 40, t, { size: 7.5, alpha: T_FAINT });
-      });
+      text("compile", COMPILE.x + 18, COMPILE.y + 17, t, { size: 9.5, caps: true, alpha: 0.6, weight: "500", track: true });
+      {
+        let px2 = COMPILE.x + 18;
+        (["bundles", "search index", "types", "agent context"] as const).forEach((nm) => {
+          const p = toScreen(px2, COMPILE.y + 37);
+          const size = 7.5 * p.s;
+          ctx!.font = `400 ${size}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif`;
+          const w = ctx!.measureText(nm).width / p.s;
+          ctx!.beginPath();
+          ctx!.roundRect(p.x - 5 * p.s, p.y - 7 * p.s, (w + 10) * p.s, 14 * p.s, 0);
+          stroke(0.16 * t);
+          text(nm, px2, COMPILE.y + 37, t, { size: 7.5, alpha: T_FAINT });
+          px2 += w + 15;
+        });
+      }
       route([[BI.x + BI.w / 2, BI.y + BI.h], [BI.x + BI.w / 2, COMPILE.y]], t, { alpha: 0.2 });
       // Google Workspace: where the knowledge is written
       {
@@ -1158,7 +1177,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         ctx!.strokeStyle = INK(0.1 * t * inkMul);
         ctx!.beginPath(); ctx!.moveTo(fa.x, fa.y); ctx!.lineTo(fb.x, fb.y); ctx!.stroke();
       }
-      text("v2026-07 · sealed by hash", BI.x + 18, BI.y + BI.h - 15, t, { size: 8.5, alpha: T_FAINT });
+      text("v2026-07", BI.x + 18, BI.y + BI.h - 15, t, { size: 8.5, alpha: T_FAINT });
     });
   }
 
@@ -1479,8 +1498,9 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       /* the renderer bank: five devices with real IO */
       // the row tag, pinned on the hall boundary beside the first machine
       // clear of the design-language feed at x=520 and the first renderer card at x=600
+      // the row tag cuts straight through the hall wall, no card, per his call
       if (willRender(9)) {
-        plate(526, 715, 594, 735, t);
+        knock(526, 715, 594, 735);
         text("renderers", 588, 725, t, { size: 9, caps: true, alpha: 0.62, weight: "500", track: true, anchor: "right" as CanvasTextAlign });
       }
       RENDERER_DEFS.forEach((rd, i) => {
@@ -1510,9 +1530,9 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
     withLayer(3, () => {
       if (t <= 0.02) return;
       // connectors from the hall, one per surface, at each card's centre
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 300], [WIN.x, 300]], t, { alpha: 0.2, dash: true });
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 542], [APIS.x, 542]], t, { alpha: 0.2, dash: true });
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 723], [MCP.x, 723]], t, { alpha: 0.2, dash: true });
+      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 305], [WIN.x, 305]], t, { alpha: 0.2, dash: true });
+      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 561], [APIS.x, 561]], t, { alpha: 0.2, dash: true });
+      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 749], [MCP.x, 749]], t, { alpha: 0.2, dash: true });
 
       // design os: the window where people run the system
       card(WIN.x, WIN.y, WIN.w, WIN.h, t, { strong: true });
@@ -1546,28 +1566,51 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         text(nm, WIN.x + dx + 10, WIN.y + dy + 152, t, { size: 8.5, alpha: T_FAINT });
       });
 
-      // applications: the API panel
+      /* applications: names on the left, a strip of live traffic on the
+         right, in the register's own mono ledger idiom so the card carries
+         the same visual weight as the rest of the board */
       card(APIS.x, APIS.y, APIS.w, APIS.h, t);
       text("applications · APIs", APIS.x + 16, APIS.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
       ["brand API", "search API", "render API", "workflow API"].forEach((nm, i) => {
-        const col = i % 2, row = Math.floor(i / 2);
-        const ex = APIS.x + 16 + col * 240, ey = APIS.y + 54 + row * 28;
-        const p = toScreen(ex, ey);
+        const ey = APIS.y + 50 + i * 24;
+        const p = toScreen(APIS.x + 19, ey);
         ctx!.beginPath();
-        ctx!.arc(p.x + 3 * p.s, p.y, 2 * p.s, 0, Math.PI * 2);
+        ctx!.arc(p.x, p.y, 2 * p.s, 0, Math.PI * 2);
         ctx!.fillStyle = INK(0.5 * t * inkMul);
         ctx!.fill();
-        text(nm, ex + 14, ey, t, { size: 10, alpha: T_BODY, mono: true });
+        text(nm, APIS.x + 30, ey, t, { size: 10, alpha: T_BODY, mono: true });
       });
-      text("versioned contracts · typed clients", APIS.x + 16, APIS.y + 110, t, { size: 8.5, alpha: T_FAINT });
+      {
+        const dv3 = toScreen(APIS.x + 250, APIS.y + 42);
+        const dv4 = toScreen(APIS.x + 250, APIS.y + APIS.h - 16);
+        ctx!.strokeStyle = INK(0.1 * t * inkMul);
+        ctx!.beginPath(); ctx!.moveTo(dv3.x, dv3.y); ctx!.lineTo(dv4.x, dv4.y); ctx!.stroke();
+      }
+      [["GET /claims", "200"], ["POST /render", "202"], ["GET /search", "200"]].forEach(([ln, code], i) => {
+        const ey = APIS.y + 52 + i * 22;
+        text(ln, APIS.x + 268, ey, t, { size: 8.5, alpha: i === 0 ? 0.52 : 0.36, mono: true });
+        text(code, APIS.x + APIS.w - 18, ey, t, { size: 8.5, alpha: T_FAINT, mono: true, anchor: "right" as CanvasTextAlign });
+      });
+      text("versioned · typed", APIS.x + 268, APIS.y + 122, t, { size: 8.5, alpha: T_FAINT });
 
-      // agents: the MCP panel
+      /* agents: the tree on the left, the session's record on the right */
       card(MCP.x, MCP.y, MCP.w, MCP.h, t);
       text("agents · MCP", MCP.x + 16, MCP.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
       ["mcp", "├ resources", "├ tools", "└ prompts"].forEach((ln, i) => {
         text(ln, MCP.x + 20, MCP.y + 48 + i * 22, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
       });
-      text("authenticated · scoped · recorded", MCP.x + 180, MCP.y + 92, t, { size: 8.5, alpha: T_FAINT });
+      {
+        const dv3 = toScreen(MCP.x + 250, MCP.y + 40);
+        const dv4 = toScreen(MCP.x + 250, MCP.y + MCP.h - 16);
+        ctx!.strokeStyle = INK(0.1 * t * inkMul);
+        ctx!.beginPath(); ctx!.moveTo(dv3.x, dv3.y); ctx!.lineTo(dv4.x, dv4.y); ctx!.stroke();
+      }
+      text("authenticated · scoped · recorded", MCP.x + 268, MCP.y + 52, t, { size: 8.5, alpha: T_FAINT });
+      [["brand.claims.list", "ok"], ["render.preview", "ok"]].forEach(([ln, code], i) => {
+        const ey = MCP.y + 78 + i * 22;
+        text(ln, MCP.x + 268, ey, t, { size: 8.5, alpha: 0.42, mono: true });
+        text(code, MCP.x + MCP.w - 18, ey, t, { size: 8.5, alpha: T_FAINT, mono: true, anchor: "right" as CanvasTextAlign });
+      });
       // the caret blinks only when the board is allowed to move at all
       if (RUN_MOTION && active !== BEATS - 1 && Math.floor(idleClock * 2.2) % 2 === 0) {
         const caret = toScreen(MCP.x + 20, MCP.y + 132);
@@ -1586,19 +1629,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         }
       });
 
-      /* the column's own product: finished artifacts, and directly beneath
-         them the register they are signed into */
-      card(OUTPUTS.x, OUTPUTS.y, OUTPUTS.w, OUTPUTS.h, t);
-      OUTPUT_NAMES.forEach((nm, i) => {
-        const col = i % 3, row = Math.floor(i / 3);
-        const ox = OUTPUTS.x + 14 + col * 160, oy = OUTPUTS.y + 12 + row * 34;
-        const p = toScreen(ox, oy);
-        const q = toScreen(ox + 150, oy + 28);
-        ctx!.beginPath();
-        ctx!.roundRect(p.x, p.y, q.x - p.x, q.y - p.y, 0);
-        stroke(0.2 * t);
-        text(nm, ox + 8, oy + 14, t, { size: 8, alpha: T_BODY, maxW: 136 });
-      });
     });
   }
 
@@ -1654,7 +1684,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         ctx!.fill();
         stroke(0.5 * t);
       };
-      [300, 542, 723].forEach((gy) => gate(GOV.x + GOV.w, gy));
+      [305, 561, 749, REL_LINE].forEach((gy) => gate(GOV.x + GOV.w, gy));
       [COMPILE.y + 27, DL.y + 160].forEach((gy) => gate(GOV.x, gy));
       /* Everything the governed line has to say is said ON it. This caption
          describes the gates, so it is set into the bottom rule beside them
@@ -1663,15 +1693,13 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       chipLabel("gates at every crossing · fail closed", GOV.x + 40, GOV.y + GOV.h, t);
       chipLabel("human approval", GOV.x + 470, GOV.y + GOV.h, t);
       chipLabel("exceptions, documented", GOV.x + 640, GOV.y + GOV.h, t);
-      /* Governance signs the release, so its line reaches across to the
-         register: down from the bottom rule, across the evidence bus at a
-         joint, and in through the register's left edge below the bus's lane
-         and the meter labels. The drop leaves from the clear stretch of rule
-         right of the exceptions caption. */
-      route([[1380, GOV.y + GOV.h], [1380, 1136], [SHELF.x, 1136]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
-      /* A signed release is a set of finished files: outputs sits directly
-         above the register and fills it with one short drop. */
-      route([[1600, OUTPUTS.y + OUTPUTS.h], [1600, SHELF.y]], t, { alpha: S_RULE, double: true });
+      /* Governance signs the release through a gate of its own: a straight
+         reach from the boundary into the register beside it. */
+      route([[GOV.x + GOV.w, REL_LINE], [SHELF.x, REL_LINE]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
+      /* A signed release is a set of finished files, and the files live in
+         object storage on the substrate directly above: one short drop from
+         storage into the register that freezes them. */
+      route([[1600, PLINTH.y + PLINTH.h], [1600, SHELF.y]], t, { alpha: S_RULE, double: true });
       // signed, then announced: the chain continues left along its own line
       route([[SHELF.x + SHELF.w, REL_LINE], [NOTES.x, REL_LINE]], t, { alpha: S_RULE, double: true });
       /* The notes card sits on the same line, drawn by governance because a
@@ -1781,14 +1809,11 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       text("signals become decisions, not dashboards", SEAT.x + 16, SEAT.y + 42, t, { size: 8.5, alpha: T_FAINT, maxW: SEAT.w - 32 });
       route([[SEAT.x + 70, SEAT.y], [SEAT.x + 70, 1010], [80, 1010], [80, 400], [BI.x, 400]], t, { alpha: S_RULE, double: true });
       route([[80, DL.y + 160], [DL.x, DL.y + 160]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
-      /* Two places where a governance run and an observability run cross: the
-         evidence riser through the governed line's bottom rule, and the
-         governed line dropping past the bus to sign a release. It crosses the
-         bus; it does not feed it. Each joint belongs to both layers, so it
-         takes whichever of the two is the more lit. */
+      /* The one place a governance run and an observability run cross: the
+         evidence riser through the governed line's bottom rule. The joint
+         belongs to both layers, so it takes whichever is the more lit. */
       const bothLit = Math.max(layerLight[4], layerLight[5]);
       crossJoint(900, GOV.y + GOV.h, t, bothLit);
-      crossJoint(1380, BUS_Y, t, bothLit);
     });
   }
 
