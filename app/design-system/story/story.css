@@ -1,4 +1,7 @@
-/* ─── the press story: desktop-only full-bleed stage ─── */
+/* ─── the press story: desktop-only, stage-driven, hard-partitioned ───
+   The canvas owns the left region and may never enter the right column; the
+   divider between them is drawn, not implied. The final stage releases the
+   column and the drawing takes the whole screen. */
 
 .site-ds.ds-story-mode {
   padding: 0;
@@ -11,17 +14,17 @@
   z-index: 30;
 }
 
-.site-ds .ds-stage-wrap {
-  position: relative;
-  /* one 130vh stretch per beat, plus room to arrive and leave */
-  height: calc(8 * 130vh + 50vh);
+.site-ds .ds-shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  background: #fefefd;
 }
 
-.site-ds .ds-stage-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
+.site-ds .ds-stage-region {
+  position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .site-ds .ds-stage-canvas {
@@ -30,24 +33,41 @@
   height: 100%;
 }
 
-/* ─── the title beat ─── */
+/* ─── the reserved column ─── */
 
-.site-ds .ds-title-block {
-  position: absolute;
-  top: 24vh;
-  left: clamp(2rem, 8vw, 9rem);
-  width: min(440px, 38vw);
-  transition: opacity 0.4s cubic-bezier(0.2, 0, 0, 1);
+.site-ds .ds-panel-col {
+  width: clamp(400px, 29vw, 560px);
+  border-left: 1px solid rgba(20, 18, 16, 0.14);
+  background: #fefefd;
+  overflow: hidden;
+  transition: width 0.55s cubic-bezier(0.2, 0, 0, 1), opacity 0.4s cubic-bezier(0.2, 0, 0, 1);
 }
 
-.site-ds .ds-title-block .ds-body { margin-top: 0.4rem; }
-
-.site-ds .ds-title-gone {
+.site-ds .ds-shell-full .ds-panel-col {
+  width: 0;
   opacity: 0;
-  pointer-events: none;
+  border-left-color: transparent;
 }
 
-.site-ds .ds-scroll-cue {
+.site-ds .ds-panel-scroll {
+  height: 100%;
+  width: clamp(400px, 29vw, 560px);
+  overflow-y: auto;
+  padding: clamp(4.5rem, 9vh, 7rem) clamp(1.6rem, 2.4vw, 2.6rem) 7rem;
+}
+
+.site-ds .ds-panel-inner {
+  animation: ds-stage-panel-in 0.45s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes ds-stage-panel-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.site-ds .ds-panel-inner .ds-body { margin-top: 0.4rem; }
+
+.site-ds .ds-nav-hint {
   margin-top: 2.4rem;
   font-size: 0.72rem;
   letter-spacing: 0.14em;
@@ -55,23 +75,7 @@
   color: var(--ds-faded);
 }
 
-/* ─── caption steps ─── */
-
-.site-ds .ds-cap {
-  position: absolute;
-  right: clamp(2rem, 6vw, 7rem);
-  width: 360px;
-  padding-left: 1.2rem;
-  border-left: 1px solid rgba(20, 18, 16, 0.14);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.45s cubic-bezier(0.2, 0, 0, 1), transform 0.45s cubic-bezier(0.2, 0, 0, 1);
-}
-
-.site-ds .ds-cap-active {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* ─── panel typography (shared by every stage) ─── */
 
 .site-ds .ds-cap-kicker {
   font-size: 0.72rem;
@@ -94,33 +98,7 @@
   line-height: 1.55;
   letter-spacing: -0.01em;
   color: var(--ds-mid);
-  background: rgba(254, 254, 253, 0.82);
   text-wrap: pretty;
-}
-
-/* ─── the floor below the drawing ─── */
-
-.site-ds .ds-story-floor {
-  padding: clamp(3rem, 6vw, 5rem) var(--ds-pad) clamp(4rem, 8vw, 6rem);
-}
-
-/* the boot frame while the chooser decides */
-.ds-boot {
-  min-height: 100svh;
-  background: #fefefd;
-}
-
-/* nine beats */
-.site-ds .ds-stage-wrap-9 {
-  height: calc(9 * 130vh + 50vh);
-}
-
-/* ─── structured layer panels ─── */
-
-.site-ds .ds-cap-panel {
-  width: 420px;
-  background: rgba(254, 254, 253, 0.94);
-  padding: 1.1rem 0 1.1rem 1.2rem;
 }
 
 .site-ds .ds-cap-section {
@@ -129,10 +107,6 @@
   text-transform: uppercase;
   color: var(--ds-faded);
   margin: 1rem 0 0.45rem;
-}
-
-.site-ds .ds-cap-panel .ds-cap-section:first-of-type {
-  margin-top: 0.8rem;
 }
 
 .site-ds .ds-chips {
@@ -170,69 +144,111 @@
   white-space: pre;
 }
 
-/* ─── the explorer end state ─── */
+/* ─── the final view's name, top right over the full-bleed drawing ─── */
 
-.site-ds .ds-explorer-chips {
-  position: fixed;
-  left: 50%;
-  bottom: clamp(1.4rem, 3vh, 2.2rem);
-  transform: translateX(-50%) translateY(16px);
-  display: flex;
-  gap: 0.45rem;
+.site-ds .ds-full-title {
+  position: absolute;
+  top: clamp(1.4rem, 3vh, 2.4rem);
+  right: clamp(1.6rem, 2.6vw, 2.8rem);
+  text-align: right;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.45s cubic-bezier(0.2, 0, 0, 1), transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+  transform: translateY(-6px);
+  transition: opacity 0.5s cubic-bezier(0.2, 0, 0, 1) 0.25s, transform 0.5s cubic-bezier(0.2, 0, 0, 1) 0.25s;
   z-index: 20;
 }
 
-.site-ds .ds-explore-on .ds-explorer-chips {
+.site-ds .ds-shell-full .ds-full-title {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
-  pointer-events: auto;
+  transform: translateY(0);
 }
 
-.site-ds .ds-explorer-chip {
+.site-ds .ds-full-title .ds-cap-title { margin-bottom: 0; }
+
+/* ─── the stage rail ─── */
+
+.site-ds .ds-stage-nav {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.4rem, 3vh, 2.2rem);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+  z-index: 20;
+}
+
+.site-ds .ds-nav-chip,
+.site-ds .ds-nav-step {
   font-family: var(--ds-sans);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--ds-mid);
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(20, 18, 16, 0.18);
   border-radius: 0;
-  padding: 0.42rem 0.7rem;
+  padding: 0.4rem 0.62rem;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease;
   box-shadow: 0 1px 2px rgba(23, 23, 26, 0.04);
+  white-space: nowrap;
 }
 
-.site-ds .ds-explorer-chip:hover { border-color: rgba(20, 18, 16, 0.45); color: var(--ds-ink); }
+.site-ds .ds-nav-chip:hover,
+.site-ds .ds-nav-step:hover:not(:disabled) {
+  border-color: rgba(20, 18, 16, 0.45);
+  color: var(--ds-ink);
+}
 
-.site-ds .ds-explorer-chip-on {
+.site-ds .ds-nav-chip-on {
   border-color: rgba(20, 18, 16, 0.65);
   color: var(--ds-ink);
+}
+
+/* aria-disabled rather than disabled, so a step never drops keyboard focus to
+   the body by disabling under the user's own press; it just looks and acts inert */
+.site-ds .ds-nav-step[aria-disabled="true"] {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
 }
 
 .site-ds .ds-explorer-num {
   color: var(--ds-faded);
   font-size: 0.7rem;
-  margin-right: 0.4rem;
 }
 
-.site-ds .ds-explorer-panel {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  right: clamp(2rem, 6vw, 7rem);
-  width: 420px;
-  max-height: 80vh;
-  overflow-y: auto;
+/* numbered chips carry their number; the title unfolds when the chip is
+   current, or on the final view once the column has ACTUALLY gone (ds-shell-wide,
+   set a beat after the collapse) so the rail never overflows mid-transition */
+.site-ds .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
+  display: none;
+}
+
+.site-ds .ds-nav-chip:has(.ds-explorer-num) .ds-explorer-num {
+  margin-right: 0;
+}
+
+.site-ds .ds-nav-chip-on:has(.ds-explorer-num) .ds-nav-label,
+.site-ds .ds-shell-wide .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
+  display: inline;
+  margin-left: 0.4rem;
+}
+
+/* visible to screen readers, out of the visual layout */
+.site-ds .ds-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* the boot frame while the chooser decides */
+.ds-boot {
+  min-height: 100svh;
   background: #fefefd;
-  border-left: 1px solid rgba(20, 18, 16, 0.14);
-  padding: 1.1rem 0 1.1rem 1.2rem;
-  z-index: 15;
-  animation: ds-panel-in 0.3s cubic-bezier(0.2, 0, 0, 1);
-}
-
-@keyframes ds-panel-in {
-  from { opacity: 0; transform: translateY(calc(-50% + 8px)); }
-  to   { opacity: 1; transform: translateY(-50%); }
 }

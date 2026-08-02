@@ -20,25 +20,74 @@ const EASE = (t: number) => 1 - Math.pow(1 - t, 3);
 
 const S_MAIN = 0.52, S_MID = 0.3, S_SOFT = 0.16;
 const T_TITLE = 0.85, T_BODY = 0.6, T_FAINT = 0.42;
+
+/* ── the double rule ──
+   Governance and observability are the two layers that watch rather than make,
+   and they are drawn as a double rule: a pair of hairlines with a narrow
+   channel between them. In print a double rule has always marked a boundary of
+   a different order than the rules inside it, which is exactly the claim here.
+   Each line of the pair runs a shade finer than the page's 1px linework, and
+   no finer: taken below that the pair stops reading as a boundary and starts
+   reading as a smudge, which is a worse failure than reading heavy. Both the
+   channel and the stroke are held in screen pixels, like line width itself,
+   so the pair keeps its proportion at every zoom instead of closing up when
+   the camera pulls back. Fittings that break the rule (gates, meters, the
+   review point) stay single and at S_MAIN: rule quiet, fittings crisp. */
+const S_RULE = 0.52;   // one hairline of the pair
+const RULE_GAP = 1.8;  // half the channel, css px, constant across zooms
+const RULE_W = 0.9;    // a shade finer than the page's linework, no finer
+/* The smallest a fitting may be and still cut a legible break in the pair:
+   clear of the far hairline's outer edge, plus its own half stroke, plus a
+   little paper. Derived, not chosen, so a fitting never grows heavier than the
+   rule actually requires. Above this floor fittings keep their authored world
+   size, which is what preserves the hierarchy between a station dot, a meter
+   and the terminus the whole bus runs back to. */
+const FIT_MIN = RULE_GAP + RULE_W / 2 + 1;
 const DIM = 0.38; // spotlight: everything not selected drops to this
 
 /* ── layout: 2000 x 1150 world ── */
 
-const FRAMES: Camera[] = [
-  { zoom: 0.8, cx: 1080, cy: 560 },    // 0 the scattered field
-  { zoom: 1.3, cx: 560, cy: 430 },     // 1 brand intelligence
-  { zoom: 1.3, cx: 560, cy: 810 },     // 2 design language
-  { zoom: 0.88, cx: 1010, cy: 590 },   // 3 production
-  { zoom: 0.9, cx: 1560, cy: 570 },    // 4 interface
-  { zoom: 0.79, cx: 950, cy: 575 },    // 5 governance
-  { zoom: 0.85, cx: 900, cy: 860 },    // 6 observability
-  { zoom: 0.7, cx: 1150, cy: 610 },    // 7 the run
-  { zoom: 0.66, cx: 1030, cy: 600 },   // 8 the whole system
+/* ── per-stage framing ──
+   A stage is authored as a world rectangle: the subsystem it is about, plus
+   the breathing room it deserves. The camera is DERIVED, never hand-tuned:
+   each frame the rect is fitted to the canvas region the stage actually has,
+   so a dense stage genuinely zooms in, a wide region genuinely gains scale,
+   and a change in region width (the panel releasing its column) becomes a
+   camera move like any other. pad is the fraction of the region kept clear
+   around the rect; maxZoom keeps a close-up from blowing past the ink density
+   the drawing was authored at. */
+type View = { x: number; y: number; w: number; h: number; pad?: number; maxZoom?: number; anchor?: "bottom" };
+const VIEWS: View[] = [
+  { x: 80, y: 60, w: 1920, h: 1150, pad: 0.02 },               // 0 the scattered field
+  { x: 120, y: 128, w: 360, h: 515, pad: 0.06, maxZoom: 1.45 },// 1 brand intelligence
+  { x: 120, y: 578, w: 360, h: 435, pad: 0.06, maxZoom: 1.45 },// 2 design language
+  { x: 505, y: 128, w: 890, h: 855, pad: 0.04 },               // 3 production
+  { x: 1360, y: 130, w: 650, h: 900, pad: 0.05 },              // 4 interface
+  { x: 430, y: 88, w: 1040, h: 1200, pad: 0.03 },              // 5 governance
+  /* the world ends just under the release row, so a centred fit would strand
+     a third of the region as bare paper below the band. Anchored to the
+     bottom, with the plinth cropped: it is dimmed context at this stage, and
+     giving it up is what buys the band its zoom. The feed still enters from
+     the right, labelled. */
+  { x: 60, y: 860, w: 1470, h: 430, pad: 0.05, anchor: "bottom" }, // 6 observability
+  /* the run must contain the release chain its own choreography triggers: a
+     frame that excludes the register shows the outputs feed running off the
+     bottom of the screen into cards cut in half */
+  { x: 360, y: 118, w: 1660, h: 1160, pad: 0.03 },             // 7 the run
+  { x: 60, y: 60, w: 1950, h: 1240, pad: 0.03 },               // 8 the whole system
 ];
 
-const BI = { x: 120, y: 174, w: 340, h: 340 };
-const COMPILE = { x: 120, y: 540, w: 340, h: 54 };
-const DL = { x: 120, y: 624, w: 340, h: 340 };
+/* The lane is sized to its content: label column plus, on design language,
+   the token level each foundation belongs to. */
+const BI = { x: 170, y: 174, w: 240, h: 340 };
+const COMPILE = { x: 170, y: 540, w: 240, h: 54 };
+const DL = { x: 170, y: 624, w: 240, h: 340 };
+// what each design-language foundation is, in the token hierarchy
+const TOKEN_LEVEL: Record<string, string> = {
+  "color tokens": "primitive", typography: "primitive", spacing: "primitive",
+  scale: "primitive", shape: "primitive", grids: "semantic", motion: "semantic",
+  "image behavior": "semantic", accessibility: "semantic", "data visualization": "component",
+};
 const HALL = { x: 560, y: 160, w: 780, h: 840 };
 /* the hall: two shelves above the spine, the renderer bank below it.
    the workflow is not a station among stations; it is the artery that
@@ -87,16 +136,37 @@ const RECIPE_DEFS: Array<{ name: string; slots: number; ports: number }> = [
 /* What a brand system actually assembles: the parts of a rendered artifact,
    not the controls of an application. */
 const PART_DEFS = ["headline", "body", "quote", "credit", "lockup", "image", "ground", "palette", "figure", "list", "chip", "seal"];
-const WIN = { x: 1440, y: 160, w: 500, h: 300 };
-const APIS = { x: 1440, y: 500, w: 500, h: 160 };
-const MCP = { x: 1440, y: 700, w: 500, h: 190 };
-const PLINTH = { x: 1440, y: 930, w: 500, h: 60 };
-const OUTPUTS = { x: 1440, y: 1030, w: 500, h: 88 };
-const GOV = { x: 544, y: 128, w: 876, h: 902 };
+const WIN = { x: 1490, y: 160, w: 500, h: 300 };
+const APIS = { x: 1490, y: 500, w: 500, h: 160 };
+const MCP = { x: 1490, y: 700, w: 500, h: 190 };
+const PLINTH = { x: 1490, y: 930, w: 500, h: 60 };
+const OUTPUTS = { x: 1490, y: 1030, w: 500, h: 88 };
+const GOV = { x: 480, y: 128, w: 940, h: 902 };
 // where the dispatch fans out to the three surfaces, inside the governed line
+/* inside the governed boundary: the branches must cross the line at their
+   own gate, which is the whole point of three gates */
 const FAN_X = 1385;
 const BUS_Y = 1100;
-const REVIEW = { x: 330, y: BUS_Y };
+/* ── two chains, not one line ──
+   The bottom of the board carries two different stories and they must not share
+   a line. The EVIDENCE chain runs along BUS_Y: released work gets used, usage
+   lands in the event log on the substrate, the bus carries it back, and the
+   feedback loop turns it into decisions that travel up into the knowledge
+   layers. The RELEASE chain runs below it: production's finished outputs are
+   what a release is made of, governance signs that set, and the signed release
+   is announced. They meet in the world, not on the diagram. Both run right to
+   left, so the whole bottom of the board reads in one direction. */
+const REL_Y = 1180, REL_H = 92;
+const REL_LINE = REL_Y + REL_H / 2;
+const SHELF = { x: 640, y: REL_Y, w: 230, h: REL_H };
+/* the bus runs from the substrate's event log to the feedback loop, and stops
+   short of the interface lane so the outputs card is never crossed */
+const BUS_X1 = 1460;
+const NOTES = { x: 380, y: REL_Y, w: 230, h: REL_H };
+// the only card on the evidence line, and the only thing the bus touches
+const SEAT = { x: 150, y: BUS_Y - 46, w: 200, h: 92 };
+// the bus terminates in the feedback loop; there is no run past it
+const REVIEW = { x: SEAT.x + SEAT.w, y: BUS_Y };
 
 const RECIPE_NAMES = ["blog campaign", "branded document", "slide deck", "event campaign", "newsletter"];
 // seats on the model boundary: a mark name, or null for an open seat
@@ -106,6 +176,8 @@ const MARK_GAP = 21;
 // where the two knowledge layers are authored, in reading order left to right
 const BI_MARKS = ["notion", "drive"];
 const DL_MARKS = ["figma", "paper"];
+// the channels a signed release is announced through
+const NOTE_MARKS = ["slack", "gmail"];
 const RENDERER_DEFS: Array<{ name: string; fmt: string; marks: string[] }> = [
   { name: "web", fmt: "HTML", marks: [] },
   { name: "image", fmt: "PNG", marks: ["openai", "krea", "recraft"] },
@@ -144,15 +216,10 @@ const FRAGS: Frag[] = [
 const BI_ROWS = FRAGS.filter((f) => f.layer === 0);
 const DL_ROWS = FRAGS.filter((f) => f.layer === 1);
 
-export function mountAssembly(opts: {
-  wrap: HTMLDivElement;
-  canvas: HTMLCanvasElement;
-  captions: HTMLElement[];
-  titleBlock: HTMLElement | null;
-}) {
-  const { wrap, canvas, captions, titleBlock } = opts;
+export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
+  const { canvas } = opts;
   let ctx = canvas.getContext("2d");
-  if (!ctx) return { destroy: () => {}, setLayer: (_: number | null) => {} };
+  if (!ctx) return { destroy: () => {}, setStage: (_: number) => {} };
 
   let W = 0, H = 0, dpr = 1;
   let raf = 0, running = false, last = 0;
@@ -160,18 +227,40 @@ export function mountAssembly(opts: {
   const reveal = new Array(BEATS).fill(0);
   const focus = new Array(BEATS).fill(0);
   const layerLight = new Array(LAYER_COUNT).fill(1); // spotlight currents
-  const cam = { ...FRAMES[0] };
   let active = 0;
   let runClock = 0;
   let idleClock = 0;
-  let explorerLayer: number | null = null;
+
+  /* the camera is a chase toward the active stage's fitted rect; the fit is
+     recomputed every frame from the region's live size, so a resize (or the
+     panel column releasing its space) is a camera move, not a jump */
+  /* the stage rail owns the bottom band of the region; the camera fits into
+     what remains, or the drawing parks its lowest row under the buttons */
+  const NAV_INSET = 96;
+  function fitView(v: View): Camera {
+    const base = Math.min(W / 2060, H / 1210);
+    if (base <= 0) return { zoom: 1, cx: v.x + v.w / 2, cy: v.y + v.h / 2 };
+    const He = Math.max(200, H - NAV_INSET);
+    const pad = 1 - (v.pad ?? 0.04);
+    const zoom = Math.min(
+      (W / (base * v.w)) * pad,
+      (He / (base * v.h)) * pad,
+      v.maxZoom ?? 1.5,
+    );
+    const s = base * zoom;
+    const cy = v.anchor === "bottom"
+      ? v.y + v.h - (He - ((v.pad ?? 0.04) / 2) * He - H * 0.5) / s
+      : v.y + v.h / 2 + (NAV_INSET / 2) / s;
+    return { zoom, cx: v.x + v.w / 2, cy };
+  }
+  const cam: Camera = { zoom: 0.8, cx: 1080, cy: 560 };
 
   const iconPaths = new Map<string, Path2D>();
   for (const [k, d] of Object.entries(ICONS)) iconPaths.set(k, new Path2D(d));
 
   /* connector favicons: real product marks, drawn as uniform tiles in the
      top-right corner of the card each tool connects to */
-  const MARK_NAMES = ["anthropic", "openai", "figma", "paper", "drive", "notion", "krea", "recraft", "gamma", "higgsfield"];
+  const MARK_NAMES = ["anthropic", "openai", "figma", "paper", "drive", "notion", "krea", "recraft", "gamma", "higgsfield", "slack", "gmail"];
   const marks = new Map<string, HTMLImageElement>();
   for (const name of MARK_NAMES) {
     const im = new Image();
@@ -200,7 +289,16 @@ export function mountAssembly(opts: {
     ctx!.lineWidth = 1;
   }
 
-  function resize() {
+  /* Assigning canvas.width resets the backing store to transparent, so it can
+     only ever happen immediately BEFORE a draw. A ResizeObserver fires after
+     rAF callbacks, so resizing inside it would wipe the frame that was just
+     drawn and leave the canvas blank for the whole of the panel's collapse.
+     Observers therefore only raise a flag; the resize is applied at the top of
+     the next frame, in the same tick as the draw that follows it. */
+  let needsResize = true;
+  function applyResize() {
+    if (!needsResize) return;
+    needsResize = false;
     dpr = Math.min(2, window.devicePixelRatio || 1);
     W = canvas.clientWidth;
     H = canvas.clientHeight;
@@ -208,10 +306,12 @@ export function mountAssembly(opts: {
     canvas.height = Math.round(H * dpr);
   }
 
+  /* dead centre: the camera fit assumes it, and the old 2% optical drop would
+     push every fitted rect out the bottom of its region */
   function toScreen(wx: number, wy: number) {
     const base = Math.min(W / 2060, H / 1210);
     const s = base * cam.zoom;
-    return { x: W * 0.5 + (wx - cam.cx) * s, y: H * 0.52 + (wy - cam.cy) * s, s };
+    return { x: W * 0.5 + (wx - cam.cx) * s, y: H * 0.5 + (wy - cam.cy) * s, s };
   }
 
   /* every drawn element belongs to a layer; its ink rides the spotlight */
@@ -246,167 +346,299 @@ export function mountAssembly(opts: {
     ctx!.letterSpacing = "0px";
   }
 
+  /* A knockout with no word in it is just a hole in the drawing. text() drops
+     anything that would render under 4px, so every element that clears paper
+     for a label has to ask first, or it leaves a gap where the label was. */
+  function willRender(size: number) {
+    return size * toScreen(0, 0).s >= 4;
+  }
+
+  /* A label set into a line sits on a small plate, not on bare paper. Cleared
+     paper alone makes the line look as though it simply stopped, and leaves
+     the word floating in the break with nothing holding it; a plate gives the
+     line something to stop against and gives the label an edge, so it reads
+     as mounted rather than as damage. The border sits under the weight of the
+     rule it interrupts, so a plate never competes with its own line. */
+  /* Where two double rules cross, they must not simply overprint: four
+     separate crossings read as two systems laid over each other. The joint
+     opens both channels into one another, so what reads is a single continuous
+     run of pipe with a turn in it. Both rails of each rule stop at the other's
+     channel, and the four corners are drawn back in. */
+  function crossJoint(wx: number, wy: number, t: number, mul: number) {
+    const p = toScreen(wx, wy);
+    const g = RULE_GAP, w = ruleW();
+    const arm = g + w;                       // how far past the channel to clear
+    ctx!.fillStyle = `rgba(254, 254, 253, ${0.99 * t})`;
+    ctx!.fillRect(p.x - arm, p.y - arm, arm * 2, arm * 2);
+    ctx!.strokeStyle = INK(S_RULE * t * mul);
+    ctx!.lineWidth = w;
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => {
+      ctx!.beginPath();
+      ctx!.moveTo(p.x + sx * g, p.y + sy * arm);
+      ctx!.lineTo(p.x + sx * g, p.y + sy * g);
+      ctx!.lineTo(p.x + sx * arm, p.y + sy * g);
+      ctx!.stroke();
+    });
+    ctx!.lineWidth = 1;
+  }
+
+  const PLATE_INK = S_MID;
+  function plate(x0: number, y0: number, x1: number, y1: number, t: number) {
+    const a = toScreen(x0, y0);
+    const b = toScreen(x1, y1);
+    ctx!.fillStyle = `rgba(254, 254, 253, ${0.99 * t})`;
+    ctx!.fillRect(a.x, a.y, b.x - a.x, b.y - a.y);
+    ctx!.strokeStyle = INK(PLATE_INK * t * inkMul);
+    ctx!.lineWidth = 1;
+    ctx!.strokeRect(a.x, a.y, b.x - a.x, b.y - a.y);
+  }
+
   /* width of a tracked caps label in world units, so elements can sit beside
      text without hardcoding font metrics */
-  /* Detail vocabulary shared by the small glyphs: every mark is placed in the
-     glyph's own units so a part reads as the thing it is, not as an outline. */
-  function glyphPen(cx2: number, cy2: number, u: number, t: number) {
-    const A = (a: number) => INK(a * t * inkMul);
-    const P = (x: number, y: number) => ({ x: cx2 + x * u, y: cy2 + y * u });
+  /* The printed pen: masses, fine rules, knockouts, in the specimen inks.
+     Every primitive reports its extents, so a glyph can be measured before it
+     is drawn and then centred in its own tile. Fine rules stay one device
+     hairline at any glyph scale, the way a printed rule stays fine. */
+  let glyphBox: { x0: number; y0: number; x1: number; y1: number } | null = null;
+  function note(x0: number, y0: number, x1: number, y1: number) {
+    if (!glyphBox) return;
+    if (x0 < glyphBox.x0) glyphBox.x0 = x0;
+    if (y0 < glyphBox.y0) glyphBox.y0 = y0;
+    if (x1 > glyphBox.x1) glyphBox.x1 = x1;
+    if (y1 > glyphBox.y1) glyphBox.y1 = y1;
+  }
+  /* paint once to measure, then again shifted so the drawing sits centred */
+  function centred(paint: (cx2: number, cy2: number) => void, cx2: number, cy2: number) {
+    glyphBox = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+    paint(cx2, cy2);
+    const b = glyphBox;
+    glyphBox = null;
+    if (!isFinite(b.x0)) { paint(cx2, cy2); return; }
+    paint(cx2 + (cx2 - (b.x0 + b.x1) / 2), cy2 + (cy2 - (b.y0 + b.y1) / 2));
+  }
+
+  function printPen(cx2: number, cy2: number, u: number, tt: number) {
+    const P = (px: number, py: number) => ({ x: cx2 + px * u, y: cy2 + py * u });
+    const measuring = () => glyphBox !== null;
     return {
-      L(x1: number, y1: number, x2: number, y2: number, a: number) {
-        const p1 = P(x1, y1), p2 = P(x2, y2);
-        ctx!.strokeStyle = A(a); ctx!.lineWidth = glyphLWF;
-        ctx!.beginPath(); ctx!.moveTo(p1.x, p1.y); ctx!.lineTo(p2.x, p2.y); ctx!.stroke();
+      M(px: number, py: number, w: number, h: number, ink: InkName) {
+        const q = P(px, py);
+        note(q.x, q.y, q.x + w * u, q.y + h * u);
+        if (measuring()) return;
+        ctx!.fillStyle = NINK(ink, tt);
+        ctx!.fillRect(q.x, q.y, w * u, h * u);
       },
-      poly(pts: Array<[number, number]>, a: number) {
-        ctx!.strokeStyle = A(a); ctx!.lineWidth = glyphLWF;
+      R(x1: number, y: number, x2: number, ink: InkName, w = 0.75) {
+        const q1 = P(x1, y), q2 = P(x2, y);
+        note(q1.x, q1.y - w / 2, q2.x, q1.y + w / 2);
+        if (measuring()) return;
+        ctx!.strokeStyle = NINK(ink, tt); ctx!.lineWidth = w;
+        ctx!.beginPath(); ctx!.moveTo(q1.x, q1.y); ctx!.lineTo(q2.x, q2.y); ctx!.stroke();
+      },
+      V(px: number, y1: number, y2: number, ink: InkName, w = 0.75) {
+        const q1 = P(px, y1), q2 = P(px, y2);
+        note(q1.x - w / 2, Math.min(q1.y, q2.y), q1.x + w / 2, Math.max(q1.y, q2.y));
+        if (measuring()) return;
+        ctx!.strokeStyle = NINK(ink, tt); ctx!.lineWidth = w;
+        ctx!.beginPath(); ctx!.moveTo(q1.x, q1.y); ctx!.lineTo(q2.x, q2.y); ctx!.stroke();
+      },
+      C(px: number, py: number, r: number, ink: InkName) {
+        const q = P(px, py), rr = r * u;
+        note(q.x - rr, q.y - rr, q.x + rr, q.y + rr);
+        if (measuring()) return;
+        ctx!.beginPath(); ctx!.arc(q.x, q.y, rr, 0, Math.PI * 2);
+        ctx!.fillStyle = NINK(ink, tt); ctx!.fill();
+      },
+      G(pts: Array<[number, number]>, ink: InkName) {
+        pts.forEach(([px, py]) => { const q = P(px, py); note(q.x, q.y, q.x, q.y); });
+        if (measuring()) return;
         ctx!.beginPath();
-        pts.forEach(([x, y], i) => { const q = P(x, y); i ? ctx!.lineTo(q.x, q.y) : ctx!.moveTo(q.x, q.y); });
+        pts.forEach(([px, py], i) => { const q = P(px, py); i ? ctx!.lineTo(q.x, q.y) : ctx!.moveTo(q.x, q.y); });
+        ctx!.closePath(); ctx!.fillStyle = NINK(ink, tt); ctx!.fill();
+      },
+      S(pts: Array<[number, number]>, ink: InkName, w = 1.4) {
+        pts.forEach(([px, py]) => { const q = P(px, py); note(q.x, q.y - w / 2, q.x, q.y + w / 2); });
+        if (measuring()) return;
+        ctx!.strokeStyle = NINK(ink, tt); ctx!.lineWidth = w;
+        ctx!.beginPath();
+        pts.forEach(([px, py], i) => { const q = P(px, py); i ? ctx!.lineTo(q.x, q.y) : ctx!.moveTo(q.x, q.y); });
         ctx!.stroke();
       },
-      R(x: number, y: number, w: number, h: number, a: number) {
-        const q = P(x, y);
-        ctx!.strokeStyle = A(a); ctx!.lineWidth = glyphLWF;
-        ctx!.beginPath(); ctx!.rect(q.x, q.y, w * u, h * u); ctx!.stroke();
+      T(str: string, px: number, py: number, size: number, ink: InkName, weight = "500", anchor: CanvasTextAlign = "left") {
+        const q = P(px, py), fs = size * u;
+        ctx!.font = `${weight} ${fs}px -apple-system, BlinkMacSystemFont, sans-serif`;
+        const w = ctx!.measureText(str).width;
+        const x0 = anchor === "center" ? q.x - w / 2 : anchor === "right" ? q.x - w : q.x;
+        note(x0, q.y - fs * 0.36, x0 + w, q.y + fs * 0.36);
+        if (measuring()) return;
+        ctx!.fillStyle = NINK(ink, tt);
+        ctx!.textAlign = anchor; ctx!.textBaseline = "middle";
+        ctx!.fillText(str, q.x, q.y);
+        ctx!.textAlign = "left";
       },
-      F(x: number, y: number, w: number, h: number, a: number) {
-        const q = P(x, y);
-        ctx!.fillStyle = A(a); ctx!.fillRect(q.x, q.y, w * u, h * u);
+      /* A set quotation mark: the ball and its tail are one continuous
+         contour, so the tail tapers out of the bowl instead of sitting
+         beside it as a second lump. cs is the mark's ball radius. */
+      comma(px: number, py: number, cs: number, ink: InkName) {
+        const q = P(px, py), r = cs * u;
+        note(q.x - r, q.y - r, q.x + 1.15 * r, q.y + 3.05 * r);
+        if (measuring()) return;
+        ctx!.fillStyle = NINK(ink, tt);
+        ctx!.beginPath();
+        ctx!.arc(q.x, q.y, r, Math.PI * 0.42, Math.PI * 2.08);
+        ctx!.bezierCurveTo(
+          q.x + 1.32 * r, q.y + 1.34 * r,
+          q.x + 0.62 * r, q.y + 2.36 * r,
+          q.x - 0.52 * r, q.y + 3.0 * r,
+        );
+        ctx!.bezierCurveTo(
+          q.x + 0.06 * r, q.y + 2.02 * r,
+          q.x + 0.34 * r, q.y + 1.24 * r,
+          q.x + Math.cos(Math.PI * 0.42) * r, q.y + Math.sin(Math.PI * 0.42) * r,
+        );
+        ctx!.closePath(); ctx!.fill();
       },
-      C(x: number, y: number, r: number, a: number, fill = false) {
-        const q = P(x, y);
-        ctx!.beginPath(); ctx!.arc(q.x, q.y, r * u, 0, Math.PI * 2);
-        if (fill) { ctx!.fillStyle = A(a); ctx!.fill(); }
-        else { ctx!.strokeStyle = A(a); ctx!.lineWidth = glyphLWF; ctx!.stroke(); }
+      /* a pair, set at the spacing a double quote actually takes */
+      quotes(px: number, py: number, cs: number, ink: InkName) {
+        this.comma(px, py, cs, ink);
+        this.comma(px + 2.55 * cs, py, cs, ink);
+      },
+      /* the sitter: head and shoulders held inside the disc, never spilling */
+      avatar(px: number, py: number, r: number, disc: InkName, fig: InkName) {
+        const q = P(px, py), R = r * u;
+        note(q.x - R, q.y - R, q.x + R, q.y + R);
+        if (measuring()) return;
+        ctx!.save();
+        ctx!.beginPath(); ctx!.arc(q.x, q.y, R, 0, Math.PI * 2);
+        ctx!.fillStyle = NINK(disc, tt); ctx!.fill();
+        ctx!.clip();
+        ctx!.fillStyle = NINK(fig, tt);
+        ctx!.beginPath(); ctx!.arc(q.x, q.y - R * 0.26, R * 0.34, 0, Math.PI * 2); ctx!.fill();
+        ctx!.beginPath(); ctx!.arc(q.x, q.y + R * 0.72, R * 0.62, 0, Math.PI * 2); ctx!.fill();
+        ctx!.restore();
       },
     };
   }
 
-  /* A component in the rack, drawn as the artifact part it is. Cell is 58x36
-     world units; the glyph works in a 48x28 box around its centre. */
+  /* A component in the rack, printed. Cell 58x36; glyph box ~50x28. */
   function partGlyph(kind: string, cx2: number, cy2: number, u: number, t: number) {
-    const g = glyphPen(cx2, cy2, u, t);
+    const g = printPen(cx2, cy2, u, t * inkMul);
     switch (kind) {
       case "headline":
-        g.L(-21, -12, -21, 11, 0.14);
-        g.F(-18, -9, 33, 6, 0.5); g.F(-18, -1, 21, 6, 0.5);
-        g.L(-18, 8, 17, 8, 0.18);
-        g.L(-23, -9, -21, -9, 0.3); g.L(-23, 5, -21, 5, 0.3);
+        g.M(-23, -11, 40, 6, "graphite"); g.M(-23, -2, 30, 6, "graphite");
+        g.R(-23, 8, 23, "greige");
+        g.M(-23, 10.5, 32, 3, "stone");
         break;
       case "body":
-        g.L(-22, -11, -22, 11, 0.14);
-        [0, 1, 2, 3, 4].forEach((i) => g.L(-18, -9 + i * 4.6, [16, 19, 14, 18, 2][i], -9 + i * 4.6, 0.34));
+        g.V(-24, -11, 12, "greige");
+        [0, 1, 2, 3].forEach((i) => g.M(-20, -10 + i * 5.6, [40, 43, 36, 24][i], 3, "stone"));
         break;
       case "quote":
-        g.F(-19, -10, 3.4, 5, 0.5); g.F(-14, -10, 3.4, 5, 0.5);
-        g.L(-19, -4.6, -17.9, -2.4, 0.5); g.L(-14, -4.6, -12.9, -2.4, 0.5);
-        [0, 1, 2].forEach((i) => g.L(-19, 0 + i * 5, [17, 13, 8][i], 0 + i * 5, 0.36));
+        g.quotes(-20, -9, 2.2, "graphite");
+        g.M(-21, 1, 42, 3.2, "umber");
+        g.M(-21, 7, 32, 3.2, "umber");
         break;
       case "credit":
-        g.L(-9, -8, 9, -8, 0.3);
-        g.F(-9, -4, 18, 3.4, 0.48);
-        g.F(-9, 3, 11, 2.4, 0.26);
-        g.L(-13, -4, -11, -4, 0.34);
+        g.M(-16, -6, 10, 2.6, "graphite");
+        g.M(-16, -0.5, 32, 3.4, "umber");
+        g.M(-16, 6, 22, 2.6, "stone");
         break;
       case "lockup":
-        g.F(-18, -5, 10, 10, 0.5);
-        g.F(-4, -4.5, 19, 4, 0.46); g.F(-4, 2, 12, 2.4, 0.26);
-        [[-22, -10], [22, -10], [-22, 10], [22, 10]].forEach(([x, y]) => {
-          g.L(x, y, x + (x < 0 ? 3 : -3), y, 0.2); g.L(x, y, x, y + (y < 0 ? 3 : -3), 0.2);
-        });
+        g.M(-20, -8, 13, 13, "umber");
+        g.M(-3, -6, 24, 4, "stone"); g.M(-3, 1, 15, 2.6, "greige");
+        g.R(-24, -12, -18, "stone"); g.V(-24, -12, -6, "stone");
+        g.R(18, 12, 24, "stone"); g.V(24, 6, 12, "stone");
         break;
       case "image":
-        g.R(-19, -12, 38, 24, 0.4);
-        g.poly([[-19, 5], [-9, -4], [-1, 3], [8, -7], [19, 4]], 0.36);
-        g.L(-19, 5, 19, 5, 0.28);
-        g.C(11, -7, 3, 0.4);
-        [[-19, -12, 1], [19, -12, -1], [-19, 12, 1], [19, 12, -1]].forEach(([x, y, d]) => g.L(x, y, x + 4 * (d as number), y, 0.26));
-        g.L(-8, -3, -4, -3, 0.44); g.L(-6, -5, -6, -1, 0.44);
+        g.M(-22, -12, 44, 24, "mist");
+        g.G([[-22, 12], [-9, -2], [0, 6], [10, -6], [22, 12]], "greige");
+        g.C(13, -6, 3, "umber");
         break;
       case "ground":
-        g.R(-19, -12, 38, 24, 0.28);
-        for (let i = 0; i < 9; i++) g.L(-19 + i * 4.6, 12, -19 + i * 4.6 + 9, -12, 0.06 + i * 0.028);
-        for (let i = 0; i < 5; i++) g.C(-13 + i * 6.5, -6 + (i % 2) * 9, 0.9, 0.34, true);
+        g.M(-22, -12, 44, 24, "mist");
+        for (let i = 0; i < 7; i++) g.V(-18 + i * 6.2, -12 + (i % 2) * 3, 12 - ((i + 1) % 2) * 3, "greige");
+        g.C(-8, -3, 1.2, "umber"); g.C(6, 4, 1.2, "umber");
         break;
       case "palette":
-        [0.1, 0.22, 0.36, 0.5, 0.64].forEach((a, i) => g.F(-19 + i * 7.7, -10, 6.6, 13, a));
-        g.R(-20.4, -11.4, 9.4, 15.8, 0.5);
-        [0, 1, 2, 3, 4].forEach((i) => g.L(-15.7 + i * 7.7, 6, -15.7 + i * 7.7, 9, 0.3));
-        g.L(-19, 10.5, 19, 10.5, 0.16);
+        (["graphite", "umber", "stone", "greige", "mist"] as InkName[]).forEach((ink, i) => g.M(-22 + i * 9.2, -9, 8, 13, ink));
+        g.R(-22, 8, 24, "greige");
+        [0, 1, 2, 3, 4].forEach((i) => g.V(-18 + i * 9.2, 8, 11, "umber"));
         break;
       case "figure":
-        g.L(-18, -12, -18, 10, 0.3); g.L(-18, 10, 19, 10, 0.3);
-        g.L(-18, 1, 19, 1, 0.1); g.L(-18, -7, 19, -7, 0.1);
-        [[-13, 6], [-5, 12], [3, 8], [11, 17]].forEach(([x, h]) => g.F(x, 10 - h, 6, h, 0.34));
-        g.poly([[-10, 1], [-2, -3], [6, -1], [14, -9]], 0.5);
-        g.C(14, -9, 1.6, 0.6, true);
+        g.V(-20, -11, 10, "stone"); g.R(-20, 10, 22, "stone");
+        [[-15, 6], [-7, 12], [1, 8], [9, 16]].forEach(([px, h]) => g.M(px, 10 - h, 5.5, h, "greige"));
+        g.S([[-12, 2], [-4, -3], [4, -1], [13, -8]], "umber", 1.2);
+        g.C(13, -8, 1.5, "graphite");
         break;
       case "list":
         [0, 1, 2].forEach((i) => {
-          const y = -8 + i * 8, ind = i === 1 ? 6 : 0;
-          if (i === 1) g.L(-16 + ind, y, -13 + ind, y, 0.44);
-          else g.F(-18 + ind, y - 1.6, 3.2, 3.2, 0.46);
-          g.L(-12 + ind, y, [14, 16, 10][i], y, 0.34);
+          g.M(-20, -9 + i * 8, 3, 3, "umber");
+          g.M(-13, -9 + i * 8, [30, 34, 24][i], 3, "stone");
         });
         break;
       case "chip":
-        g.R(-21, -7, 42, 14, 0.42);
-        g.F(-16, -1.7, 20, 3.4, 0.32);
-        g.L(8, 0, 16, 0, 0.5); g.L(13, -3, 16, 0, 0.5); g.L(13, 3, 16, 0, 0.5);
+        g.M(-22, -6, 34, 12, "umber");
+        g.M(-17, -1.7, 18, 3.4, "paper");
+        g.R(12, 0, 20, "umber", 1.1);
+        g.G([[20, -2.8], [24.5, 0], [20, 2.8]], "umber");
         break;
-      default: // seal
-        g.C(0, 0, 11.5, 0.4); g.C(0, 0, 8.5, 0.2);
-        g.poly([[-4, 0], [-1.2, 3.2], [4.4, -3.4]], 0.55);
-        for (let i = 0; i < 12; i++) {
-          const a2 = (i / 12) * Math.PI * 2;
-          g.L(Math.cos(a2) * 11.5, Math.sin(a2) * 11.5, Math.cos(a2) * 13.6, Math.sin(a2) * 13.6, 0.24);
+      default: { // seal
+        const N = 22, R0 = 11.5;
+        for (let i = 0; i < N; i++) {
+          const a1 = (i / N) * Math.PI * 2, a2 = ((i + 0.42) / N) * Math.PI * 2;
+          g.G([
+            [Math.cos(a1) * (R0 - 2.6), Math.sin(a1) * (R0 - 2.6)],
+            [Math.cos(a1) * R0, Math.sin(a1) * R0],
+            [Math.cos(a2) * R0, Math.sin(a2) * R0],
+            [Math.cos(a2) * (R0 - 2.6), Math.sin(a2) * (R0 - 2.6)],
+          ], "umber");
         }
+        g.C(0, 0, 5.8, "graphite");
+        g.S([[-2.6, 0.2], [-0.7, 2.2], [3.1, -2.2]], "paper", 1.6);
         break;
+      }
     }
   }
 
-  /* A renderer's device, drawn as the thing that makes that file. */
+  /* A renderer's device, printed. Interior ~104x64. */
   function deviceGlyph(i: number, cx2: number, cy2: number, u: number, t: number) {
-    const g = glyphPen(cx2, cy2, u, t);
-    if (i === 0) { // web: a browser window with a real page in it
-      g.R(-24, -17, 48, 34, 0.42);
-      g.L(-24, -9, 24, -9, 0.34);
-      [0, 1, 2].forEach((d) => g.C(-20 + d * 3.4, -13, 1.1, 0.34, true));
-      g.R(-11, -15, 26, 4, 0.18);
-      g.F(-20, -5, 29, 8, 0.28);
-      g.L(-20, 6, 4, 6, 0.3); g.L(-20, 10, 12, 10, 0.3); g.L(-20, 14, 0, 14, 0.3);
-      g.F(20, -6, 2.4, 12, 0.2);
-    } else if (i === 1) { // image: a framed photograph with crop marks
-      g.R(-24, -15, 48, 30, 0.42);
-      g.poly([[-24, 6], [-12, -5], [-2, 4], [9, -8], [24, 5]], 0.36);
-      g.L(-24, 6, 24, 6, 0.26);
-      g.C(14, -7, 3.6, 0.4);
-      [[-24, -15, 1], [24, -15, -1], [-24, 15, 1], [24, 15, -1]].forEach(([x, y, d]) => g.L(x, y, x + 5 * (d as number), y, 0.26));
-      g.L(-10, -2, -5, -2, 0.44); g.L(-7.5, -4.5, -7.5, 0.5, 0.44);
-    } else if (i === 2) { // document: a page with a turned corner
-      g.poly([[-16, -18], [8, -18], [16, -10], [16, 18], [-16, 18], [-16, -18]], 0.42);
-      g.poly([[8, -18], [8, -10], [16, -10]], 0.3);
-      g.F(-11, -13, 15, 3.6, 0.46);
-      [0, 1, 2].forEach((d) => g.L(-11, -6 + d * 4, [11, 9, 11][d], -6 + d * 4, 0.3));
-      g.L(-11, 8, -11, 14, 0.34);
-      g.L(-8, 9, 6, 9, 0.28); g.L(-8, 13, 2, 13, 0.28);
-      g.C(11, 15, 1.2, 0.3, true);
-    } else if (i === 3) { // deck: a slide, and the deck it belongs to
-      g.R(-24, -16, 48, 27, 0.42);
-      g.F(-19, -11, 20, 3.6, 0.46);
-      g.L(-19, -4, -3, -4, 0.3); g.L(-19, 0, -6, 0, 0.3); g.L(-19, 4, -9, 4, 0.3);
-      g.R(3, -5, 17, 12, 0.28);
-      g.poly([[3, 7], [8, 1], [12, 4], [16, -1], [20, 7]], 0.3);
-      [0, 1, 2].forEach((d) => g.R(-18 + d * 13, 14, 11, 5, d === 0 ? 0.4 : 0.2));
-    } else { // video: a frame and its timeline
-      g.R(-24, -17, 48, 26, 0.42);
-      g.poly([[-5, -10], [7, -4], [-5, 2], [-5, -10]], 0.5);
-      g.C(0, -4, 11, 0.16);
-      g.L(-24, 14, 24, 14, 0.3);
-      for (let d = 0; d < 9; d++) g.L(-24 + d * 6, 12, -24 + d * 6, 16, 0.18);
-      g.C(-8, 14, 2.4, 0.55, true);
-      g.F(-24, 13.4, 16, 1.2, 0.4);
+    const g = printPen(cx2, cy2, u, t * inkMul);
+    if (i === 0) { // web: the browser, set quiet
+      g.M(-36, -26, 72, 11, "greige");
+      [0, 1, 2].forEach((d) => g.C(-30 + d * 5.5, -20.5, 1.4, "paper"));
+      g.M(-8, -23.6, 36, 5.5, "paper");
+      g.M(-36, -15, 72, 41, "mist");
+      g.M(-29, -9, 36, 12, "umber");
+      g.M(-29, 8, 28, 3, "stone"); g.M(-29, 14, 23, 3, "stone");
+      g.V(13, -9, 20, "greige");
+      g.M(18, -9, 13, 18, "greige");
+      g.M(18, 13, 13, 3, "stone");
+    } else if (i === 1) { // image: the plate, its crop, its focal mark
+      g.M(-34, -22, 68, 44, "mist");
+      g.G([[-34, 22], [-13, 0], [1, 12], [15, -6], [34, 22]], "greige");
+      g.C(19, -10, 3.6, "umber");
+    } else if (i === 2) { // document: the page, its fold, its margins
+      g.G([[-19, -26], [9, -26], [19, -16], [19, 26], [-19, 26], [-19, -26]], "mist");
+      g.G([[9, -26], [9, -16], [19, -16]], "greige");
+      g.M(-12, -19, 17, 3.6, "graphite");
+      g.R(-12, -11, 12, "stone");
+      [0, 1, 2].forEach((d) => g.M(-12, -7 + d * 5, [22, 19, 22][d], 2.2, "stone"));
+      g.V(-9.5, 9, 18, "umber", 1.1);
+      g.M(-5, 9, 16, 2.2, "umber"); g.M(-5, 14, 13, 2.2, "umber");
+    } else if (i === 3) { // deck: the slide and its furniture
+      g.M(-36, -24, 72, 40, "mist");
+      g.M(-29, -17, 30, 6, "graphite");
+      g.M(-29, -6, 22, 2.6, "stone"); g.M(-29, -1, 18, 2.6, "stone");
+      g.V(6, -17, 10, "greige");
+      g.G([[11, 9], [20, -3], [26, 3], [31, -6], [31, 9]], "greige");
+      [0, 1, 2].forEach((d) => g.M(-36 + d * 12, 21, 9, 4, d === 0 ? "umber" : "greige"));
+    } else { // video: the frame and its timeline
+      g.M(-36, -25, 72, 38, "greige");
+      g.G([[-5, -14], [10, -6], [-5, 2]], "paper");
+      g.R(-36, 19, 36, "greige", 2.4);
+      g.R(-36, 19, -8, "umber", 2.4);
+      g.M(-9.5, 16, 3, 7, "graphite");
+      [0, 1, 2, 3, 4, 5].forEach((d) => g.V(-36 + d * 14.4, 24, 27, "stone"));
     }
   }
 
@@ -419,6 +651,11 @@ export function mountAssembly(opts: {
     ctx!.letterSpacing = "0px";
     return w / p0.s;
   }
+
+  /* One line of a double rule, never thinner than the screen can actually draw:
+     on a retina panel this is a true single device pixel, and on a 1x display it
+     floors at one rather than dissolving into a grey wash. */
+  const ruleW = () => Math.max(RULE_W, 1 / dpr);
 
   function stroke(alpha: number, dash?: number[]) {
     ctx!.strokeStyle = INK(alpha * inkMul);
@@ -485,71 +722,125 @@ export function mountAssembly(opts: {
     stroke((o?.strong ? S_MAIN : S_MID) * t);
   }
 
+  /* Shift a screen polyline by d along each segment's left normal and mitre the
+     corners at the intersection of the shifted segments, so a doubled run keeps
+     an even channel all the way round a bend instead of pinching at the elbow. */
+  type SP = { x: number; y: number };
+  function offsetPoly(sp: SP[], d: number): SP[] {
+    const segs = sp.slice(0, -1).map((a, i) => {
+      const dx = sp[i + 1].x - a.x, dy = sp[i + 1].y - a.y;
+      const L = Math.hypot(dx, dy) || 1;
+      const nx = (-dy / L) * d, ny = (dx / L) * d;
+      return { a: { x: a.x + nx, y: a.y + ny }, ux: dx / L, uy: dy / L, b: { x: sp[i + 1].x + nx, y: sp[i + 1].y + ny } };
+    });
+    const out: SP[] = [segs[0].a];
+    for (let i = 1; i < segs.length; i++) {
+      const p = segs[i - 1], q = segs[i];
+      const den = p.ux * q.uy - p.uy * q.ux;
+      if (Math.abs(den) < 1e-6) { out.push(q.a); continue; }   // collinear, nothing to mitre
+      const u = ((q.a.x - p.a.x) * q.uy - (q.a.y - p.a.y) * q.ux) / den;
+      out.push({ x: p.a.x + p.ux * u, y: p.a.y + p.uy * u });
+    }
+    out.push(segs[segs.length - 1].b);
+    return out;
+  }
+  /* which way a corner turns; the inside of the turn takes the smaller radius */
+  function turnSign(sp: SP[], i: number) {
+    const z = (sp[i].x - sp[i - 1].x) * (sp[i + 1].y - sp[i].y) - (sp[i].y - sp[i - 1].y) * (sp[i + 1].x - sp[i].x);
+    return z > 0 ? 1 : z < 0 ? -1 : 0;
+  }
+
   /* dash: the line belongs to another layer and is only crossing into this one.
      Dashed routes fade in rather than draw on, since the dash pattern is the
-     line's identity and animating the offset would set the dots marching. */
-  function route(pts: Array<[number, number]>, t: number, o?: { alpha?: number; pulse?: number; dash?: boolean }) {
+     line's identity and animating the offset would set the dots marching.
+     double: the run belongs to one of the two watching layers, and is drawn as
+     a double rule. */
+  function route(pts: Array<[number, number]>, t: number, o?: { alpha?: number; pulse?: number; dash?: boolean; double?: boolean; trimStart?: number; trimEnd?: number }) {
     const tt = t * inkMul;
     if (tt <= 0.02 || pts.length < 2) return;
     const sp = pts.map(([x, y]) => toScreen(x, y));
+    /* Pull an end back along its own segment by a screen distance. A branch
+       meeting a double rule has to stop on the trunk's near hairline: the
+       centreline is the one place it must not stop, since both of its rails
+       would dead-end in the channel with the far rail left unbroken. The
+       trunk's rails are screen offsets, so a caller working in world
+       coordinates cannot shorten the branch itself. */
+    const trim = (i: number, j: number, d: number) => {
+      const a = sp[i], b2 = sp[j];
+      const L = Math.hypot(b2.x - a.x, b2.y - a.y) || 1;
+      sp[i] = { ...a, x: a.x + ((b2.x - a.x) / L) * d, y: a.y + ((b2.y - a.y) / L) * d };
+    };
+    if (o?.trimStart) trim(0, 1, o.trimStart);
+    if (o?.trimEnd) trim(sp.length - 1, sp.length - 2, o.trimEnd);
     const r = 8 * sp[0].s;
-    const p = new Path2D();
-    p.moveTo(sp[0].x, sp[0].y);
-    for (let i = 1; i < sp.length - 1; i++) p.arcTo(sp[i].x, sp[i].y, sp[i + 1].x, sp[i + 1].y, r);
-    p.lineTo(sp[sp.length - 1].x, sp[sp.length - 1].y);
-    let len = 0;
-    for (let i = 1; i < sp.length; i++) len += Math.hypot(sp[i].x - sp[i - 1].x, sp[i].y - sp[i - 1].y);
-    if (o?.dash) {
-      // one uniform ink for the whole dotted class; alpha is ignored here
-      ctx!.strokeStyle = INK(DASH_INK * Math.min(1, tt * 1.4) * EASE(t));
-      ctx!.lineWidth = 1;
-      ctx!.setLineDash([2 * sp[0].s, 3 * sp[0].s]);
-      ctx!.stroke(p);
-      ctx!.setLineDash([]);
-      if (o?.pulse !== undefined && o.pulse > 0 && o.pulse < 1) {
-        ctx!.strokeStyle = INK(0.8 * inkMul);
-        ctx!.lineWidth = 1.5;
-        const seg = len * 0.1;
-        ctx!.setLineDash([seg, len]);
-        ctx!.lineDashOffset = -(len - seg) * o.pulse + seg;
-        ctx!.stroke(p);
-        ctx!.setLineDash([]);
-        ctx!.lineDashOffset = 0;
-        ctx!.lineWidth = 1;
+    const mk = (off: number) => {
+      const q = off === 0 ? sp : offsetPoly(sp, off);
+      const p = new Path2D();
+      p.moveTo(q[0].x, q[0].y);
+      for (let i = 1; i < q.length - 1; i++) {
+        p.arcTo(q[i].x, q[i].y, q[i + 1].x, q[i + 1].y, off === 0 ? r : Math.max(0.5, r - off * turnSign(sp, i)));
       }
-      return;
-    }
-    ctx!.strokeStyle = INK((o?.alpha ?? S_SOFT) * Math.min(1, tt * 1.4));
-    ctx!.lineWidth = 1;
-    const e = EASE(t);
-    ctx!.setLineDash([len]);
-    ctx!.lineDashOffset = len * (1 - e);
-    ctx!.stroke(p);
-    ctx!.setLineDash([]);
-    ctx!.lineDashOffset = 0;
-    if (o?.pulse !== undefined && o.pulse > 0 && o.pulse < 1) {
+      p.lineTo(q[q.length - 1].x, q[q.length - 1].y);
+      let len = 0;
+      for (let i = 1; i < q.length; i++) len += Math.hypot(q[i].x - q[i - 1].x, q[i].y - q[i - 1].y);
+      return { p, len };
+    };
+    const runs = o?.double ? [mk(RULE_GAP), mk(-RULE_GAP)] : [mk(0)];
+    const lw = o?.double ? ruleW() : 1;
+    // a pulse always rides the centre of the run, never one side of a pair
+    const pulse = () => {
+      if (o?.pulse === undefined || o.pulse <= 0 || o.pulse >= 1) return;
+      const c = o?.double ? mk(0) : runs[0];
       ctx!.strokeStyle = INK(0.8 * inkMul);
       ctx!.lineWidth = 1.5;
-      const seg = len * 0.1;
-      ctx!.setLineDash([seg, len]);
-      ctx!.lineDashOffset = -(len - seg) * o.pulse + seg;
-      ctx!.stroke(p);
+      const seg = c.len * 0.1;
+      ctx!.setLineDash([seg, c.len]);
+      ctx!.lineDashOffset = -(c.len - seg) * o.pulse + seg;
+      ctx!.stroke(c.p);
       ctx!.setLineDash([]);
       ctx!.lineDashOffset = 0;
       ctx!.lineWidth = 1;
+    };
+    if (o?.dash) {
+      // one uniform ink for the whole dotted class; alpha is ignored here
+      ctx!.strokeStyle = INK(DASH_INK * Math.min(1, tt * 1.4) * EASE(t));
+      ctx!.lineWidth = lw;
+      ctx!.setLineDash([2 * sp[0].s, 3 * sp[0].s]);
+      runs.forEach(({ p }) => ctx!.stroke(p));
+      ctx!.setLineDash([]);
+      ctx!.lineWidth = 1;
+      pulse();
+      return;
     }
+    ctx!.strokeStyle = INK((o?.alpha ?? S_SOFT) * Math.min(1, tt * 1.4));
+    ctx!.lineWidth = lw;
+    const e = EASE(t);
+    runs.forEach(({ p, len }) => {
+      ctx!.setLineDash([len]);
+      ctx!.lineDashOffset = len * (1 - e);
+      ctx!.stroke(p);
+    });
+    ctx!.setLineDash([]);
+    ctx!.lineDashOffset = 0;
+    ctx!.lineWidth = 1;
+    pulse();
   }
 
-  function chipLabel(str: string, wx: number, wy: number, t: number) {
+  /* bare: the chip is not set into a line, so it needs no plate to stop one */
+  function chipLabel(str: string, wx: number, wy: number, t: number, o?: { bare?: boolean }) {
     const tt = t * inkMul;
     if (tt <= 0.02) return;
     const p = toScreen(wx, wy);
     const size = 9 * p.s;
     if (size < 4) return;
     ctx!.font = `500 ${size}px -apple-system, BlinkMacSystemFont, sans-serif`;
-    const tw = ctx!.measureText(str.toUpperCase()).width + 0.08 * size * str.length;
-    ctx!.fillStyle = `rgba(254, 254, 253, ${0.98 * t})`;
-    ctx!.fillRect(p.x - 8 * p.s, p.y - size, tw + 16 * p.s, size * 2);
+    const tw = (ctx!.measureText(str.toUpperCase()).width + 0.08 * size * str.length) / p.s;
+    if (o?.bare) {
+      ctx!.fillStyle = `rgba(254, 254, 253, ${0.98 * t})`;
+      ctx!.fillRect(p.x - 8 * p.s, p.y - size, (tw + 16) * p.s, size * 2);
+    } else {
+      plate(wx - 8, wy - 9, wx + tw + 8, wy + 9, t);
+    }
     text(str, wx, wy, t, { size: 9, caps: true, alpha: T_FAINT, track: true });
   }
 
@@ -559,6 +850,24 @@ export function mountAssembly(opts: {
      hairline border, quiet shadow, sharp corners, with an ultra-detailed
      glyph inside. compact mode renders the docked icon. */
   const FRAG_W = 96, FRAG_H = 64;
+
+  /* ── the specimen inks: opaque neutrals, mixed like a print run ──
+     Graphite is the emphasis ink: one small mass per glyph, never more.
+     Reveal and spotlight multiply into the alpha, so a fading or dimmed
+     glyph fades as a whole print, not stroke by stroke. */
+  const NEUTRAL = {
+    graphite: [74, 70, 63],
+    umber: [132, 124, 113],
+    stone: [175, 168, 157],
+    greige: [215, 209, 199],
+    mist: [236, 232, 225],
+    paper: [254, 254, 253],
+  } as const;
+  type InkName = keyof typeof NEUTRAL;
+  function NINK(name: InkName, a2: number) {
+    const c = NEUTRAL[name];
+    return `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${Math.max(0, Math.min(1, a2))})`;
+  }
   /* Glyph painters draw with hairlines multiplied by this factor. Live it is 1;
      while painting a sprite it is raised so the stroke, once the picture is
      scaled down, reads as the same hairline. */
@@ -570,42 +879,6 @@ export function mountAssembly(opts: {
     ctx!.save();
     ctx!.translate(px, py);
     ctx!.rotate((rot * Math.PI) / 180);
-    const L = (x1: number, y1: number, x2: number, y2: number, a = 0.42, wd = 1) => {
-      ctx!.strokeStyle = INK(a * tt);
-      ctx!.lineWidth = wd * glyphLWF;
-      ctx!.beginPath();
-      ctx!.moveTo(x1 * s, y1 * s);
-      ctx!.lineTo(x2 * s, y2 * s);
-      ctx!.stroke();
-    };
-    const R = (x: number, y: number, w: number, h: number, a = 0.4, fa = -1, r = 0) => {
-      ctx!.beginPath();
-      ctx!.roundRect(x * s, y * s, w * s, h * s, r * s);
-      if (fa >= 0) { ctx!.fillStyle = INK(fa * tt); ctx!.fill(); }
-      if (a > 0) { ctx!.strokeStyle = INK(a * tt); ctx!.lineWidth = glyphLWF; ctx!.stroke(); }
-    };
-    const C = (x: number, y: number, r: number, a = 0.45, fa = -1) => {
-      ctx!.beginPath();
-      ctx!.arc(x * s, y * s, r * s, 0, Math.PI * 2);
-      if (fa >= 0) { ctx!.fillStyle = INK(fa * tt); ctx!.fill(); }
-      if (a > 0) { ctx!.strokeStyle = INK(a * tt); ctx!.lineWidth = glyphLWF; ctx!.stroke(); }
-    };
-    const T = (str: string, x: number, y: number, sz: number, a = 0.7, weight = "500") => {
-      ctx!.font = `${weight} ${sz * s}px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx!.fillStyle = INK(a * tt);
-      ctx!.textAlign = "center";
-      ctx!.textBaseline = "middle";
-      ctx!.fillText(str, x * s, y * s);
-      ctx!.textAlign = "left";
-    };
-    const P = (pts: Array<[number, number]>, a = 0.4, wd = 1, close = false) => {
-      ctx!.strokeStyle = INK(a * tt);
-      ctx!.lineWidth = wd * glyphLWF;
-      ctx!.beginPath();
-      pts.forEach(([x, y], i) => (i === 0 ? ctx!.moveTo(x * s, y * s) : ctx!.lineTo(x * s, y * s)));
-      if (close) ctx!.closePath();
-      ctx!.stroke();
-    };
 
     /* the enclosure: one size for every fragment */
     const tw = compact ? 34 : FRAG_W;
@@ -623,295 +896,207 @@ export function mountAssembly(opts: {
     ctx!.lineWidth = glyphLWF;
     ctx!.stroke();
 
+    centred((gx2, gy2) => fragGlyph(kind, gx2, gy2, s, tt, compact), 0, 0);
+    ctx!.restore();
+  }
+
+  function fragGlyph(kind: string, cx2: number, cy2: number, s: number, tt: number, compact: boolean) {
+    const g = printPen(cx2, cy2, s, tt);
+
     if (compact) {
-      /* the signature element only, small and clean */
+      /* the signature element, printed small */
       switch (kind) {
-        case "statement": L(-10, -3, 10, -3, 0.7, 1.3); L(-10, 3, 5, 3, 0.3); break;
-        case "paragraph": R(-11, -6, 5, 5, 0.3, 0.1); L(-3, -4, 11, -4, 0.3); L(-11, 3, 11, 3, 0.3); break;
-        case "profile": C(-6, 0, 4, 0.5); L(1, -2, 10, -2, 0.45); L(1, 3, 7, 3, 0.28); break;
-        case "hierarchy": L(-10, -4, 4, -4, 0.6, 1.2); L(-7, -4, -7, 4, 0.28); L(-7, 4, 8, 4, 0.36); break;
-        case "claim": L(-11, 0, 2, 0, 0.4); C(8, 0, 4, 0.55); break;
-        case "quote": T("\u201C", -8, -1, 12, 0.5); L(-1, 1, 10, 1, 0.4); break;
-        case "channels": C(-9, -4, 1.4, 0, 0.5); L(-5, -4, 8, -4, 0.3); R(-10.2, 2, 2.6, 2.6, 0.45); L(-5, 3.4, 6, 3.4, 0.3); break;
-        case "principles": T("1", -9, -3, 5.5, 0.55); L(-4, -3, 9, -3, 0.32); T("2", -9, 4, 5.5, 0.55); L(-4, 4, 7, 4, 0.32); break;
-        case "beforeafter": R(-11, -5, 7, 10, 0.28); R(4, -5, 7, 10, 0.5); L(-2, 0, 2, 0, 0.45); break;
-        case "swatches": for (let i = 0; i < 4; i++) R(-11 + i * 5.8, -3.5, 4.6, 7, 0.2, 0.15 + i * 0.2); break;
-        case "aa": T("A", -4, 0, 11, 0.8); T("a", 5, 1.5, 7.5, 0.5, "400"); break;
-        case "ruler": L(-11, 2, 11, 2, 0.45); for (let i = 0; i < 5; i++) L(-9 + i * 4.5, 2, -9 + i * 4.5, i % 2 ? -2 : -4, 0.42); break;
-        case "grid": R(-9, -6, 18, 12, 0.4); L(-3, -6, -3, 6, 0.22); L(3, -6, 3, 6, 0.22); break;
-        case "steps": R(-10, 1, 4, 4, 0.45); R(-4, -1, 6, 6, 0.5); R(4, -4, 8, 9, 0.55); break;
-        case "shapes": C(-6, 0, 4, 0.45); R(2, -4, 8, 8, 0.45, -1, 2.5); break;
-        case "easing": ctx!.strokeStyle = INK(0.55 * tt); ctx!.lineWidth = 1.2; ctx!.beginPath(); ctx!.moveTo(-9 * s, 5 * s); ctx!.bezierCurveTo(-1 * s, 5 * s, 0, -5 * s, 9 * s, -5 * s); ctx!.stroke(); break;
-        case "frame": R(-10, -7, 20, 14, 0.45); ctx!.strokeStyle = INK(0.35 * tt); ctx!.beginPath(); ctx!.moveTo(-7 * s, 4 * s); ctx!.lineTo(-2 * s, -2 * s); ctx!.lineTo(2 * s, 2 * s); ctx!.lineTo(7 * s, -3 * s); ctx!.stroke(); break;
-        case "sparkline": for (let i = 0; i < 4; i++) { const h2 = [4, 8, 6, 10][i]; R(-9 + i * 5, 5 - h2, 3.6, h2, 0, 0.28); } break;
-        case "contrast": R(-10, -6, 10, 12, 0, 0.75); ctx!.fillStyle = `rgba(254,254,253,${0.95 * tt})`; ctx!.font = `500 ${7 * s}px -apple-system, sans-serif`; ctx!.textAlign = "center"; ctx!.textBaseline = "middle"; ctx!.fillText("A", -5 * s, 0.5 * s); ctx!.textAlign = "left"; T("A", 5, 0.5, 7, 0.75); break;
+        case "statement": g.M(-13, -6, 26, 5, "graphite"); g.M(-13, 2.5, 12, 3, "stone"); break;
+        case "paragraph": g.M(-13, -6.6, 6, 6, "umber"); g.M(-5.5, -6.4, 18, 2.5, "stone"); g.M(-5.5, -2.6, 14, 2.5, "stone"); g.M(-13, 1.6, 25.5, 2.5, "stone"); g.M(-13, 5.6, 18, 2.5, "stone"); break;
+        case "profile": g.avatar(-9.5, -1, 4.3, "stone", "paper"); g.M(-3, -4.3, 15, 2.9, "umber"); g.M(-3, 0.4, 10, 2.4, "greige"); g.M(-3, 4.2, 6, 2.4, "greige"); break;
+        case "hierarchy": g.M(-13, -8, 17, 3.4, "graphite"); g.V(-11.5, -4, 6.5, "umber", 1); g.R(-11.5, -0.6, -7, "umber", 1); g.M(-6, -2, 13, 2.6, "stone"); g.R(-11.5, 6, -7, "umber", 1); g.M(-6, 4.6, 9, 2.6, "stone"); break;
+        case "claim": g.M(-13, -4.4, 15, 3, "umber"); g.M(-13, 1.4, 11, 3, "stone"); g.C(9.6, -1.4, 3.8, "graphite"); g.S([[8, -1.2], [9.2, 0.1], [11.4, -2.6]], "paper", 1.1); break;
+        case "quote": g.quotes(-12, -5, 1.7, "graphite"); g.M(-13, 3.5, 24, 3, "umber"); g.M(-13, 8.5, 15, 2.4, "stone"); break;
+        case "channels": g.C(-11, -6, 2.1, "umber"); g.M(-6.5, -7.2, 19, 2.5, "stone"); g.M(-13, -1.6, 4.2, 4.2, "umber"); g.M(-6.5, -1.2, 14, 2.5, "stone"); g.G([[-11, 3.4], [-8.6, 7.6], [-13.4, 7.6]], "umber"); g.M(-6.5, 4.8, 16, 2.5, "stone"); break;
+        case "principles": g.T("1", -12.5, -4.6, 5.4, "umber", "600"); g.M(-7.5, -5.8, 20, 2.7, "stone"); g.T("2", -12.5, 3, 5.4, "umber", "600"); g.M(-7.5, 1.8, 16, 2.7, "stone"); break;
+        case "beforeafter": g.M(-13, -7, 9.5, 14, "mist"); g.M(5, -7, 9.5, 14, "greige"); g.M(7, -4, 5.5, 2.2, "paper"); g.M(7, 0, 3.5, 2.2, "paper"); g.R(-2, 0, 1.2, "umber", 1.2); g.G([[1.2, -1.8], [2.9, 0], [1.2, 1.8]], "umber"); break;
+        case "banned": g.M(-13, -6.4, 18, 3.2, "greige"); g.R(-14.6, -4.8, 7.6, "graphite", 1.1); g.M(-13, 1.2, 14, 3.2, "umber"); g.S([[8.6, 2.6], [9.9, 4], [12.6, 1], ], "umber", 1.2); break;
+        case "swatches": (["umber", "stone", "greige"] as InkName[]).forEach((ink, i) => g.M(-10 + i * 7.4, -3.6, 6.4, 7.2, ink)); break;
+        case "aa": g.T("A", -8, 0, 11, "graphite", "600"); g.T("a", 3, 1, 7.5, "stone", "400"); break;
+        case "ruler": g.R(-11, 2, 11, "umber", 1); [0, 1, 2, 3, 4].forEach((i) => g.V(-9 + i * 4.5, i % 2 ? -1 : -3, 2, "stone", 1)); break;
+        case "grid": g.M(-9, -6, 18, 12, "mist"); g.M(-6, -4, 4, 8, "greige"); g.M(1, -4, 4, 8, "greige"); break;
+        case "steps": g.M(-10, 1, 5, 4, "greige"); g.M(-3, -1, 6, 6, "stone"); g.M(5, -4, 7, 9, "umber"); break;
+        case "shapes": g.C(-6, 0, 4, "stone"); g.M(2, -4, 8, 8, "umber"); break;
+        case "easing": g.S([[-9, 5], [-2, 5], [0, -5], [9, -5]], "umber", 1.2); g.C(9, -5, 1.4, "graphite"); break;
+        case "frame": g.M(-10, -6.5, 20, 13, "mist"); g.G([[-10, 6.5], [-3, -1], [3, 3], [10, 6.5]], "greige"); g.C(5, -3, 1.6, "umber"); break;
+        case "sparkline": [3, 7, 5, 9].forEach((h, i) => g.M(-9 + i * 5, 5 - h, 3.6, h, "stone")); g.C(9, -4.5, 1.4, "graphite"); break;
+        default: g.M(-10, -5, 9, 10, "graphite"); g.T("A", -5.5, 0.5, 6.5, "paper", "500", "center"); g.T("A", 5, 0.5, 6.5, "stone", "500", "center"); break;
       }
-      ctx!.restore();
       return;
     }
 
-
-
+    /* the full drawing, printed */
+    const L0 = -38;
     switch (kind) {
       case "statement":
-        L(-38, -19, -30, -19, 0.55, 1.6);
-        L(-38, -8, 20, -8, 0.78, 1.7);
-        L(-38, 1, 34, 1, 0.3);
-        L(-38, 9, 28, 9, 0.3);
-        L(-38, 17, 10, 17, 0.3);
-        L(-38, 23, -12, 23, 0.55, 1.4);
+        g.M(L0, -22, 58, 6.5, "graphite");
+        g.M(L0, -12, 44, 6.5, "graphite");
+        g.M(L0, 0, 50, 3.6, "stone");
+        g.M(L0, 7, 41, 3.6, "stone");
+        g.R(L0, 18, L0 + 72, "greige");
+        g.M(L0, 21.5, 24, 2.6, "umber");
         break;
       case "paragraph":
-        R(-38, -20, 15, 15, 0.35, 0.07);
-        L(-18, -17, 36, -17, 0.3);
-        L(-18, -10, 32, -10, 0.3);
-        L(-38, 0, 36, 0, 0.3);
-        L(-38, 7, 28, 7, 0.3);
-        L(-34, 16, 36, 16, 0.3);
-        L(-34, 23, 14, 23, 0.3);
+        g.R(L0, -23, L0 + 72, "greige");
+        g.M(L0, -16, 12, 12, "umber");
+        g.M(L0 + 16, -16, 50, 3.2, "stone");
+        g.M(L0 + 16, -9.5, 56, 3.2, "stone");
+        g.M(L0, 0, 72, 3.2, "stone");
+        g.M(L0, 6.5, 66, 3.2, "stone");
+        g.M(L0, 13, 40, 3.2, "stone");
         break;
       case "profile":
-        C(-26, -9, 10, 0.5);
-        C(-26, -12.5, 3, 0, 0.55);
-        ctx!.strokeStyle = INK(0.55 * tt);
-        ctx!.beginPath();
-        ctx!.arc(-26 * s, -3.5 * s, 5.2 * s, Math.PI * 1.08, Math.PI * 1.92);
-        ctx!.stroke();
-        L(-10, -15, 28, -15, 0.62, 1.4);
-        L(-10, -6, 18, -6, 0.3);
-        R(-10, 2, 22, 3, 0, 0.14);
-        R(-10, 8, 15, 3, 0, 0.22);
-        L(-38, 17, 38, 17, 0.12);
-        R(-38, 21, 18, 6, 0.28);
+        g.avatar(L0 + 9, -13, 9, "stone", "paper");
+        g.M(L0 + 24, -17, 34, 4.2, "umber");
+        g.M(L0 + 24, -9, 26, 3, "stone");
+        g.R(L0, 0, L0 + 72, "greige");
+        g.M(L0, 5, 30, 3, "stone");
+        g.M(L0 + 38, 5, 24, 3, "stone");
+        g.M(L0, 12, 26, 3, "stone");
+        g.M(L0 + 38, 12, 30, 3, "stone");
+        g.M(L0, 19, 20, 5, "mist");
         break;
       case "hierarchy":
-        L(-36, -19, 0, -19, 0.7, 1.5);
-        L(-32, -19, -32, 20, 0.24);
-        L(-32, -5, -26, -5, 0.24);
-        L(-24, -5, 8, -5, 0.42);
-        L(-20, -5, -20, 20, 0.18);
-        L(-20, 6, -14, 6, 0.18);
-        L(-12, 6, 16, 6, 0.32);
-        L(-32, 20, -26, 20, 0.24);
-        L(-24, 20, 12, 20, 0.42);
+        g.M(L0, -22, 40, 5, "graphite");
+        g.V(L0 + 4, -15, 16, "umber");
+        [[-8, 34], [1, 42], [10, 28]].forEach(([y, w]) => {
+          g.R(L0 + 4, y + 1.5, L0 + 12, "umber");
+          g.M(L0 + 14, y, w, 3.4, "stone");
+        });
         break;
       case "claim":
-        L(-38, -12, 8, -12, 0.42);
-        L(-38, -3, 2, -3, 0.3);
-        L(-38, 6, 6, 6, 0.3);
-        C(26, -2, 11, 0.5);
-        C(26, -2, 7.5, 0.3);
-        ctx!.strokeStyle = INK(0.75 * tt);
-        ctx!.lineWidth = 1.5 * glyphLWF;
-        ctx!.beginPath();
-        ctx!.moveTo(21 * s, -2 * s);
-        ctx!.lineTo(24.6 * s, 2 * s);
-        ctx!.lineTo(31.4 * s, -6 * s);
-        ctx!.stroke();
-        L(19, 14, 33, 14, 0.2);
+        g.M(L0, -18, 62, 3.6, "umber");
+        g.M(L0, -11, 48, 3.6, "umber");
+        g.R(L0, 0, L0 + 72, "greige");
+        g.M(L0, 6, 30, 3, "stone");
+        g.C(L0 + 62, 12, 7.5, "graphite");
+        g.S([[L0 + 59, 12.3], [L0 + 61.2, 14.6], [L0 + 65.4, 9.6]], "paper", 1.4);
         break;
       case "quote":
-        T("\u201C", -34, -16, 21, 0.5);
-        L(-16, -12, 30, -12, 0.4);
-        L(-16, -3, 22, -3, 0.4);
-        T("\u201D", 32, 1, 21, 0.5);
-        ctx!.strokeStyle = INK(0.4 * tt);
-        ctx!.lineWidth = 1.1 * glyphLWF;
-        ctx!.beginPath();
-        ctx!.moveTo(-16 * s, 14 * s);
-        for (let i = 0; i <= 36; i++) {
-          const x = -16 + i * 1.15;
-          ctx!.lineTo(x * s, (14 + Math.sin(i * 0.55) * (1.4 + Math.sin(i * 0.13) * 1.2)) * s);
-        }
-        ctx!.stroke();
-        C(4, 14, 1.4, 0, 0.55);
+        g.quotes(L0 + 2, -16, 2.9, "graphite");
+        g.M(L0, -3, 66, 4, "umber");
+        g.M(L0, 5, 54, 4, "umber");
+        g.M(L0, 15, 14, 2.6, "graphite");
         break;
-      case "banned":
-        L(-38, -16, -2, -16, 0.42);
-        L(-40, -16, 0, -16, 0.6, 1.4);
-        L(-38, -5, 6, -5, 0.42);
-        L(-40, -5, 8, -5, 0.6, 1.4);
-        C(26, -10, 11, 0.55);
-        L(18.2, -2.2, 33.8, -17.8, 0.55, 1.3);
-        L(-38, 10, 12, 10, 0.34);
-        ctx!.strokeStyle = INK(0.6 * tt);
-        ctx!.lineWidth = 1.3 * glyphLWF;
-        ctx!.beginPath();
-        ctx!.moveTo(18 * s, 10 * s);
-        ctx!.lineTo(20.6 * s, 12.8 * s);
-        ctx!.lineTo(25 * s, 6.6 * s);
-        ctx!.stroke();
-        L(-38, 19, 2, 19, 0.22);
+      case "channels": {
+        const rows: Array<[string, number, number]> = [["c", -18, 40], ["s", -8, 46], ["t", 2, 34], ["d", 12, 43]];
+        rows.forEach(([shape, y, w]) => {
+          if (shape === "c") g.C(L0 + 3, y + 1.6, 2.6, "stone");
+          else if (shape === "s") g.M(L0 + 0.6, y - 0.8, 4.8, 4.8, "stone");
+          else if (shape === "t") g.G([[L0 + 3, y - 1.2], [L0 + 5.8, y + 3.6], [L0 + 0.2, y + 3.6]], "stone");
+          else g.G([[L0 + 3, y - 1.4], [L0 + 6, y + 1.6], [L0 + 3, y + 4.6], [L0, y + 1.6]], "stone");
+          g.M(L0 + 11, y, w, 3.2, "umber");
+          g.M(L0 + 58, y, 14, 3.2, "greige");
+        });
+        g.M(L0 + 58, -18, [9, 14, 6, 11][3], 3.2, "greige");
         break;
-      case "channels":
-        C(-33, -18, 2.8, 0, 0.5);
-        L(-25, -18, 12, -18, 0.34);
-        R(-24, -19.5, 0, 0, 0);
-        R(20, -20, 14, 4, 0, 0.28);
-        R(-35.8, -7.6, 5.6, 5.6, 0.5);
-        L(-25, -5, 6, -5, 0.34);
-        R(20, -7, 10, 4, 0, 0.2);
-        P([[-33, 5], [-36, 10.5], [-30, 10.5]], 0.5, 1, true);
-        L(-25, 8, 16, 8, 0.34);
-        R(20, 6, 16, 4, 0, 0.35);
-        P([[-33, 17], [-36.2, 20.5], [-33, 24], [-29.8, 20.5]], 0.5, 1, true);
-        L(-25, 21, 2, 21, 0.34);
-        R(20, 19, 7, 4, 0, 0.14);
-        break;
+      }
       case "principles":
-        T("1", -35, -16, 8.5, 0.62);
-        L(-27, -16, 26, -16, 0.38);
-        ctx!.strokeStyle = INK(0.6 * tt);
-        ctx!.lineWidth = 1.3 * glyphLWF;
-        ctx!.beginPath();
-        ctx!.moveTo(30 * s, -16 * s);
-        ctx!.lineTo(32.4 * s, -13.4 * s);
-        ctx!.lineTo(36.6 * s, -19 * s);
-        ctx!.stroke();
-        L(-38, -8, 38, -8, 0.1);
-        T("2", -35, 0, 8.5, 0.62);
-        L(-27, 0, 18, 0, 0.38);
-        L(-38, 8, 38, 8, 0.1);
-        T("3", -35, 16, 8.5, 0.62);
-        L(-27, 16, 22, 16, 0.38);
+        g.T("01", L0 + 3, -15, 6.5, "umber", "500");
+        g.M(L0 + 14, -18, 52, 3.6, "stone");
+        g.M(L0 + 14, -11, 40, 3.6, "stone");
+        g.R(L0, -1, L0 + 72, "greige");
+        g.T("02", L0 + 3, 7, 6.5, "umber", "500");
+        g.M(L0 + 14, 4, 46, 3.6, "stone");
+        g.M(L0 + 14, 11, 34, 3.6, "stone");
         break;
       case "beforeafter":
-        R(-40, -18, 28, 36, 0.26);
-        L(-36, 12, -18, -10, 0.2);
-        L(-36, -4, -24, 12, 0.2);
-        L(-36, 4, -30, 12, 0.16);
-        R(12, -18, 28, 36, 0.55);
-        L(16, -10, 36, -10, 0.42);
-        L(16, -2, 32, -2, 0.42);
-        L(16, 5, 34, 5, 0.42);
-        L(16, 12, 26, 12, 0.42);
-        L(36, -22, 40, -22, 0.6); L(40, -22, 40, -18, 0.6);
-        L(-6, 0, 6, 0, 0.55, 1.2);
-        L(3, -3, 6, 0, 0.55, 1.2);
-        L(3, 3, 6, 0, 0.55, 1.2);
+        g.M(L0, -16, 30, 34, "mist");
+        g.M(L0 + 4, -11, 18, 2.6, "stone");
+        g.M(L0 + 4, -5, 22, 2.6, "stone");
+        g.M(L0 + 4, 1, 14, 2.6, "stone");
+        g.M(L0 + 42, -16, 30, 34, "greige");
+        g.M(L0 + 46, -11, 20, 4, "umber");
+        g.M(L0 + 46, -3, 22, 2.6, "paper");
+        g.M(L0 + 46, 3, 16, 2.6, "paper");
+        g.R(L0 + 32, 1, L0 + 40, "umber", 1.1);
+        g.G([[L0 + 40, -1.4], [L0 + 42.6, 1], [L0 + 40, 3.4]], "umber");
+        break;
+      case "banned":
+        g.M(L0, -20, 44, 3.6, "stone");
+        g.R(L0 - 2, -18.2, L0 + 48, "graphite", 1.1);
+        g.M(L0, -11, 36, 3.6, "stone");
+        g.R(L0 - 2, -9.2, L0 + 40, "graphite", 1.1);
+        g.R(L0, 1, L0 + 72, "greige");
+        g.M(L0, 7, 48, 3.6, "umber");
+        g.S([[L0 + 56, 9.5], [L0 + 58.4, 12], [L0 + 63, 6.4]], "umber", 1.4);
         break;
       case "swatches":
-        for (let i = 0; i < 6; i++) {
-          R(-39 + i * 13, -14, 11, 18, 0.24, 0.08 + i * 0.15);
-          L(-36 + i * 13, 8, -31 + i * 13, 8, 0.22);
-        }
-        R(-39 + 4 * 13 - 2, -16, 15, 22, 0.65);
-        L(-39, 15, 39, 15, 0.14);
-        for (let i = 0; i < 6; i++) L(-33.5 + i * 13, 15, -33.5 + i * 13, 18, 0.25);
+        (["graphite", "umber", "stone", "greige", "mist"] as InkName[]).forEach((ink, i) => g.M(L0 + i * 14.6, -18, 13, 17, ink));
+        g.R(L0, 4, L0 + 71, "greige");
+        [0, 1, 2, 3, 4].forEach((i) => g.V(L0 + 6.5 + i * 14.6, 4, 7.5, "umber"));
+        g.M(L0, 15, 18, 3, "umber");
+        g.M(L0 + 24, 15, 12, 3, "stone");
+        g.M(L0 + 42, 15, 15, 3, "greige");
         break;
       case "aa":
-        L(-40, -18, 40, -18, 0.15);
-        L(-40, -4, 40, -4, 0.11);
-        L(-40, 14, 40, 14, 0.26);
-        L(-40, 21, 40, 21, 0.1);
-        T("A", -16, -1, 30, 0.88);
-        T("a", 12, 5, 19, 0.55, "400");
-        L(28, -10, 34, -10, 0.6, 1.8);
-        L(28, -4, 34, -4, 0.35, 1);
-        L(28, 2, 34, 2, 0.22, 1);
+        g.T("A", L0 + 12, -3, 24, "graphite", "600", "center");
+        g.T("a", L0 + 32, 1, 15, "stone", "400", "center");
+        g.R(L0 + 46, -14, L0 + 72, "greige");
+        g.R(L0 + 46, -3, L0 + 72, "greige");
+        g.R(L0 + 46, 8, L0 + 72, "greige");
+        g.M(L0 + 46, -16.4, 5, 2.4, "umber");
+        g.M(L0 + 46, -5.4, 5, 2.4, "umber");
+        g.R(L0, 17, L0 + 72, "greige");
         break;
       case "ruler":
-        L(-40, 10, 40, 10, 0.55);
-        for (let i = 0; i < 11; i++) {
-          const h2 = i % 5 === 0 ? 14 : i % 2 === 0 ? 9 : 5.5;
-          L(-40 + i * 8, 10, -40 + i * 8, 10 - h2, 0.44);
-        }
-        L(-24, -14, 0, -14, 0.42);
-        L(-24, -17.5, -24, -10.5, 0.42);
-        L(0, -17.5, 0, -10.5, 0.42);
-        L(-21, -14, -24, -14, 0.42);
-        L(16, -14, 32, -14, 0.3);
-        L(16, -17, 16, -11, 0.3);
-        L(32, -17, 32, -11, 0.3);
-        L(-40, 20, 40, 20, 0.12);
+        g.R(L0, -6, L0 + 72, "umber", 1.1);
+        [0, 1, 2, 3, 4, 5, 6, 7, 8].forEach((i) => g.V(L0 + 2 + i * 8.5, -6, i % 2 ? -12 : -16, "stone", 1));
+        g.V(L0 + 2, 2, 8, "umber"); g.V(L0 + 36, 2, 8, "umber");
+        g.R(L0 + 2, 5, L0 + 36, "umber");
+        g.M(L0 + 46, 8, 22, 3, "stone");
         break;
       case "grid":
-        R(-38, -22, 76, 44, 0.42);
-        for (let i = 0; i < 6; i++) {
-          const x = -34 + i * 12;
-          R(x, -18, 8, 36, 0, 0.045);
-        }
-        R(-34, -18, 20, 16, 0.5, 0.02);
-        L(-38, 0, 38, 0, 0.08);
+        g.M(L0, -20, 72, 36, "mist");
+        [0, 1, 2, 3, 4].forEach((i) => g.M(L0 + 5 + i * 13.4, -15, 9.5, 26, "greige"));
+        g.R(L0, 21, L0 + 72, "greige");
         break;
       case "steps":
-        L(-40, 22, 40, 22, 0.2);
-        R(-36, 13, 8, 9, 0.48);
-        R(-22, 7, 13, 15, 0.52);
-        R(-3, -2, 18, 24, 0.56);
-        R(21, -13, 24, 35, 0.6);
-        ctx!.setLineDash([2 * s, 3 * s]);
-        L(-32, 11, 30, -15, 0.22);
-        ctx!.setLineDash([]);
+        g.R(L0, 18, L0 + 72, "greige");
+        g.M(L0 + 4, 8, 14, 10, "greige");
+        g.M(L0 + 26, -2, 17, 20, "stone");
+        g.M(L0 + 51, -14, 20, 32, "umber");
         break;
       case "shapes":
-        C(-26, 0, 11, 0.5);
-        R(-8, -11, 22, 22, 0.5);
-        R(20, -11, 22, 22, 0.5, -1, 7);
-        L(27, -11, 27, -16, 0.35);
-        L(27, -16, 32, -16, 0.35);
+        g.C(L0 + 13, -2, 11, "stone");
+        g.M(L0 + 34, -13, 22, 22, "umber");
+        g.R(L0, 16, L0 + 72, "greige");
+        g.M(L0, 19.5, 16, 2.6, "stone");
+        g.M(L0 + 34, 19.5, 16, 2.6, "umber");
         break;
       case "easing":
-        L(-34, 20, 36, 20, 0.28);
-        L(-34, 20, -34, -22, 0.28);
-        for (let i = 1; i < 5; i++) L(-34 + i * 17, 20, -34 + i * 17, 18, 0.18);
-        for (let i = 1; i < 4; i++) L(-34, 20 - i * 12, -32, 20 - i * 12, 0.18);
-        ctx!.strokeStyle = INK(0.65 * tt);
-        ctx!.lineWidth = 1.5 * glyphLWF;
-        ctx!.beginPath();
-        ctx!.moveTo(-34 * s, 20 * s);
-        ctx!.bezierCurveTo(-6 * s, 20 * s, -10 * s, -18 * s, 36 * s, -18 * s);
-        ctx!.stroke();
-        L(-34, 20, -20, 12, 0.25);
-        C(-20, 12, 1.7, 0, 0.5);
-        L(36, -18, 22, -14, 0.25);
-        C(22, -14, 1.7, 0, 0.5);
-        C(2, 0, 2.2, 0, 0.75);
+        g.R(L0, -18, L0 + 66, "mist"); g.R(L0, 14, L0 + 66, "mist");
+        g.V(L0, -18, 14, "mist"); g.V(L0 + 66, -18, 14, "mist");
+        g.S([[L0, 14], [L0 + 26, 14], [L0 + 38, -18], [L0 + 66, -18]], "umber", 1.5);
+        g.C(L0, 14, 1.8, "stone");
+        g.C(L0 + 66, -18, 2.2, "graphite");
         break;
       case "frame":
-        R(-38, -24, 76, 48, 0.5);
-        L(-12.6, -24, -12.6, 24, 0.08);
-        L(12.6, -24, 12.6, 24, 0.08);
-        L(-38, -8, 38, -8, 0.08);
-        L(-38, 8, 38, 8, 0.08);
-        P([[-32, 18], [-12, -10], [-2, 4], [10, -6], [32, 18]], 0.42, 1.2);
-        C(18, -14, 4.6, 0.42);
-        L(-42, -20, -42, -28, 0.6); L(-42, -28, -34, -28, 0.6);
-        L(42, 20, 42, 28, 0.6); L(42, 28, 34, 28, 0.6);
+        g.M(L0 + 4, -20, 64, 38, "mist");
+        g.G([[L0 + 4, 18], [L0 + 24, -3], [L0 + 37, 8], [L0 + 51, -8], [L0 + 68, 18]], "greige");
+        g.C(L0 + 55, -12, 3.4, "umber");
+
         break;
       case "sparkline":
-        L(-36, 18, 38, 18, 0.32);
-        L(-36, 18, -36, -20, 0.2);
-        for (let i = 1; i < 4; i++) L(-36, 18 - i * 10, 38, 18 - i * 10, 0.06);
-        {
-          const hs = [9, 19, 14, 25, 12, 21, 16];
-          const tops: Array<[number, number]> = [];
-          for (let i = 0; i < 7; i++) {
-            R(-32 + i * 10, 18 - hs[i], 7, hs[i], 0, 0.15 + (i % 3) * 0.09);
-            tops.push([-28.5 + i * 10, 18 - hs[i]]);
-          }
-          ctx!.strokeStyle = INK(0.5 * tt);
-          ctx!.lineWidth = 1.2 * glyphLWF;
-          ctx!.beginPath();
-          tops.forEach(([x, y], i) => (i === 0 ? ctx!.moveTo(x * s, (y - 4) * s) : ctx!.lineTo(x * s, (y - 4) * s)));
-          ctx!.stroke();
-          C(tops[6][0], tops[6][1] - 4, 1.8, 0, 0.6);
-        }
+        g.R(L0, 16, L0 + 72, "greige");
+        [7, 13, 9, 17, 12, 20].forEach((h, i) => g.M(L0 + 3 + i * 11.6, 16 - h, 7.5, h, "stone"));
+        g.S([[L0 + 7, 6], [L0 + 18, 0], [L0 + 30, 4], [L0 + 42, -4], [L0 + 53, 1], [L0 + 65, -7]], "umber", 1.3);
+        g.C(L0 + 65, -7, 1.8, "graphite");
         break;
-      case "contrast":
-        R(-38, -24, 38, 48, 0, 0.8);
-        ctx!.fillStyle = `rgba(254,254,253,${0.95 * tt})`;
-        ctx!.font = `500 ${21 * s}px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx!.textAlign = "center";
-        ctx!.textBaseline = "middle";
-        ctx!.fillText("A", -19 * s, 0);
-        ctx!.textAlign = "left";
-        T("A", 19, 0, 21, 0.85);
-        L(0, -24, 0, 24, 0.22);
-        for (let i = 0; i < 4; i++) R(8 + i * 8, 16, 5, 4, 0, i < 3 ? 0.3 : 0.1);
+      default: // contrast
+        g.M(L0 + 2, -16, 30, 30, "graphite");
+        g.T("A", L0 + 17, 0, 15, "paper", "500", "center");
+        g.M(L0 + 40, -16, 30, 30, "mist");
+        g.T("A", L0 + 55, 0, 15, "stone", "500", "center");
+        g.R(L0 + 2, 20, L0 + 32, "umber");
+        g.R(L0 + 40, 20, L0 + 70, "greige");
         break;
     }
-    ctx!.restore();
   }
 
 
@@ -931,7 +1116,11 @@ export function mountAssembly(opts: {
         const docked = e > 0.96;
         withLayer(f.layer, () => {
           fragSketch(f.kind, p.x, p.y, p.s * (docked ? 0.72 : 1), appear, docked ? 0 : f.rot * (1 - e), docked);
-          if (docked) text(f.label, def.x + 72, ty, appear, { size: 10, alpha: T_BODY });
+          if (docked) {
+            text(f.label, def.x + 72, ty, appear, { size: 10, alpha: T_BODY });
+            const lvl = def === DL ? TOKEN_LEVEL[f.label] : undefined;
+            if (lvl) text(lvl, def.x + def.w - 18, ty, appear, { size: 8, alpha: 0.34, anchor: "right" as CanvasTextAlign });
+          }
         });
       });
     });
@@ -951,9 +1140,9 @@ export function mountAssembly(opts: {
       BI_MARKS.forEach((m, i) => markTile(m, BI.x + BI.w - 22 - (BI_MARKS.length - 1 - i) * MARK_GAP, BI.y + 26, t));
       // the compile step
       card(COMPILE.x, COMPILE.y, COMPILE.w, COMPILE.h, t);
-      text("compile", COMPILE.x + 18, COMPILE.y + 27, t, { size: 9.5, caps: true, alpha: 0.6, weight: "500", track: true });
-      (["JSON bundles", "search index", "types", "agent context"] as const).forEach((nm, i) => {
-        text(nm, COMPILE.x + [96, 162, 226, 264][i], COMPILE.y + 27, t, { size: 8, alpha: T_FAINT, maxW: 58 });
+      text("compile", COMPILE.x + 18, COMPILE.y + 20, t, { size: 9.5, caps: true, alpha: 0.6, weight: "500", track: true });
+      (["bundles", "search index", "types", "agent context"] as const).forEach((nm, i) => {
+        text(nm, COMPILE.x + 18 + [0, 43, 102, 135][i], COMPILE.y + 40, t, { size: 7.5, alpha: T_FAINT });
       });
       route([[BI.x + BI.w / 2, BI.y + BI.h], [BI.x + BI.w / 2, COMPILE.y]], t, { alpha: 0.2 });
       // Google Workspace: where the knowledge is written
@@ -1079,7 +1268,7 @@ export function mountAssembly(opts: {
         ctx!.beginPath();
         ctx!.rect(pa.x, pa.y, pb.x - pa.x, pb.y - pa.y);
         stroke(0.24 * t);
-        partGlyph(PART_DEFS[idx], pa.x + 29 * u, pa.y + 18 * u, u, t);
+        centred((gx2, gy2) => partGlyph(PART_DEFS[idx], gx2, gy2, u, t), pa.x + 29 * u, pa.y + 18 * u);
         text(PART_DEFS[idx], px + 29, py + 46, t, { size: 7.5, caps: true, alpha: 0.4, anchor: "center" as CanvasTextAlign, track: true });
       }
 
@@ -1112,7 +1301,7 @@ export function mountAssembly(opts: {
         // lines pass behind (the trunk down, the context feed up)
         if (st.name !== "render" && st.name !== "context assembly") text(st.name, st.x, SPINE.y + LABEL_DROP, t, { size: 8, alpha: T_FAINT, anchor: "center" as CanvasTextAlign });
       });
-      {
+      if (willRender(8)) {
         const ka = toScreen(744, 595);
         const kb = toScreen(826, 610);
         ctx!.fillStyle = `rgba(254, 254, 253, ${0.97 * t})`;
@@ -1136,7 +1325,7 @@ export function mountAssembly(opts: {
       // the manifold: render drives every renderer. The trunk drops straight from
       // the station, passing behind its label's knockout and the interpreters rail.
       route([[950, 599], [950, MANIFOLD_Y]], t, { alpha: 0.18, dash: true });
-      {
+      if (willRender(8)) {
         const ka = toScreen(929, 595);
         const kb = toScreen(971, 610);
         ctx!.fillStyle = `rgba(254, 254, 253, ${0.97 * t})`;
@@ -1210,10 +1399,17 @@ export function mountAssembly(opts: {
       };
       mouth(HALL.x, BELT_X0, inBoost);
       mouth(HALL.x + HALL.w, BELT_X1, outBoost);
-      knock(543, 546, 613, 560);
-      text("input schemas", 578, 553, t, { size: 7.5, alpha: T_FAINT, anchor: "center" as CanvasTextAlign });
-      knock(1294, 546, 1346, 560);
-      text("exporters", 1320, 553, t, { size: 7.5, alpha: T_FAINT, anchor: "center" as CanvasTextAlign });
+      // the two mouths, named at a size that can actually be read
+      /* Both mouth plates sit a little higher and narrower than the knockouts
+         they replaced: a plate has a border, so it needs real clearance where
+         a bare fill needed none. The right edge stays clear of the recipes
+         pull at x=620, and the bottom clears the traveler's lane. */
+      if (willRender(10.5)) {
+        plate(530, 538, 614, 560, t);
+        text("input schemas", 572, 549, t, { size: 10.5, alpha: T_FAINT, anchor: "center" as CanvasTextAlign });
+        plate(1284, 538, 1356, 560, t);
+        text("exporters", 1320, 549, t, { size: 10.5, alpha: T_FAINT, anchor: "center" as CanvasTextAlign });
+      }
 
       /* the test bench: the full rig under the bank, one passed check per machine */
       RENDERER_DEFS.forEach((rd, i) => {
@@ -1236,7 +1432,7 @@ export function mountAssembly(opts: {
         ctx!.beginPath(); ctx!.moveTo(c1.x, c1.y); ctx!.lineTo(c2.x, c2.y); ctx!.lineTo(c3.x, c3.y); ctx!.stroke();
       });
       text("production tests", BENCH.x + CARD_PAD, BENCH.y + BENCH.h / 2, t, { size: 9, caps: true, alpha: 0.62, weight: "500", track: true });
-      text("re-runs every renderer and flags any file that comes out different", BENCH.x + BENCH.w - CARD_PAD, BENCH.y + BENCH.h / 2, t, { size: 8.5, alpha: T_FAINT, anchor: "right" as CanvasTextAlign });
+      text("re-runs every renderer and flags where the system would now produce something different", BENCH.x + BENCH.w - CARD_PAD, BENCH.y + BENCH.h / 2, t, { size: 8.5, alpha: T_FAINT, anchor: "right" as CanvasTextAlign });
 
       /* the run token, with its traveler recipe clipped on */
       if (runK >= 0) {
@@ -1276,8 +1472,11 @@ export function mountAssembly(opts: {
 
       /* the renderer bank: five devices with real IO */
       // the row tag, pinned on the hall boundary beside the first machine
-      knock(526, 717, 597, 733);
-      text("renderers", 594, 725, t, { size: 9, caps: true, alpha: 0.62, weight: "500", track: true, anchor: "right" as CanvasTextAlign });
+      // clear of the design-language feed at x=520 and the first renderer card at x=600
+      if (willRender(9)) {
+        plate(526, 715, 594, 735, t);
+        text("renderers", 588, 725, t, { size: 9, caps: true, alpha: 0.62, weight: "500", track: true, anchor: "right" as CanvasTextAlign });
+      }
       RENDERER_DEFS.forEach((rd, i) => {
         const ux = RB.x + i * 143;
         card(ux, RB.y, 128, RB.h, t, { rise: false });
@@ -1288,7 +1487,7 @@ export function mountAssembly(opts: {
         });
         // the device glyph
         const gc = toScreen(ux + 64, RB.y + 78);
-        deviceGlyph(i, gc.x, gc.y, gc.s, t);
+        centred((gx2, gy2) => deviceGlyph(i, gx2, gy2, gc.s, t), gc.x, gc.y);
         // output tray + format tag
         const ta = toScreen(ux + 24, RB.y + RB.h - 34);
         const tb = toScreen(ux + 104, RB.y + RB.h - 18);
@@ -1387,55 +1586,121 @@ export function mountAssembly(opts: {
       if (t <= 0.02) return;
       const a = toScreen(GOV.x, GOV.y);
       const b = toScreen(GOV.x + GOV.w, GOV.y + GOV.h);
-      ctx!.beginPath();
-      ctx!.roundRect(a.x, a.y, b.x - a.x, b.y - a.y, 0);
-      stroke(0.26 * t);
-      chipLabel("governance and validation", GOV.x + 28, GOV.y, t);
-      // lifecycle strip, mounted on the top line
-      const states = ["draft", "experimental", "approved", "deprecated", "retired"];
-      states.forEach((nm, i) => {
-        const sx = GOV.x + 330 + i * 96;
-        const p = toScreen(sx, GOV.y);
-        ctx!.fillStyle = `rgba(254,254,253,${0.98 * t})`;
-        ctx!.fillRect(p.x - 4 * p.s, p.y - 8 * p.s, 88 * p.s, 16 * p.s);
+      // the governed line, a double rule with mitred corners
+      ctx!.lineWidth = ruleW();
+      [-RULE_GAP, RULE_GAP].forEach((d) => {
         ctx!.beginPath();
-        ctx!.arc(p.x + 2 * p.s, p.y, 2 * p.s, 0, Math.PI * 2);
-        ctx!.fillStyle = INK((i === 2 ? 0.7 : 0.3) * t * inkMul);
-        ctx!.fill();
-        text(nm, sx + 8, GOV.y, t, { size: 8, alpha: i === 2 ? 0.6 : T_FAINT });
+        ctx!.rect(a.x + d, a.y + d, b.x - a.x - 2 * d, b.y - a.y - 2 * d);
+        ctx!.strokeStyle = INK(S_RULE * t * inkMul);
+        ctx!.stroke();
       });
-      // gate posts where work leaves the hall
-      [320, 585, 790].forEach((gy) => {
-        const p = toScreen(GOV.x + GOV.w, gy);
+      ctx!.lineWidth = 1;
+      chipLabel("governance and validation", GOV.x + 28, GOV.y, t);
+      /* Lifecycle strip, set into the top rule. No marker beside each state:
+         the word is the mark, and the rule breaking to let it through is what
+         mounts it. Which state is current is carried by ink alone. Every
+         knockout is measured off the word it has to clear, so the states can
+         be set at a readable size without a hardcoded box cropping them. */
+      const states = ["draft", "experimental", "approved", "deprecated", "retired"];
+      if (willRender(10.5)) {
+        let sx = GOV.x + 300;
+        states.forEach((nm, i) => {
+          const p = toScreen(sx, GOV.y);
+          const px = 10.5 * p.s;
+          ctx!.font = `400 ${px}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif`;
+          const w = ctx!.measureText(nm).width / p.s;
+          plate(sx - 9, GOV.y - 10, sx + w + 9, GOV.y + 10, t);
+          text(nm, sx, GOV.y, t, { size: 10.5, alpha: i === 2 ? T_BODY : T_FAINT });
+          sx += w + 40;
+        });
+      }
+      /* Gates stand wherever work crosses the line. Three on the way out, one
+         per surface. Two on the way in: knowledge and tokens only reach
+         production once they are approved and released. */
+      const gate = (gx: number, gy: number) => {
+        const p = toScreen(gx, gy);
         ctx!.strokeStyle = INK(0.5 * t * inkMul);
+        ctx!.lineWidth = 1;
         ctx!.beginPath();
         ctx!.moveTo(p.x, p.y - 12 * p.s);
         ctx!.lineTo(p.x, p.y + 12 * p.s);
         ctx!.stroke();
         ctx!.beginPath();
-        ctx!.arc(p.x, p.y, 3 * p.s, 0, Math.PI * 2);
+        // never smaller than the channel it has to break, however far out we are
+        ctx!.arc(p.x, p.y, Math.max(3.4 * p.s, FIT_MIN), 0, Math.PI * 2);
         ctx!.fillStyle = PAPER;
         ctx!.fill();
         stroke(0.5 * t);
-      });
-      text("gates at every exit · fail closed", GOV.x + GOV.w - 20, 862, t, { size: 8.5, alpha: T_FAINT, anchor: "right" as CanvasTextAlign });
-      // the approval seat + exceptions register, mounted on the bottom line
+      };
+      [320, 585, 790].forEach((gy) => gate(GOV.x + GOV.w, gy));
+      [COMPILE.y + 27, DL.y + 160].forEach((gy) => gate(GOV.x, gy));
+      /* Everything the governed line has to say is said ON it. This caption
+         describes the gates, so it is set into the bottom rule beside them
+         rather than left floating in the margin, alongside the approval seat
+         and the exceptions register. */
+      chipLabel("gates at every crossing · fail closed", GOV.x + 40, GOV.y + GOV.h, t);
       chipLabel("human approval", GOV.x + 470, GOV.y + GOV.h, t);
       chipLabel("exceptions, documented", GOV.x + 640, GOV.y + GOV.h, t);
-      // the release shelf
-      card(GOV.x + 40, GOV.y + GOV.h + 26, 330, 64, t);
-      text("signed releases", GOV.x + 56, GOV.y + GOV.h + 50, t, { size: 9.5, alpha: T_TITLE, weight: "500" });
-      text("every render checked byte for byte", GOV.x + 56, GOV.y + GOV.h + 70, t, { size: 8.5, alpha: T_FAINT });
-      [0, 1, 2, 3].forEach((i) => {
-        const p = toScreen(GOV.x + 250 + i * 28, GOV.y + GOV.h + 58);
+      /* The release shelf hangs off the governed line and lands on the
+         evidence bus. Governance is what signs a release, so the record is
+         governance's; observability is what returns evidence about it, so the
+         bus runs through it. This short drop is the tie to the layer that
+         owns it, and the reason the card is not floating below the boundary.
+         It hangs from the clear stretch of rule between the gates caption and
+         the approval seat: a caption knocks the rule out for its whole width,
+         so a tie dropped inside one would attach to paper, not to the line. */
+      route([[SHELF.x + 150, GOV.y + GOV.h], [SHELF.x + 150, SHELF.y]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
+      /* The other input, and the one that was missing: a signed release is a
+         set of finished files. Outputs is what production actually made, so it
+         feeds the register, which is why the register's contents never came
+         from the evidence bus. It rides the outputs card's own reveal rather
+         than a threshold, so it fades with the card it comes from instead of
+         vanishing at full ink the instant a backward jump crosses the line. */
+      route([[1600, OUTPUTS.y + OUTPUTS.h], [1600, REL_LINE], [SHELF.x + SHELF.w, REL_LINE]], t * reveal[7], { alpha: S_RULE, double: true });
+      // signed, then announced: the chain continues left along its own line
+      route([[SHELF.x, REL_LINE], [NOTES.x + NOTES.w, REL_LINE]], t, { alpha: S_RULE, double: true });
+      /* The notes card sits on the same line, drawn by governance because a
+         release is what triggers an announcement. The feedback loop is
+         observability's and is drawn there, on its own line, at its own light. */
+      card(NOTES.x, NOTES.y, NOTES.w, NOTES.h, t);
+      text("release notes", NOTES.x + 16, NOTES.y + 22, t, { size: 9.5, alpha: T_TITLE, weight: "500" });
+      text("every change announced to the people who use it", NOTES.x + 16, NOTES.y + 42, t, { size: 8.5, alpha: T_FAINT, maxW: NOTES.w - 32 });
+      // top right, the same corner every other card hangs its connectors in
+      NOTE_MARKS.forEach((m, i) => markTile(m, NOTES.x + NOTES.w - 22 - (NOTE_MARKS.length - 1 - i) * MARK_GAP, NOTES.y + 24, t));
+      card(SHELF.x, SHELF.y, SHELF.w, SHELF.h, t);
+      /* A register, not a row of blank tiles. Four anonymous thumbnails said
+         nothing about what a signed release is; a dated line carrying the hash
+         it was sealed with, and the count of files that hash covers, says the
+         whole thing: this exact set of files, frozen, and provably unchanged.
+         Approved work is never regenerated, so the hash is what makes a
+         release a thing rather than a recipe for making one again. */
+      text("signed releases", SHELF.x + 16, SHELF.y + 22, t, { size: 9.5, alpha: T_TITLE, weight: "500" });
+      text("approved files frozen and hashed, never regenerated", SHELF.x + 16, SHELF.y + 40, t, { size: 8, alpha: T_FAINT, maxW: SHELF.w - 32 });
+      /* The rule under the heading and the seal beside the entry are drawn ink,
+         not text, so they survive a zoom the entry itself does not. Guarded
+         together: a register with a divider and a seal but no line in it reads
+         as a card that failed, which is the same failure as a knockout with no
+         word in it. */
+      if (willRender(8)) {
+        const ry = SHELF.y + 54;
+        const rl = toScreen(SHELF.x + 16, ry);
+        const rr = toScreen(SHELF.x + SHELF.w - 16, ry);
+        ctx!.strokeStyle = INK(0.14 * t * inkMul);
+        ctx!.lineWidth = 1;
+        ctx!.beginPath(); ctx!.moveTo(rl.x, rl.y); ctx!.lineTo(rr.x, rr.y); ctx!.stroke();
+
+        const ry2 = SHELF.y + 72;
+        text("2026-07-14", SHELF.x + 16, ry2, t, { size: 8, alpha: T_BODY, mono: true });
+        text("8f3a91", SHELF.x + 84, ry2, t, { size: 8, alpha: 0.5, mono: true });
+        text("42 files", SHELF.x + SHELF.w - 16, ry2, t, { size: 8, alpha: T_FAINT, anchor: "right" as CanvasTextAlign });
+        // the seal on the release currently in force
+        const p = toScreen(SHELF.x + 138, ry2);
+        ctx!.strokeStyle = INK(0.62 * t * inkMul);
+        ctx!.lineWidth = 1;
         ctx!.beginPath();
-        ctx!.roundRect(p.x, p.y - 12 * p.s, 20 * p.s, 26 * p.s, 0);
-        stroke(0.3 * t);
-        ctx!.beginPath();
-        ctx!.arc(p.x + 10 * p.s, p.y - 8 * p.s, 1.6 * p.s, 0, Math.PI * 2);
-        ctx!.fillStyle = INK(0.5 * t * inkMul);
-        ctx!.fill();
-      });
+        ctx!.moveTo(p.x - 3 * p.s, p.y); ctx!.lineTo(p.x - 1 * p.s, p.y + 2.4 * p.s); ctx!.lineTo(p.x + 3.4 * p.s, p.y - 2.8 * p.s);
+        ctx!.stroke();
+      }
       // the one rust moment: during the run, validate blocks then clears
       if (runK >= 0.52 && runK < 0.68) {
         const sx = 1032.5;
@@ -1454,52 +1719,61 @@ export function mountAssembly(opts: {
   function drawObs(t: number) {
     withLayer(5, () => {
       if (t <= 0.02) return;
-      // the bus breaks at the release shelf: the shelf is docked on the line
-      ctx!.strokeStyle = INK(0.3 * t * inkMul);
-      {
-        const a = toScreen(1900, BUS_Y);
-        const b = toScreen(914, BUS_Y);
-        ctx!.beginPath(); ctx!.moveTo(a.x, a.y); ctx!.lineTo(b.x, b.y); ctx!.stroke();
-      }
-      {
-        const a = toScreen(584, BUS_Y);
-        const b = toScreen(REVIEW.x, BUS_Y);
-        ctx!.beginPath(); ctx!.moveTo(a.x, a.y); ctx!.lineTo(b.x, b.y); ctx!.stroke();
+      /* One line throughout, in the same double rule the governed line takes:
+         the bus, its return artery and both of its connections are a single
+         system. The run in from the substrate and the run along the bus are one
+         path, so the corner mitres instead of butting two doubled ends together.
+         It ends at the ledger's right edge: the line arrives at the aftermath
+         rather than running past it. */
+      route([[PLINTH.x, PLINTH.y + PLINTH.h / 2], [BUS_X1, PLINTH.y + PLINTH.h / 2], [BUS_X1, BUS_Y], [REVIEW.x, BUS_Y]], t, { alpha: S_RULE, double: true });
+      text("usage recorded", BUS_X1 - 10, 1046, t, { size: 8, alpha: T_FAINT, anchor: "right" as CanvasTextAlign });
+      // evidence riser into the hall, in the clear stretch past the shelf,
+      // stopping on the bus's near rail so the tee reads clean
+      route([[900, BUS_Y], [900, HALL.y + HALL.h]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
+      /* Ticks traveling backward, always, and drawn before the meters: a tick
+         passing a fitting submerges behind it the way it submerges into the
+         ledger, rather than sitting as debris inside the break. */
+      for (let i = 0; i < 5; i++) {
+        const u = ((idleClock * 0.14 + i / 5) % 1);
+        const tx = BUS_X1 - u * (BUS_X1 - REVIEW.x);
+        const p = toScreen(tx, BUS_Y);
+        ctx!.fillStyle = INK(0.5 * t * inkMul);
+        // the tick fills the channel, a slug traveling between the two rules
+        ctx!.fillRect(p.x - 2.5 * p.s, p.y - RULE_GAP, 5 * p.s, RULE_GAP * 2);
       }
       // meters along the bus
       METERS.forEach((nm, i) => {
-        // spaced to clear the release shelf (584-914) and the evidence riser at 990
-        const mx2 = [440, 535, 940, 1130, 1320, 1510, 1700][i];
+        // an even run between the shelf and the interface the bus collects from
+        const mx2 = 945 + i * 80;
         const p = toScreen(mx2, BUS_Y);
         ctx!.beginPath();
-        ctx!.arc(p.x, p.y, 3 * p.s, 0, Math.PI * 2);
+        ctx!.arc(p.x, p.y, Math.max(3.4 * p.s, FIT_MIN), 0, Math.PI * 2);
         ctx!.fillStyle = PAPER;
         ctx!.fill();
-        stroke(0.42 * t);
+        stroke(S_MAIN * t);
         text(nm, mx2, BUS_Y + 24, t, { size: 8, alpha: T_FAINT, anchor: "center" as CanvasTextAlign });
       });
-      // ticks traveling backward, always
-      for (let i = 0; i < 5; i++) {
-        const u = ((idleClock * 0.14 + i / 5) % 1);
-        const tx = 1900 - u * (1900 - REVIEW.x);
-        if (tx > 584 && tx < 914) continue; // submerged behind the release shelf
-        const p = toScreen(tx, BUS_Y);
-        ctx!.fillStyle = INK(0.5 * t * inkMul);
-        ctx!.fillRect(p.x - 2.5 * p.s, p.y - 1 * p.s, 5 * p.s, 2 * p.s);
-      }
-      // the review point + feeds back into the system
-      const rp = toScreen(REVIEW.x, REVIEW.y);
-      ctx!.beginPath();
-      ctx!.arc(rp.x, rp.y, 7 * rp.s, 0, Math.PI * 2);
-      ctx!.fillStyle = PAPER;
-      ctx!.fill();
-      stroke(0.5 * t);
-      chipLabel("evidence returns to the people", REVIEW.x + 40, BUS_Y + 52, t);
-      // one return artery up the left margin, tapping the records and the tokens at their edges
-      route([[REVIEW.x, BUS_Y - 7], [REVIEW.x, 1010], [80, 1010], [80, 400], [BI.x, 400]], t, { alpha: 0.16 });
-      route([[80, DL.y + 160], [DL.x, DL.y + 160]], t, { alpha: 0.16 });
-      // evidence riser into the hall, clear of the shelf and the meters
-      route([[990, BUS_Y], [990, HALL.y + HALL.h]], t, { alpha: 0.16, dash: true });
+      /* The card the bus terminates in, and the only one on the row that
+         belongs to this layer. The one line that leaves it carries findings,
+         never announcements: if a token keeps getting overridden the design
+         language is wrong, and that is what has to travel back. */
+      card(SEAT.x, SEAT.y, SEAT.w, SEAT.h, t);
+      text("feedback loop", SEAT.x + 16, SEAT.y + 22, t, { size: 9.5, alpha: T_TITLE, weight: "500" });
+      text("signals become decisions, not dashboards", SEAT.x + 16, SEAT.y + 42, t, { size: 8.5, alpha: T_FAINT, maxW: SEAT.w - 32 });
+      route([[SEAT.x + 70, SEAT.y], [SEAT.x + 70, 1010], [80, 1010], [80, 400], [BI.x, 400]], t, { alpha: S_RULE, double: true });
+      route([[80, DL.y + 160], [DL.x, DL.y + 160]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
+      /* The one place two double rules cross: the evidence riser through the
+         governed line's bottom rule. The joint belongs to both layers, so it
+         takes whichever of the two is the more lit, rather than dimming with
+         observability while the rule it joins stays bright. */
+      /* Two places where a governance run and an observability run cross. The
+         riser through the governed line, and the governed line reaching past
+         the evidence bus to sign a release: it crosses the bus, it does not
+         feed it. Each joint belongs to both layers, so it takes whichever of
+         the two is the more lit. */
+      const bothLit = Math.max(layerLight[4], layerLight[5]);
+      crossJoint(900, GOV.y + GOV.h, t, bothLit);
+      crossJoint(SHELF.x + 150, BUS_Y, t, bothLit);
     });
   }
 
@@ -1566,16 +1840,7 @@ export function mountAssembly(opts: {
   function frame(now: number) {
     const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
     last = now;
-
-    const cy = window.innerHeight / 2;
-    let n = 0;
-    for (const c of captions) if (c.getBoundingClientRect().top < cy) n++;
-    active = Math.min(BEATS - 1, n);
-
-    captions.forEach((c, i) => c.classList.toggle("ds-cap-active", i + 1 === active));
-    titleBlock?.classList.toggle("ds-title-gone", active > 0);
-    wrap.classList.toggle("ds-explore-on", active >= BEATS - 1);
-    if (active < BEATS - 1 && explorerLayer !== null) explorerLayer = null;
+    applyResize();          // must precede the draw: it clears the bitmap
 
     const chase = 1 - Math.pow(0.0018, dt);
     for (let b = 0; b < BEATS; b++) {
@@ -1585,19 +1850,28 @@ export function mountAssembly(opts: {
       focus[b] += (ft - focus[b]) * chase;
     }
 
-    /* the spotlight: beats 1..6 select layers 0..5; explorer overrides */
-    let sel: number | null = null;
-    if (explorerLayer !== null && active >= BEATS - 1) sel = explorerLayer;
-    else if (active >= 1 && active <= 6) sel = active - 1;
+    /* the spotlight: stages 1..6 select layers 0..5 */
+    const sel = active >= 1 && active <= 6 ? active - 1 : null;
     for (let i = 0; i < LAYER_COUNT; i++) {
       const target = sel === null ? 1 : (sel === i ? 1 : DIM);
       layerLight[i] += (target - layerLight[i]) * chase;
     }
 
-    const f = FRAMES[active];
+    const f = fitView(VIEWS[active]);
     cam.zoom += (f.zoom - cam.zoom) * chase;
     cam.cx += (f.cx - cam.cx) * chase;
     cam.cy += (f.cy - cam.cy) * chase;
+
+    /* a read-only window for the verification tooling: the live camera and
+       region, so probes derive world-to-device mapping instead of mirroring it */
+    (window as unknown as Record<string, unknown>).__ds = {
+      W, H, dpr, active,
+      s: Math.min(W / 2060, H / 1210) * cam.zoom,
+      cam: { zoom: cam.zoom, cx: cam.cx, cy: cam.cy },
+      target: f,
+      view: VIEWS[active],
+      settled: Math.abs(cam.zoom - f.zoom) < 0.002 && Math.abs(cam.cx - f.cx) < 0.5 && Math.abs(cam.cy - f.cy) < 0.5,
+    };
 
     idleClock += dt * 0.08;
     if (active === 7) runClock = (runClock + dt / 14) % 1;
@@ -1618,8 +1892,9 @@ export function mountAssembly(opts: {
     if (reveal[4] > 0.01) drawInterface(reveal[4]);
     if (reveal[6] > 0.01) drawObs(reveal[6]);
     if (runK >= 0) drawRun(reveal[7], runK);
-    else if (reveal[7] > 0.5) {
-      // after the run beat the outputs stay, part of the system
+    else if (reveal[7] > 0.02) {
+      // after the run the outputs stay, part of the system, and they fade with
+      // their own reveal rather than snapping off at a threshold
       withLayer(3, () => {
         card(OUTPUTS.x, OUTPUTS.y, OUTPUTS.w, OUTPUTS.h, reveal[7]);
         OUTPUT_NAMES.forEach((nm, i) => {
@@ -1652,24 +1927,29 @@ export function mountAssembly(opts: {
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) e.isIntersecting ? start() : stop();
   });
-  io.observe(wrap);
+  io.observe(canvas);
   const onVis = () => (document.hidden ? stop() : start());
   document.addEventListener("visibilitychange", onVis);
-  const onResize = () => resize();
+  const onResize = () => { needsResize = true; };
   window.addEventListener("resize", onResize);
+  /* the canvas region changes size without the window doing so when the panel
+     column collapses on the final stage; observe the element, not the window */
+  const ro = new ResizeObserver(() => { needsResize = true; });
+  ro.observe(canvas);
 
-  resize();
   start();
 
   return {
     destroy() {
       stop();
       io.disconnect();
+      ro.disconnect();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("resize", onResize);
     },
-    setLayer(i: number | null) {
-      explorerLayer = i;
+    setStage(i: number) {
+      active = Math.max(0, Math.min(BEATS - 1, i));
+      if (active !== 7) runClock = 0;
     },
   };
 }

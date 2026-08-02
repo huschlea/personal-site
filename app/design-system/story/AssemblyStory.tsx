@@ -1,8 +1,9 @@
 "use client";
 
-/* The destination system story, per SPEC.md. Scroll beats spotlight each
-   layer; panels render in HTML so the hierarchy trees stay crisp; the final
-   beat unlocks the clickable explorer. */
+/* The destination system story, per SPEC.md. Stages advance by explicit
+   controls, never by scroll: the canvas owns the left region, the panel owns
+   the right, and a hard divider keeps them honest. The final stage releases
+   the panel's column and the system takes the whole screen. */
 
 import { useEffect, useRef, useState } from "react";
 import { mountAssembly } from "./assembly";
@@ -63,7 +64,7 @@ export const LAYER_PANELS: LayerPanel[] = [
     title: "Production",
     what: "Turn intelligence, design language, content, assets, and intent into finished artifacts.",
     chips: ["components", "recipes", "workflows", "interpreters", "renderers", "exporters", "input schemas", "production tests"],
-    concepts: "Components are reusable parts. Recipes are approved assembly logic for recurring jobs. Workflows run from request to completion. Interpreters read the source material and draft the language for the work: headlines, subcopy, which quotes to pull, which directions to propose. They never decide how anything looks. Renderers produce the actual files; where a renderer carries no mark, the system renders that file itself. Input schemas check what comes in, exporters package what goes out, and production tests re-run every renderer and compare the files against known-good copies, so a change that breaks the output is caught immediately.",
+    concepts: "Components are reusable parts. Recipes are approved assembly logic for recurring jobs. Workflows run from request to completion. Interpreters read the source material and draft the language for the work: headlines, subcopy, which quotes to pull, which directions to propose. They never decide how anything looks. Renderers produce the actual files; where a renderer carries no mark, the system renders that file itself. Input schemas check what comes in, exporters package what goes out, and production tests re-run every renderer against the files a release froze, so when a token or a renderer shifts underneath approved work you find out before anyone ships against it.",
     tree: `production
   runtime
     - runs, with explicit state
@@ -113,8 +114,9 @@ export const LAYER_PANELS: LayerPanel[] = [
     - creative review and approval
     - intentional, documented exceptions
   release history
-    - signed releases, checked byte for byte
-    - unintended change stops the line`,
+    - approved files frozen and hashed
+    - drift under a release stops the line
+    - every release announced, in the channels people already use`,
   },
   {
     kicker: "06",
@@ -142,9 +144,18 @@ const SIMPLE_CAPS = [
   {
     kicker: "The whole system",
     title: "One system, operating",
-    body: "Knowledge in, governed work out, evidence back. Select any layer to open it.",
+    body: "Knowledge in, governed work out, evidence back. Select any stage to open it.",
   },
 ];
+
+/* the rail: every stage, addressable directly */
+const STAGES: Array<{ num: string | null; label: string }> = [
+  { num: null, label: "Intro" },
+  ...LAYER_PANELS.map((p) => ({ num: p.kicker, label: p.title })),
+  { num: null, label: "The run" },
+  { num: null, label: "The system" },
+];
+const FINAL = STAGES.length - 1;
 
 function PanelBody({ p }: { p: LayerPanel }) {
   return (
@@ -164,94 +175,147 @@ function PanelBody({ p }: { p: LayerPanel }) {
   );
 }
 
+function PanelFor({ stage }: { stage: number }) {
+  if (stage === 0) {
+    return (
+      <div className="ds-panel-inner" key="intro">
+        <h1 className="ds-title">Design system</h1>
+        <p className="ds-lead">A traditional brand system describes the brand. This one operates it.</p>
+        <p className="ds-body">
+          An operating system for creative work: what the brand knows, how it
+          speaks, the machinery that produces the work, and the law that keeps
+          it safe. No brand baked in. Step through, and the system comes together.
+        </p>
+        <p className="ds-nav-hint" aria-hidden="true">Use the stages below, or the arrow keys</p>
+      </div>
+    );
+  }
+  if (stage <= LAYER_PANELS.length) {
+    const p = LAYER_PANELS[stage - 1];
+    return (
+      <div className="ds-panel-inner" key={p.title}>
+        <p className="ds-cap-kicker">{p.kicker}</p>
+        <p className="ds-cap-title">{p.title}</p>
+        <PanelBody p={p} />
+      </div>
+    );
+  }
+  const c = SIMPLE_CAPS[stage - LAYER_PANELS.length - 1];
+  return (
+    <div className="ds-panel-inner" key={c.title}>
+      <p className="ds-cap-kicker">{c.kicker}</p>
+      <p className="ds-cap-title">{c.title}</p>
+      <p className="ds-cap-body">{c.body}</p>
+    </div>
+  );
+}
+
 export function AssemblyStory() {
-  const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const apiRef = useRef<{ destroy: () => void; setLayer: (i: number | null) => void } | null>(null);
-  const [explorer, setExplorer] = useState<number | null>(null);
+  const apiRef = useRef<{ destroy: () => void; setStage: (i: number) => void } | null>(null);
+  const [stage, setStage] = useState(0);
+  /* the rail's titles unfold only once the column has actually gone; unfolding
+     them while it is still collapsing overflows the region and clips the rail */
+  const [wide, setWide] = useState(false);
 
   useEffect(() => {
-    const wrap = wrapRef.current;
     const canvas = canvasRef.current;
-    if (!wrap || !canvas) return;
-    const captions = Array.from(wrap.querySelectorAll<HTMLElement>(".ds-cap"));
-    const api = mountAssembly({ wrap, canvas, captions, titleBlock: titleRef.current });
+    if (!canvas) return;
+    const api = mountAssembly({ canvas });
     apiRef.current = api;
     return () => api.destroy();
   }, []);
 
-  const pick = (i: number) => {
-    const next = explorer === i ? null : i;
-    setExplorer(next);
-    apiRef.current?.setLayer(next);
-  };
+  useEffect(() => {
+    apiRef.current?.setStage(stage);
+  }, [stage]);
+
+  useEffect(() => {
+    if (stage !== FINAL) { setWide(false); return; }
+    const t = window.setTimeout(() => setWide(true), 580);
+    return () => window.clearTimeout(t);
+  }, [stage]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      // Cmd/Alt+Arrow is browser history; Shift+Arrow is selection
+      if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey || e.defaultPrevented) return;
+      // inside the panel the arrows belong to whatever is being read
+      const el = e.target as HTMLElement | null;
+      if (el && el.closest && el.closest(".ds-panel-col")) return;
+      e.preventDefault();
+      setStage((s) => (e.key === "ArrowRight" ? Math.min(FINAL, s + 1) : Math.max(0, s - 1)));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const full = stage === FINAL;
+  const stageName = stage === 0 ? "Intro" : STAGES[stage].label;
 
   return (
     <div className="site-ds ds-story-mode">
       <a href="/" className="ds-home ds-story-home">Alden Huschle</a>
 
-      <div className="ds-stage-wrap ds-stage-wrap-9" ref={wrapRef}>
-        <div className="ds-stage-sticky">
+      <div className={`ds-shell${full ? " ds-shell-full" : ""}${wide ? " ds-shell-wide" : ""}`}>
+        <div className="ds-stage-region">
           <canvas
             ref={canvasRef}
             className="ds-stage-canvas"
             role="img"
-            aria-label="A brand operating system assembling on scroll: brand intelligence and design language feed a production hall of components, recipes, workflows, interpreters, and renderers; work passes governance into the interfaces; evidence returns through observability."
+            aria-label="A brand operating system assembling stage by stage: brand intelligence and design language feed a production hall of components, recipes, workflows, interpreters, and renderers; work passes governance into the interfaces; evidence returns through observability."
           />
-        </div>
 
-        <div className="ds-title-block" ref={titleRef}>
-          <h1 className="ds-title">Design system</h1>
-          <p className="ds-lead">
-            A traditional brand system describes the brand. This one operates it.
-          </p>
-          <p className="ds-body">
-            An operating system for creative work: what the brand knows, how it
-            speaks, the machinery that produces the work, and the law that keeps
-            it safe. No brand baked in. Scroll, and the system comes together.
-          </p>
-          <p className="ds-scroll-cue" aria-hidden="true">Scroll ↓</p>
-        </div>
-
-        {LAYER_PANELS.map((p, i) => (
-          <div className="ds-cap ds-cap-panel" style={{ top: `${(i + 1) * 130 + 40}vh` }} key={p.title}>
-            <p className="ds-cap-kicker">{p.kicker}</p>
-            <p className="ds-cap-title">{p.title}</p>
-            <PanelBody p={p} />
+          {/* the final view keeps its name without reclaiming the column */}
+          <div className="ds-full-title" aria-hidden={!full}>
+            <p className="ds-cap-kicker">{SIMPLE_CAPS[1].kicker}</p>
+            <p className="ds-cap-title">{SIMPLE_CAPS[1].title}</p>
           </div>
-        ))}
-        {SIMPLE_CAPS.map((c, i) => (
-          <div className="ds-cap" style={{ top: `${(i + 7) * 130 + 40}vh` }} key={c.title}>
-            <p className="ds-cap-kicker">{c.kicker}</p>
-            <p className="ds-cap-title">{c.title}</p>
-            <p className="ds-cap-body">{c.body}</p>
-          </div>
-        ))}
 
-        <div className="ds-explorer-chips" role="tablist" aria-label="Explore the system's layers">
-          {LAYER_PANELS.map((p, i) => (
+          {/* stage changes are otherwise silent to screen readers */}
+          <p className="ds-sr-only" aria-live="polite">{`Stage ${stage + 1} of ${STAGES.length}: ${stageName}`}</p>
+
+          <nav className="ds-stage-nav" aria-label="Stages">
             <button
-              key={p.title}
               type="button"
-              role="tab"
-              aria-selected={explorer === i}
-              className={`ds-explorer-chip${explorer === i ? " ds-explorer-chip-on" : ""}`}
-              onClick={() => pick(i)}
-            >
-              <span className="ds-explorer-num">{p.kicker}</span>
-              {p.title}
-            </button>
-          ))}
+              className="ds-nav-step"
+              aria-label="Previous stage"
+              /* aria-disabled, not disabled: a disabled control drops focus to
+                 the body when it disables under the user's own keypress */
+              aria-disabled={stage === 0}
+              onClick={() => setStage((s) => Math.max(0, s - 1))}
+            >←</button>
+            {STAGES.map((s, i) => (
+              <button
+                key={s.label}
+                type="button"
+                data-stage={i}
+                aria-current={stage === i ? "step" : undefined}
+                aria-label={s.num ? `${s.num} ${s.label}` : s.label}
+                className={`ds-nav-chip${stage === i ? " ds-nav-chip-on" : ""}`}
+                onClick={() => setStage(i)}
+              >
+                {s.num ? <span className="ds-explorer-num" aria-hidden="true">{s.num}</span> : null}
+                <span className="ds-nav-label" aria-hidden="true">{s.label}</span>
+              </button>
+            ))}
+            <button
+              type="button"
+              className="ds-nav-step"
+              aria-label="Next stage"
+              aria-disabled={stage === FINAL}
+              onClick={() => setStage((s) => Math.min(FINAL, s + 1))}
+            >→</button>
+          </nav>
         </div>
 
-        {explorer !== null && (
-          <div className="ds-explorer-panel" role="tabpanel">
-            <p className="ds-cap-kicker">{LAYER_PANELS[explorer].kicker}</p>
-            <p className="ds-cap-title">{LAYER_PANELS[explorer].title}</p>
-            <PanelBody p={LAYER_PANELS[explorer]} />
+        <aside className="ds-panel-col" aria-hidden={full} inert={full}>
+          {/* focusable so a keyboard user can scroll a tall tree (Safari) */}
+          <div className="ds-panel-scroll" tabIndex={0} role="region" aria-label={`${stageName} details`}>
+            <PanelFor stage={stage} />
           </div>
-        )}
+        </aside>
       </div>
     </div>
   );

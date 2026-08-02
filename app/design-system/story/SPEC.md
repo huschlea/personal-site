@@ -11,13 +11,23 @@ connection. Redline anything; what survives is what gets built.
   today/next/long-term.
 - Sentence case everywhere.
 - One accent: rust, appearing only where work is rejected.
+- Glyph imagery is printed, not drawn: opaque masses and counterforms in a
+  fixed neutral ink set (graphite, umber, stone, greige, mist, paper), with
+  fine printed rules beside the ink. Graphite is the emphasis ink: one small
+  mass per glyph, never more. Masses sit left-aligned on a baseline rhythm.
+  The neutral family is achromatic in spirit and does not compete with rust;
+  favicon marks remain the sanctioned true-colour exception.
+- Every glyph is a little page: its drawing is measured and centred in its
+  own enclosure, so no tile, part or device sits off its own axis.
 - The drawing lives on canvas; panel text lives in HTML so it is always crisp.
 - The record and chat are removed. The page is the system.
 
 ## The master visual (the end state everything works backward from)
 
 Left lane: Brand intelligence above Design language.
-Center: the production hall, the largest structure.
+Center: the production hall, the largest structure, centred in its corridor:
+the gap from the lane's right edge to the hall equals the gap from the hall
+to the interface. Governance overhangs the hall equally on both sides.
 Right lane: the interface with its three doors, on a substrate plinth.
 Governance drawn as the boundary around production and its exits, with
 instruments mounted on the line. Observability as the return bus along the
@@ -151,6 +161,13 @@ Panel, layer 02:
 Drawing detail for 02: the token stack drawn as three physical levels feeding a
 distribution fan; the Figma mark with its two one-way arrows.
 
+Both left-lane cards are sized to their content rather than to a round number,
+and share one width so the lane aligns. Design language spends its reclaimed
+width on a right-hand column giving each foundation its token level, which the
+card's own footer already reads as a legend: primitive to semantic to
+component. Brand intelligence simply reclaims the space; a column is only
+worth adding where there is something true and varied to put in it.
+
 ## Beat 3 · The production hall
 
 The centerpiece. One hall, five visible stations:
@@ -279,10 +296,18 @@ Panel, layer 04:
 The boundary itself comes forward, instruments mounted on the line:
 
 - the lifecycle strip: draft · experimental · approved · deprecated · retired
-- gate posts at production's exit and at each interface door
+- gate posts wherever work crosses the line, in both directions: three on the
+  way out, one per interface surface, and two on the way in, where the
+  compiled context and the token release enter. Nothing reaches production
+  that is not approved and released; nothing leaves that is not gated. The
+  fan that distributes output sits inside the boundary so each branch crosses
+  at its own gate.
 - the approval seat: human judgment, drawn as a seat, not a checkbox
 - the exceptions register: a small bound book
 - the release shelf: signed releases, checked byte for byte
+
+Evidence returning from observability is not gated: measurement flows back
+freely, it is not governed output.
 
 Panel, layer 05:
 
@@ -310,11 +335,14 @@ Panel, layer 05:
 
 ## Beat 6 · Observability
 
-The return bus along the bottom: small meters reading adoption · time to
-output · overrides · search failures · rework · render errors · agent
-activity. Signal ticks travel backward continuously, collect at a review
-point, and feed three lines back into the records, the tokens, and the
-recipes.
+The return bus along the bottom, connected at both ends: signals enter from
+the interface, where every use is written to the event log on the substrate,
+and travel backward past small meters reading adoption · time to output ·
+overrides · search failures · rework · render errors · agent activity. They
+collect at the review point, and evidence returns from there up the left
+margin to the records and the tokens, and up into production. The bus stops
+short of the interface lane so it never crosses the outputs card, and it
+breaks where the signed-releases shelf sits on it.
 
 Panel, layer 06:
 
@@ -359,6 +387,36 @@ Camera out to the full drawing, everything at full ink. The six layer chips
 appear in a row; clicking a chip re-runs its spotlight and panel. The scroll
 story ends; the explorer remains. No click-to-jump during the scroll (v1).
 
+## Stage navigation and the partition (settled 2026-08-01)
+
+- Stages advance by explicit control, never by scroll: a rail of stage
+  buttons with prev and next, plus the arrow keys. The sweeping transitions
+  survive intact because the camera, reveal, and spotlight are chase
+  currents; navigation only moves their targets. Jumping three stages sweeps
+  through the same motion grammar as stepping one.
+- The layout is hard-partitioned. The text column is a reserved region the
+  drawing may never enter, separated by a drawn divider, not an implied one.
+  The canvas is sized to the left region, so the partition is structural: the
+  drawing cannot occlude the copy because it does not share pixels with it.
+- A stage's camera is authored as a world rectangle, never as a zoom number:
+  the subsystem the stage is about, plus its breathing room. The fit is
+  DERIVED each frame from the live region, so a dense stage genuinely zooms
+  in, a larger display genuinely gains scale, and the panel releasing its
+  column is just a camera move. pad keeps margin, maxZoom keeps a close-up
+  from blowing past the ink density the drawing was authored at, and the
+  stage rail's band is subtracted before fitting so the drawing never parks
+  under the buttons.
+- Anchoring is part of framing. The world ends just below the release row,
+  so a centred fit on the observability band would strand a third of the
+  region as bare paper: the band anchors to the bottom and the dimmed system
+  above is the context. Cropping the plinth from that frame is what buys the
+  band its zoom; the feed still enters from the right, labelled.
+- The final stage releases the column and the system takes the whole screen;
+  the stage chips unfold their titles there, and clicking any of them
+  returns to that stage with its text restored. One canvas centring rule
+  (dead centre, no optical drop): the fitted camera assumes it, and a 2%
+  anchor bias pushes every fitted rect out the bottom of its region.
+
 ## Interaction and craft (carried from v2, tightened)
 
 - Spotlight: selected structures at full ink, everything else at 45 percent;
@@ -376,6 +434,109 @@ story ends; the explorer remains. No click-to-jump during the scroll (v1).
   length and a dotted line may curve into it without the junction reading
   as a mistake. Every dotted line on the page carries the identical ink,
   whatever its caller asks for: they are one class and must read as one.
+- Three line classes, then. The third is the double rule, and it belongs to
+  the two layers that watch rather than make: governance and observability.
+  Both are drawn as a pair of hairlines with a narrow channel between them,
+  which is the printer's own answer to this problem. A double rule has always
+  marked a boundary of a different order than the rules inside it, which is
+  exactly the claim: these layers enclose and measure the work, they do not
+  participate in it. Each line of the pair runs finer than the page's 1px
+  linework (0.75) and lighter (0.34), so the two together read as one slick
+  rule rather than as two lines or as a heavier one. The channel and the
+  stroke are both held in screen pixels, like line width itself, so the pair
+  keeps its proportion at every zoom instead of closing up when the camera
+  pulls back. Colour was tried first and rejected: filling the two layers
+  read as highlighting a region, and colouring their linework spent the
+  page's one-ink credibility on a distinction that pattern can carry alone.
+- Corners on a double rule mitre. Each side is offset along its own normal
+  and the corner taken at the intersection of the offset segments, with the
+  inside of a turn given the smaller radius, so the channel stays even round
+  a bend. A run that turns must therefore be one path: the evidence bus's
+  right-hand leg and the feed down from the substrate are a single route for
+  this reason, not two that butt at the elbow.
+- The rule is quiet, the fittings are crisp. Whatever breaks a double rule
+  (a governance gate, a meter on the bus, the review point) stays a single
+  stroke at full weight, and is never smaller than the channel it has to
+  break, however far out the camera is. That floor is derived, never chosen:
+  clear of the far hairline's outer edge, plus the fitting's own half stroke,
+  plus a little paper. A floor picked by eye instead will quietly beat the
+  world-scaled radius at every camera the reader can reach, freeze the
+  fitting at a fixed screen size, and turn the smallest marks on the page
+  into the largest. Above the floor a fitting keeps its authored world size,
+  which is what holds the hierarchy between a station dot, a meter, and the
+  terminus a whole line runs back to.
+- A branch meeting a double rule stops on the trunk's near hairline. The
+  centreline is the one place it must not stop: both of its rails would then
+  dead-end inside the channel with the far rail left unbroken, which reads as
+  puncturing the trunk rather than meeting it. The trunk's rails are screen
+  offsets, so this cannot be expressed in the world coordinates a caller
+  writes; the trim belongs to the router.
+- The bus's traveling ticks fill the channel exactly, a slug moving between
+  the two rules rather than on them, and they are drawn before the fittings
+  so a tick submerges behind a meter the way it submerges behind the shelf.
+- A knockout with no word in it is a hole in the drawing. Text below 4px is
+  dropped rather than rendered as mush, so anything that clears paper for a
+  label has to ask whether the label will actually render at the current
+  camera, and skip the clearing too when it will not. The failure is silent
+  and only appears at the wider beats, which is where it is least excusable.
+- The lifecycle strip carries no marker beside each state. The word is the
+  mark, and the rule breaking to let it through is what mounts it; which
+  state is current is carried by ink alone. Every knockout on the strip is
+  measured off the word it has to clear, never hardcoded, so the states can
+  be set at a readable size without a fixed box cropping them.
+- Everything the governed line has to say is said on it. A caption that
+  describes the gates belongs set into the rule beside them, not floating in
+  the margin inside the boundary, where it reads as unplaced. But a caption
+  knocks the rule out for its whole measured width, so that stretch is no
+  longer line: nothing may tie into it there. Anything hanging off a rule
+  hangs from a clear stretch of it, and two elements added to the same rule
+  in the same edit must be checked against each other before either is
+  believed.
+- The bottom of the board carries TWO chains and they must never share a line.
+  The evidence chain: released work gets used, usage lands in the event log on
+  the substrate, the bus carries it back, the feedback loop turns it into
+  decisions, and those travel up into the knowledge layers. The release chain,
+  on its own line below: production's finished outputs are what a release is
+  made of, governance signs that set, and the signed release is announced.
+  They meet in the world, not on the diagram. Both run right to left, so the
+  whole bottom reads in one direction. Where the governed line reaches past
+  the bus to sign a release it CROSSES, at a joint; it does not join.
+- A signed release is a set of output files, so outputs is what feeds the
+  register. When outputs sat unconnected, the bus threading the register was
+  the only visible input and the diagram read as though telemetry produced
+  releases. One missing link can make three other things look wrong.
+- The release shelf is the one object both watching layers touch: governance
+  signs a release, so the record is governance's and hangs off its line;
+  observability returns evidence about it, so the bus runs through it. Its
+  place on the bus is load-bearing, not decorative. Reading the bus in its
+  own direction, right to left, signals leave the interface, pass the meters,
+  are bound to a specific signed release, and only then reach the people at
+  the review point.
+- Where two double rules cross, they do not overprint. Four separate crossings
+  read as two systems laid over each other; the joint stops both rails of each
+  rule at the other's channel and draws the four corners back in, so the two
+  channels open into one another and what reads is a single continuous run of
+  pipe. A joint belongs to both layers it joins, so it takes whichever of them
+  is the more lit rather than dimming with one while the other stays bright.
+- A line that ends in a bare circle claims to be a station. Where a line
+  terminates in something the system actually does, it terminates in a card
+  that names it: the evidence bus runs into the seat where people read it, and
+  the return artery leaves that card rather than a point on the line.
+- Signed releases are frozen files, not a recipe for making them again.
+  Approved work is hashed and stored; it is never regenerated, so a release is
+  a thing rather than a procedure. Re-rendering therefore is not a correctness
+  check on the artifact, it is a drift alarm on the system: it says the tokens
+  or the renderers have moved underneath approved work and it needs re-approving.
+  Do not claim work is "checked byte for byte" without saying against what.
+- Verify by asserting, not by looking. Render once and read device pixels
+  against named invariants (a rule has two rails at the declared spacing, a
+  branch leaves no ink in the trunk's channel, a wall has no notch, a plate
+  always has a word in it). Looking at pictures catches only what you thought
+  to look at, and a picture of a canvas is not evidence of its geometry.
+- Verify line craft by reading pixels, not by looking at an enlargement. The
+  canvas backs at dpr = min(2, devicePixelRatio); a screenshot taken above
+  that upscales the bitmap and returns every hairline fatter and softer than
+  it is, which will send you chasing weight that was never there.
 - A line meeting a card simply lands on its edge: no port dot. Circles are
   reserved for the workflow stations, each drawn with a thin inner ring, so
   a circle on this page always means a stop on the run.

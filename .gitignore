@@ -29,3 +29,6 @@ dist/
 
 # local agent settings
 .claude/
+
+# specimen exploration, not part of the site
+public/_specimens/
