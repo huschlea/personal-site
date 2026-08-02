@@ -87,7 +87,7 @@ export const LAYER_PANELS: LayerPanel[] = [
     chips: ["human surfaces", "application APIs", "agent surface", "runtime substrate"],
     tree: `interface
   human surfaces
-    - the brand center and its tools
+    - design os, the brand center
   application surfaces
     - brand, search, render, workflow APIs
   agent surface
@@ -135,24 +135,16 @@ export const LAYER_PANELS: LayerPanel[] = [
   },
 ];
 
-const SIMPLE_CAPS = [
-  {
-    kicker: "One job, all six layers",
-    title: "A run, end to end",
-    body: "A brief arrives at the interface. Intelligence retrieves what the brand knows; design language applies its forms; production executes the recipe; the gates check every claim and every line, and what fails is revised before it ships. The artifact set releases whole, and the run writes its record.",
-  },
-  {
-    kicker: "The whole system",
-    title: "One system, operating",
-    body: "Knowledge in, governed work out, evidence back. Select any stage to open it.",
-  },
-];
+const FINALE_CAP = {
+  kicker: "The whole system",
+  title: "One system, operating",
+  body: "Knowledge in, governed work out, evidence back. Select any stage to open it.",
+};
 
 /* the rail: every stage, addressable directly */
 const STAGES: Array<{ num: string | null; label: string }> = [
   { num: null, label: "Intro" },
   ...LAYER_PANELS.map((p) => ({ num: p.kicker, label: p.title })),
-  { num: null, label: "The run" },
   { num: null, label: "The system" },
 ];
 const FINAL = STAGES.length - 1;
@@ -184,7 +176,7 @@ function PanelFor({ stage }: { stage: number }) {
         <p className="ds-body">
           An operating system for creative work: what the brand knows, how it
           speaks, the machinery that produces the work, and the law that keeps
-          it safe. No brand baked in. Step through, and the system comes together.
+          it safe. No brand baked in. One system, explored a layer at a time.
         </p>
         <p className="ds-nav-hint" aria-hidden="true">Use the stages below, or the arrow keys</p>
       </div>
@@ -200,7 +192,7 @@ function PanelFor({ stage }: { stage: number }) {
       </div>
     );
   }
-  const c = SIMPLE_CAPS[stage - LAYER_PANELS.length - 1];
+  const c = FINALE_CAP;
   return (
     <div className="ds-panel-inner" key={c.title}>
       <p className="ds-cap-kicker">{c.kicker}</p>
@@ -264,13 +256,13 @@ export function AssemblyStory() {
             ref={canvasRef}
             className="ds-stage-canvas"
             role="img"
-            aria-label="A brand operating system assembling stage by stage: brand intelligence and design language feed a production hall of components, recipes, workflows, interpreters, and renderers; work passes governance into the interfaces; evidence returns through observability."
+            aria-label="A brand operating system, one persistent blueprint explored stage by stage: brand intelligence and design language feed a production hall of components, recipes, workflows, interpreters, and renderers; work passes governance into the interfaces; evidence returns through observability."
           />
 
           {/* the final view keeps its name without reclaiming the column */}
           <div className="ds-full-title" aria-hidden={!full}>
-            <p className="ds-cap-kicker">{SIMPLE_CAPS[1].kicker}</p>
-            <p className="ds-cap-title">{SIMPLE_CAPS[1].title}</p>
+            <p className="ds-cap-kicker">{FINALE_CAP.kicker}</p>
+            <p className="ds-cap-title">{FINALE_CAP.title}</p>
           </div>
 
           {/* stage changes are otherwise silent to screen readers */}

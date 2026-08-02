@@ -12,7 +12,7 @@ import { ICONS } from "./icons";
 type Camera = { zoom: number; cx: number; cy: number };
 
 export const LAYER_COUNT = 6;
-const BEATS = 9; // 0 scatter · 1-6 layers · 7 the run · 8 the whole
+const BEATS = 8; // 0 the whole system, small · 1-6 layers · 7 the whole system, full
 const INK = (o: number) => `rgba(20, 18, 16, ${o})`;
 const PAPER = "#FEFEFD";
 const RUST = (o: number) => `rgba(156, 63, 33, ${o})`;
@@ -58,23 +58,21 @@ const DIM = 0.38; // spotlight: everything not selected drops to this
    the drawing was authored at. */
 type View = { x: number; y: number; w: number; h: number; pad?: number; maxZoom?: number; anchor?: "bottom" };
 const VIEWS: View[] = [
-  { x: 80, y: 60, w: 1920, h: 1150, pad: 0.02 },               // 0 the scattered field
+  /* 0 and 7 share one rect: the whole system. The intro shows it small beside
+     the title; the finale shows it full-bleed. One persistent system, and the
+     stages between are a camera moving around it. */
+  { x: 60, y: 60, w: 1950, h: 1120, pad: 0.02 },               // 0 the whole system, small
   { x: 120, y: 128, w: 360, h: 515, pad: 0.06, maxZoom: 1.45 },// 1 brand intelligence
   { x: 120, y: 578, w: 360, h: 435, pad: 0.06, maxZoom: 1.45 },// 2 design language
   { x: 505, y: 128, w: 890, h: 855, pad: 0.04 },               // 3 production
-  { x: 1360, y: 130, w: 650, h: 900, pad: 0.05 },              // 4 interface
-  { x: 430, y: 88, w: 1040, h: 1200, pad: 0.03 },              // 5 governance
-  /* the world ends just under the release row, so a centred fit would strand
-     a third of the region as bare paper below the band. Anchored to the
-     bottom, with the plinth cropped: it is dimmed context at this stage, and
-     giving it up is what buys the band its zoom. The feed still enters from
-     the right, labelled. */
-  { x: 60, y: 860, w: 1470, h: 430, pad: 0.05, anchor: "bottom" }, // 6 observability
-  /* the run must contain the release chain its own choreography triggers: a
-     frame that excludes the register shows the outputs feed running off the
-     bottom of the screen into cards cut in half */
-  { x: 360, y: 118, w: 1660, h: 1160, pad: 0.03 },             // 7 the run
-  { x: 60, y: 60, w: 1950, h: 1240, pad: 0.03 },               // 8 the whole system
+  { x: 1360, y: 130, w: 650, h: 1060, pad: 0.05 },             // 4 interface, foot included
+  /* governance frames its whole domain: the boundary and the release chain it
+     signs, out to the notes card's right edge, so no card is cut mid-face */
+  { x: 430, y: 80, w: 1560, h: 970, pad: 0.03 },               // 5 governance
+  /* the evidence chain: seat, bus, meters, the feed's corner. Anchored to the
+     bottom so the dimmed system above is the context, not bare paper below. */
+  { x: 60, y: 830, w: 1410, h: 330, pad: 0.05, anchor: "bottom" }, // 6 observability
+  { x: 60, y: 60, w: 1950, h: 1120, pad: 0.03 },               // 7 the whole system
 ];
 
 /* The lane is sized to its content: label column plus, on design language,
@@ -136,11 +134,16 @@ const RECIPE_DEFS: Array<{ name: string; slots: number; ports: number }> = [
 /* What a brand system actually assembles: the parts of a rendered artifact,
    not the controls of an application. */
 const PART_DEFS = ["headline", "body", "quote", "credit", "lockup", "image", "ground", "palette", "figure", "list", "chip", "seal"];
-const WIN = { x: 1490, y: 160, w: 500, h: 300 };
-const APIS = { x: 1490, y: 500, w: 500, h: 160 };
-const MCP = { x: 1490, y: 700, w: 500, h: 190 };
-const PLINTH = { x: 1490, y: 930, w: 500, h: 60 };
-const OUTPUTS = { x: 1490, y: 1030, w: 500, h: 88 };
+/* ── the interface column, dense ──
+   The column carries every surface plus, at its foot, the release chain: a
+   release is made of outputs, so the register lives directly under the card
+   that fills it, and the announcement beside the register. Tighter cards, no
+   underfilled stretches, and the world's floor rises to ~1150. */
+const WIN = { x: 1490, y: 160, w: 500, h: 280 };
+const APIS = { x: 1490, y: 476, w: 500, h: 132 };
+const MCP = { x: 1490, y: 648, w: 500, h: 150 };
+const PLINTH = { x: 1490, y: 838, w: 500, h: 60 };
+const OUTPUTS = { x: 1490, y: 938, w: 500, h: 88 };
 const GOV = { x: 480, y: 128, w: 940, h: 902 };
 // where the dispatch fans out to the three surfaces, inside the governed line
 /* inside the governed boundary: the branches must cross the line at their
@@ -148,21 +151,20 @@ const GOV = { x: 480, y: 128, w: 940, h: 902 };
 const FAN_X = 1385;
 const BUS_Y = 1100;
 /* ── two chains, not one line ──
-   The bottom of the board carries two different stories and they must not share
-   a line. The EVIDENCE chain runs along BUS_Y: released work gets used, usage
-   lands in the event log on the substrate, the bus carries it back, and the
-   feedback loop turns it into decisions that travel up into the knowledge
-   layers. The RELEASE chain runs below it: production's finished outputs are
-   what a release is made of, governance signs that set, and the signed release
-   is announced. They meet in the world, not on the diagram. Both run right to
-   left, so the whole bottom of the board reads in one direction. */
-const REL_Y = 1180, REL_H = 92;
+   The EVIDENCE chain runs along BUS_Y: released work gets used, usage lands in
+   the event log on the substrate, the bus carries it back, and the feedback
+   loop turns it into decisions that travel up into the knowledge layers. The
+   RELEASE chain lives in the interface column's foot: outputs drop into signed
+   releases, the register links to release notes, and governance reaches across
+   to sign, crossing the bus at a joint on the way. They meet in the world, not
+   on the diagram. */
+const REL_Y = 1058, REL_H = 92;
 const REL_LINE = REL_Y + REL_H / 2;
-const SHELF = { x: 640, y: REL_Y, w: 230, h: REL_H };
+const SHELF = { x: 1490, y: REL_Y, w: 240, h: REL_H };
+const NOTES = { x: 1750, y: REL_Y, w: 240, h: REL_H };
 /* the bus runs from the substrate's event log to the feedback loop, and stops
-   short of the interface lane so the outputs card is never crossed */
+   short of the interface lane so the column is never crossed */
 const BUS_X1 = 1460;
-const NOTES = { x: 380, y: REL_Y, w: 230, h: REL_H };
 // the only card on the evidence line, and the only thing the bus touches
 const SEAT = { x: 150, y: BUS_Y - 46, w: 200, h: 92 };
 // the bus terminates in the feedback loop; there is no run past it
@@ -1503,12 +1505,12 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
   function drawInterface(t: number) {
     withLayer(3, () => {
       if (t <= 0.02) return;
-      // connectors from the hall
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 320], [WIN.x, 320]], t, { alpha: 0.2, dash: true });
-      route([[BELT_X1, 585], [WIN.x, 585]], t, { alpha: 0.2, dash: true });
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 790], [WIN.x, 790]], t, { alpha: 0.2, dash: true });
+      // connectors from the hall, one per surface, at each card's centre
+      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 300], [WIN.x, 300]], t, { alpha: 0.2, dash: true });
+      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 542], [APIS.x, 542]], t, { alpha: 0.2, dash: true });
+      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 723], [MCP.x, 723]], t, { alpha: 0.2, dash: true });
 
-      // people: the brand center window
+      // design os: the window where people run the system
       card(WIN.x, WIN.y, WIN.w, WIN.h, t, { strong: true });
       const hl = toScreen(WIN.x, WIN.y + 30);
       const hr = toScreen(WIN.x + WIN.w, WIN.y + 30);
@@ -1521,7 +1523,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         ctx!.fillStyle = INK(0.18 * t * inkMul);
         ctx!.fill();
       });
-      text("people · the brand center", WIN.x + 16, WIN.y + 50, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
+      text("design os", WIN.x + 16, WIN.y + 50, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
       ["create", "library", "guidelines", "campaigns"].forEach((nm, i) => {
         text(nm, WIN.x + 16, WIN.y + 80 + i * 26, t, { size: 10, alpha: T_BODY });
       });
@@ -1529,15 +1531,15 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       const dv2 = toScreen(WIN.x + 120, WIN.y + WIN.h - 16);
       ctx!.strokeStyle = INK(0.1 * t * inkMul);
       ctx!.beginPath(); ctx!.moveTo(dv.x, dv.y); ctx!.lineTo(dv2.x, dv2.y); ctx!.stroke();
-      ([[140, 56, "campaign"], [320, 56, "document"]] as const).forEach(([dx, dy, nm]) => {
+      ([[140, 48, "campaign"], [320, 48, "document"]] as const).forEach(([dx, dy, nm]) => {
         const pa = toScreen(WIN.x + dx, WIN.y + dy);
-        const pb = toScreen(WIN.x + dx + 160, WIN.y + dy + 180);
+        const pb = toScreen(WIN.x + dx + 160, WIN.y + dy + 168);
         ctx!.beginPath();
         ctx!.roundRect(pa.x, pa.y, pb.x - pa.x, pb.y - pa.y, 0);
         ctx!.fillStyle = INK(0.035 * t * inkMul);
         ctx!.fill();
         stroke(0.14 * t);
-        text(nm, WIN.x + dx + 10, WIN.y + dy + 164, t, { size: 8.5, alpha: T_FAINT });
+        text(nm, WIN.x + dx + 10, WIN.y + dy + 152, t, { size: 8.5, alpha: T_FAINT });
       });
 
       // applications: the API panel
@@ -1545,7 +1547,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       text("applications · APIs", APIS.x + 16, APIS.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
       ["brand API", "search API", "render API", "workflow API"].forEach((nm, i) => {
         const col = i % 2, row = Math.floor(i / 2);
-        const ex = APIS.x + 16 + col * 240, ey = APIS.y + 56 + row * 44;
+        const ex = APIS.x + 16 + col * 240, ey = APIS.y + 54 + row * 28;
         const p = toScreen(ex, ey);
         ctx!.beginPath();
         ctx!.arc(p.x + 3 * p.s, p.y, 2 * p.s, 0, Math.PI * 2);
@@ -1553,16 +1555,18 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         ctx!.fill();
         text(nm, ex + 14, ey, t, { size: 10, alpha: T_BODY, mono: true });
       });
+      text("versioned contracts · typed clients", APIS.x + 16, APIS.y + 110, t, { size: 8.5, alpha: T_FAINT });
 
       // agents: the MCP panel
       card(MCP.x, MCP.y, MCP.w, MCP.h, t);
       text("agents · MCP", MCP.x + 16, MCP.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
       ["mcp", "├ resources", "├ tools", "└ prompts"].forEach((ln, i) => {
-        text(ln, MCP.x + 20, MCP.y + 54 + i * 24, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
+        text(ln, MCP.x + 20, MCP.y + 48 + i * 22, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
       });
-      text("authenticated · scoped · recorded", MCP.x + 180, MCP.y + 102, t, { size: 8.5, alpha: T_FAINT });
-      const caret = toScreen(MCP.x + 20, MCP.y + 158);
-      if (Math.floor(idleClock * 2.2) % 2 === 0) {
+      text("authenticated · scoped · recorded", MCP.x + 180, MCP.y + 92, t, { size: 8.5, alpha: T_FAINT });
+      // the caret rests on the finale: a blueprint does not blink
+      if (active !== BEATS - 1 && Math.floor(idleClock * 2.2) % 2 === 0) {
+        const caret = toScreen(MCP.x + 20, MCP.y + 132);
         ctx!.fillStyle = INK(0.6 * t * inkMul);
         ctx!.fillRect(caret.x, caret.y - 5 * caret.s, 1.5 * caret.s, 10 * caret.s);
       }
@@ -1576,6 +1580,20 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
           ctx!.strokeStyle = INK(0.14 * t * inkMul);
           ctx!.beginPath(); ctx!.moveTo(d.x, d.y - 10 * d.s); ctx!.lineTo(d.x, d.y + 10 * d.s); ctx!.stroke();
         }
+      });
+
+      /* the column's own product: finished artifacts, and directly beneath
+         them the register they are signed into */
+      card(OUTPUTS.x, OUTPUTS.y, OUTPUTS.w, OUTPUTS.h, t);
+      OUTPUT_NAMES.forEach((nm, i) => {
+        const col = i % 3, row = Math.floor(i / 3);
+        const ox = OUTPUTS.x + 14 + col * 160, oy = OUTPUTS.y + 12 + row * 34;
+        const p = toScreen(ox, oy);
+        const q = toScreen(ox + 150, oy + 28);
+        ctx!.beginPath();
+        ctx!.roundRect(p.x, p.y, q.x - p.x, q.y - p.y, 0);
+        stroke(0.2 * t);
+        text(nm, ox + 8, oy + 14, t, { size: 8, alpha: T_BODY, maxW: 136 });
       });
     });
   }
@@ -1632,7 +1650,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         ctx!.fill();
         stroke(0.5 * t);
       };
-      [320, 585, 790].forEach((gy) => gate(GOV.x + GOV.w, gy));
+      [300, 542, 723].forEach((gy) => gate(GOV.x + GOV.w, gy));
       [COMPILE.y + 27, DL.y + 160].forEach((gy) => gate(GOV.x, gy));
       /* Everything the governed line has to say is said ON it. This caption
          describes the gates, so it is set into the bottom rule beside them
@@ -1641,24 +1659,17 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       chipLabel("gates at every crossing · fail closed", GOV.x + 40, GOV.y + GOV.h, t);
       chipLabel("human approval", GOV.x + 470, GOV.y + GOV.h, t);
       chipLabel("exceptions, documented", GOV.x + 640, GOV.y + GOV.h, t);
-      /* The release shelf hangs off the governed line and lands on the
-         evidence bus. Governance is what signs a release, so the record is
-         governance's; observability is what returns evidence about it, so the
-         bus runs through it. This short drop is the tie to the layer that
-         owns it, and the reason the card is not floating below the boundary.
-         It hangs from the clear stretch of rule between the gates caption and
-         the approval seat: a caption knocks the rule out for its whole width,
-         so a tie dropped inside one would attach to paper, not to the line. */
-      route([[SHELF.x + 150, GOV.y + GOV.h], [SHELF.x + 150, SHELF.y]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
-      /* The other input, and the one that was missing: a signed release is a
-         set of finished files. Outputs is what production actually made, so it
-         feeds the register, which is why the register's contents never came
-         from the evidence bus. It rides the outputs card's own reveal rather
-         than a threshold, so it fades with the card it comes from instead of
-         vanishing at full ink the instant a backward jump crosses the line. */
-      route([[1600, OUTPUTS.y + OUTPUTS.h], [1600, REL_LINE], [SHELF.x + SHELF.w, REL_LINE]], t * reveal[7], { alpha: S_RULE, double: true });
+      /* Governance signs the release, so its line reaches across to the
+         register: down from the bottom rule, across the evidence bus at a
+         joint, and in through the register's left edge below the bus's lane
+         and the meter labels. The drop leaves from the clear stretch of rule
+         right of the exceptions caption. */
+      route([[1380, GOV.y + GOV.h], [1380, 1136], [SHELF.x, 1136]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
+      /* A signed release is a set of finished files: outputs sits directly
+         above the register and fills it with one short drop. */
+      route([[1600, OUTPUTS.y + OUTPUTS.h], [1600, SHELF.y]], t, { alpha: S_RULE, double: true });
       // signed, then announced: the chain continues left along its own line
-      route([[SHELF.x, REL_LINE], [NOTES.x + NOTES.w, REL_LINE]], t, { alpha: S_RULE, double: true });
+      route([[SHELF.x + SHELF.w, REL_LINE], [NOTES.x, REL_LINE]], t, { alpha: S_RULE, double: true });
       /* The notes card sits on the same line, drawn by governance because a
          release is what triggers an announcement. The feedback loop is
          observability's and is drawn there, on its own line, at its own light. */
@@ -1723,23 +1734,25 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
          the bus, its return artery and both of its connections are a single
          system. The run in from the substrate and the run along the bus are one
          path, so the corner mitres instead of butting two doubled ends together.
-         It ends at the ledger's right edge: the line arrives at the aftermath
-         rather than running past it. */
+         It ends in the feedback loop: the line arrives at the people who read
+         it rather than running past them. */
       route([[PLINTH.x, PLINTH.y + PLINTH.h / 2], [BUS_X1, PLINTH.y + PLINTH.h / 2], [BUS_X1, BUS_Y], [REVIEW.x, BUS_Y]], t, { alpha: S_RULE, double: true });
       text("usage recorded", BUS_X1 - 10, 1046, t, { size: 8, alpha: T_FAINT, anchor: "right" as CanvasTextAlign });
       // evidence riser into the hall, in the clear stretch past the shelf,
       // stopping on the bus's near rail so the tee reads clean
       route([[900, BUS_Y], [900, HALL.y + HALL.h]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
-      /* Ticks traveling backward, always, and drawn before the meters: a tick
-         passing a fitting submerges behind it the way it submerges into the
-         ledger, rather than sitting as debris inside the break. */
-      for (let i = 0; i < 5; i++) {
-        const u = ((idleClock * 0.14 + i / 5) % 1);
-        const tx = BUS_X1 - u * (BUS_X1 - REVIEW.x);
-        const p = toScreen(tx, BUS_Y);
-        ctx!.fillStyle = INK(0.5 * t * inkMul);
-        // the tick fills the channel, a slug traveling between the two rules
-        ctx!.fillRect(p.x - 2.5 * p.s, p.y - RULE_GAP, 5 * p.s, RULE_GAP * 2);
+      /* Ticks traveling backward, drawn before the meters so a passing tick
+         submerges behind a fitting rather than sitting as debris inside its
+         break. On the finale they are absent entirely: a blueprint is still. */
+      if (active !== BEATS - 1) {
+        for (let i = 0; i < 5; i++) {
+          const u = ((idleClock * 0.14 + i / 5) % 1);
+          const tx = BUS_X1 - u * (BUS_X1 - REVIEW.x);
+          const p = toScreen(tx, BUS_Y);
+          ctx!.fillStyle = INK(0.5 * t * inkMul);
+          // the tick fills the channel, a slug traveling between the two rules
+          ctx!.fillRect(p.x - 2.5 * p.s, p.y - RULE_GAP, 5 * p.s, RULE_GAP * 2);
+        }
       }
       // meters along the bus
       METERS.forEach((nm, i) => {
@@ -1762,22 +1775,21 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       text("signals become decisions, not dashboards", SEAT.x + 16, SEAT.y + 42, t, { size: 8.5, alpha: T_FAINT, maxW: SEAT.w - 32 });
       route([[SEAT.x + 70, SEAT.y], [SEAT.x + 70, 1010], [80, 1010], [80, 400], [BI.x, 400]], t, { alpha: S_RULE, double: true });
       route([[80, DL.y + 160], [DL.x, DL.y + 160]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
-      /* The one place two double rules cross: the evidence riser through the
-         governed line's bottom rule. The joint belongs to both layers, so it
-         takes whichever of the two is the more lit, rather than dimming with
-         observability while the rule it joins stays bright. */
-      /* Two places where a governance run and an observability run cross. The
-         riser through the governed line, and the governed line reaching past
-         the evidence bus to sign a release: it crosses the bus, it does not
-         feed it. Each joint belongs to both layers, so it takes whichever of
-         the two is the more lit. */
+      /* Two places where a governance run and an observability run cross: the
+         evidence riser through the governed line's bottom rule, and the
+         governed line dropping past the bus to sign a release. It crosses the
+         bus; it does not feed it. Each joint belongs to both layers, so it
+         takes whichever of the two is the more lit. */
       const bothLit = Math.max(layerLight[4], layerLight[5]);
       crossJoint(900, GOV.y + GOV.h, t, bothLit);
-      crossJoint(SHELF.x + 150, BUS_Y, t, bothLit);
+      crossJoint(1380, BUS_Y, t, bothLit);
     });
   }
 
-  /* ── the run and its outputs ── */
+  /* ── the run and its outputs ──
+     TABLED. Never called; kept as the reference choreography for the future
+     full-run animation. See ANIMATION-HANDOFF.md before deleting or reviving.
+     eslint-disable-next-line @typescript-eslint/no-unused-vars */
   function drawRun(t: number, k: number) {
     if (t <= 0.02) return;
     // the brief arrives from the window to the lane
@@ -1842,25 +1854,33 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
     last = now;
     applyResize();          // must precede the draw: it clears the bitmap
 
+    /* A chase that lands. The exponential approach never actually arrives,
+       which reads as sub-pixel alpha and position drift long after a
+       transition looks finished; snapping inside a hair's width makes every
+       settled frame byte-identical to the last. */
     const chase = 1 - Math.pow(0.0018, dt);
+    const glide = (cur: number, target: number, eps: number) => {
+      const next = cur + (target - cur) * chase;
+      return Math.abs(next - target) < eps ? target : next;
+    };
     for (let b = 0; b < BEATS; b++) {
-      const target = active >= b ? 1 : 0;
-      reveal[b] += (target - reveal[b]) * chase;
-      const ft = active === b ? 1 : 0;
-      focus[b] += (ft - focus[b]) * chase;
+      /* one persistent system: everything is always drawn, and the currents
+         only carry the load-in fade. The stages are a camera and a spotlight
+         moving around a system that is already whole. */
+      reveal[b] = glide(reveal[b], 1, 0.001);
+      focus[b] = glide(focus[b], active === b ? 1 : 0, 0.001);
     }
 
     /* the spotlight: stages 1..6 select layers 0..5 */
     const sel = active >= 1 && active <= 6 ? active - 1 : null;
     for (let i = 0; i < LAYER_COUNT; i++) {
-      const target = sel === null ? 1 : (sel === i ? 1 : DIM);
-      layerLight[i] += (target - layerLight[i]) * chase;
+      layerLight[i] = glide(layerLight[i], sel === null ? 1 : (sel === i ? 1 : DIM), 0.001);
     }
 
     const f = fitView(VIEWS[active]);
-    cam.zoom += (f.zoom - cam.zoom) * chase;
-    cam.cx += (f.cx - cam.cx) * chase;
-    cam.cy += (f.cy - cam.cy) * chase;
+    cam.zoom = glide(cam.zoom, f.zoom, 0.0004);
+    cam.cx = glide(cam.cx, f.cx, 0.05);
+    cam.cy = glide(cam.cy, f.cy, 0.05);
 
     /* a read-only window for the verification tooling: the live camera and
        region, so probes derive world-to-device mapping instead of mirroring it */
@@ -1873,9 +1893,11 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       settled: Math.abs(cam.zoom - f.zoom) < 0.002 && Math.abs(cam.cx - f.cx) < 0.5 && Math.abs(cam.cy - f.cy) < 0.5,
     };
 
+    /* The run choreography is tabled and lives behind runK = -1; the finale
+       is a static blueprint (its idle draws gate on `active` at their sites).
+       See ANIMATION-HANDOFF.md. */
     idleClock += dt * 0.08;
-    if (active === 7) runClock = (runClock + dt / 14) % 1;
-    const runK = active === 7 ? runClock : -1;
+    const runK = -1;
 
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx!.fillStyle = PAPER;
@@ -1891,24 +1913,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
     if (reveal[3] > 0.01) drawHall(reveal[3], runK);
     if (reveal[4] > 0.01) drawInterface(reveal[4]);
     if (reveal[6] > 0.01) drawObs(reveal[6]);
-    if (runK >= 0) drawRun(reveal[7], runK);
-    else if (reveal[7] > 0.02) {
-      // after the run the outputs stay, part of the system, and they fade with
-      // their own reveal rather than snapping off at a threshold
-      withLayer(3, () => {
-        card(OUTPUTS.x, OUTPUTS.y, OUTPUTS.w, OUTPUTS.h, reveal[7]);
-        OUTPUT_NAMES.forEach((nm, i) => {
-          const col = i % 3, row = Math.floor(i / 3);
-          const ox = OUTPUTS.x + 14 + col * 160, oy = OUTPUTS.y + 12 + row * 34;
-          const p = toScreen(ox, oy);
-          const q = toScreen(ox + 150, oy + 28);
-          ctx!.beginPath();
-          ctx!.roundRect(p.x, p.y, q.x - p.x, q.y - p.y, 0);
-          stroke(0.2 * reveal[7]);
-          text(nm, ox + 8, oy + 14, reveal[7], { size: 8, alpha: T_BODY, maxW: 136 });
-        });
-      });
-    }
 
     if (running) raf = requestAnimationFrame(frame);
   }
@@ -1949,7 +1953,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
     },
     setStage(i: number) {
       active = Math.max(0, Math.min(BEATS - 1, i));
-      if (active !== 7) runClock = 0;
     },
   };
 }

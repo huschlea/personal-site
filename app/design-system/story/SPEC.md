@@ -417,6 +417,26 @@ story ends; the explorer remains. No click-to-jump during the scroll (v1).
   (dead centre, no optical drop): the fitted camera assumes it, and a 2%
   anchor bias pushes every fitted rect out the bottom of its region.
 
+## The static blueprint era (settled 2026-08-01)
+
+- There is no run stage. The finale is a static blueprint: no ticks, no
+  caret, no pulses, asserted byte-identical frame to frame. The full-run
+  animation is tabled, not deleted; ANIMATION-HANDOFF.md is the map and
+  runK = -1 is the single switch that keeps its choreography dormant.
+- One persistent system. Every stage draws the whole board; only the camera
+  and the spotlight move. Nothing assembles, because the claim is a system
+  that already exists, not one that comes together for the viewer. The intro
+  is the same rect as the finale, small beside the title.
+- The release chain lives at the interface column's foot: outputs directly
+  above the register it fills, notes beside the register, and governance
+  reaching across the whole board to sign, crossing the evidence bus at a
+  joint. The column carries the weight it lacked; the world's floor rose
+  from 1272 to 1150 and every full-board frame gained the difference.
+- The window where people run the system is named design os.
+- Chases land. Every current snaps to its target inside an epsilon, so a
+  settled frame is byte-identical to the next: stillness is enforced, not
+  approximate.
+
 ## Interaction and craft (carried from v2, tightened)
 
 - Spotlight: selected structures at full ink, everything else at 45 percent;
