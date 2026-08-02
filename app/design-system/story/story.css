@@ -18,14 +18,14 @@
   --ds-panel-w: clamp(360px, 24vw, 440px);
   position: fixed;
   inset: 0;
-  display: flex;
   background: #fefefd;
 }
 
+/* the canvas spans the whole viewport and the panel overlays it: the
+   partition is enforced by the camera fit, never by resizing the element */
 .site-ds .ds-stage-region {
-  position: relative;
-  flex: 1;
-  min-width: 0;
+  position: absolute;
+  inset: 0;
 }
 
 .site-ds .ds-stage-canvas {
@@ -43,6 +43,11 @@
    Entering the finale: fade 0.3s, then collapse. Leaving: restore width at
    once and fade the content back in over the camera's return. */
 .site-ds .ds-panel-col {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
   width: var(--ds-panel-w);
   border-left: 1px solid rgba(20, 18, 16, 0.14);
   background: #fefefd;

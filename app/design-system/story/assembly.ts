@@ -69,7 +69,9 @@ const VIEWS: View[] = [
   { x: 120, y: 128, w: 360, h: 515, pad: 0.06, maxZoom: 2.1 }, // 1 brand intelligence
   { x: 120, y: 578, w: 360, h: 435, pad: 0.06, maxZoom: 2.1 }, // 2 design language
   { x: 505, y: 128, w: 890, h: 855, pad: 0.04, maxZoom: 1.65 },// 3 production
-  { x: 1370, y: 140, w: 640, h: 930, pad: 0.05, maxZoom: 1.8 }, // 4 interface, foot included
+  /* the interface frames only its own surfaces: the release chain below is
+     governance's and stays out of this stage's rect */
+  { x: 1370, y: 140, w: 640, h: 800, pad: 0.05, maxZoom: 1.9 }, // 4 interface
   /* governance frames its whole domain: the boundary and the release chain it
      signs, out to the notes card's right edge, so no card is cut mid-face */
   /* extra world above the boundary pushes the frame down clear of the home
@@ -226,8 +228,8 @@ const FRAGS: Frag[] = [
 const BI_ROWS = FRAGS.filter((f) => f.layer === 0);
 const DL_ROWS = FRAGS.filter((f) => f.layer === 1);
 
-export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
-  const { canvas } = opts;
+export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLElement | null }) {
+  const { canvas, panel } = opts;
   let ctx = canvas.getContext("2d");
   if (!ctx) return { destroy: () => {}, setStage: (_: number) => {} };
 
@@ -241,19 +243,24 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
   let runClock = 0;
   let idleClock = 0;
 
-  /* the camera is a chase toward the active stage's fitted rect; the fit is
-     recomputed every frame from the region's live size, so a resize (or the
-     panel column releasing its space) is a camera move, not a jump */
-  /* the stage rail owns the bottom band of the region; the camera fits into
-     what remains, or the drawing parks its lowest row under the buttons */
+  /* ── the partition is the camera's, not the canvas's ──
+     The canvas always spans the full viewport and the panel simply overlays
+     its right edge. Resizing the canvas element mid-transition translated the
+     whole drawing half a panel-width in a single frame, which no easing could
+     hide; instead the element never changes and the panel's width only moves
+     the FIT TARGET, which the camera chases. Every stage change, the finale
+     in both directions included, is one continuous camera move. */
+  let inset = 0;
+  /* the stage rail owns the bottom band; the camera fits into what remains */
   const NAV_INSET = 96;
   function fitView(v: View): Camera {
     const base = Math.min(W / 2060, H / 1210);
     if (base <= 0) return { zoom: 1, cx: v.x + v.w / 2, cy: v.y + v.h / 2 };
+    const We = Math.max(200, W - inset);
     const He = Math.max(200, H - NAV_INSET);
     const pad = 1 - (v.pad ?? 0.04);
     const zoom = Math.min(
-      (W / (base * v.w)) * pad,
+      (We / (base * v.w)) * pad,
       (He / (base * v.h)) * pad,
       v.maxZoom ?? 1.5,
     );
@@ -261,9 +268,11 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
     const cy = v.anchor === "bottom"
       ? v.y + v.h - (He - ((v.pad ?? 0.04) / 2) * He - H * 0.5) / s
       : v.y + v.h / 2 + (NAV_INSET / 2) / s;
-    return { zoom, cx: v.x + v.w / 2, cy };
+    /* centre the rect in the region left of the panel */
+    return { zoom, cx: v.x + v.w / 2 + inset / (2 * s), cy };
   }
   const cam: Camera = { zoom: 0.8, cx: 1080, cy: 560 };
+  const camT: Camera = { zoom: 0.8, cx: 1080, cy: 560 }; // the smoothed target
 
   const iconPaths = new Map<string, Path2D>();
   for (const [k, d] of Object.entries(ICONS)) iconPaths.set(k, new Path2D(d));
@@ -1563,13 +1572,25 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         ctx!.fillStyle = INK(0.035 * t * inkMul);
         ctx!.fill();
         stroke(0.14 * t);
+        // a page lives in each pane: image, then copy, in the printed idiom
+        const bx = WIN.x + dx + 10, by = WIN.y + dy + 10;
+        const ia = toScreen(bx, by);
+        const ib = toScreen(bx + 140, by + 62);
+        ctx!.fillStyle = INK(0.05 * t * inkMul);
+        ctx!.fillRect(ia.x, ia.y, ib.x - ia.x, ib.y - ia.y);
+        [92, 128, 108, 72].forEach((bw, bi) => {
+          const ba = toScreen(bx, by + 76 + bi * 14);
+          const bb = toScreen(bx + bw, by + 81 + bi * 14);
+          ctx!.fillStyle = INK((bi === 0 ? 0.16 : 0.09) * t * inkMul);
+          ctx!.fillRect(ba.x, ba.y, bb.x - ba.x, bb.y - ba.y);
+        });
         text(nm, WIN.x + dx + 10, WIN.y + dy + 152, t, { size: 8.5, alpha: T_FAINT });
       });
 
       /* applications: names on the left, a strip of live traffic on the
          right, in the register's own mono ledger idiom so the card carries
          the same visual weight as the rest of the board */
-      card(APIS.x, APIS.y, APIS.w, APIS.h, t);
+      card(APIS.x, APIS.y, APIS.w, APIS.h, t, { strong: true });
       text("applications · APIs", APIS.x + 16, APIS.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
       ["brand API", "search API", "render API", "workflow API"].forEach((nm, i) => {
         const ey = APIS.y + 50 + i * 24;
@@ -1594,7 +1615,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       text("versioned · typed", APIS.x + 268, APIS.y + 122, t, { size: 8.5, alpha: T_FAINT });
 
       /* agents: the tree on the left, the session's record on the right */
-      card(MCP.x, MCP.y, MCP.w, MCP.h, t);
+      card(MCP.x, MCP.y, MCP.w, MCP.h, t, { strong: true });
       text("agents · MCP", MCP.x + 16, MCP.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
       ["mcp", "├ resources", "├ tools", "└ prompts"].forEach((ln, i) => {
         text(ln, MCP.x + 20, MCP.y + 48 + i * 22, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
@@ -1619,7 +1640,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       }
 
       // the substrate plinth
-      card(PLINTH.x, PLINTH.y, PLINTH.w, PLINTH.h, t, { radius: 3 });
+      card(PLINTH.x, PLINTH.y, PLINTH.w, PLINTH.h, t, { radius: 3, strong: true });
       ["runtime database", "object storage", "event log"].forEach((nm, i) => {
         text(nm, PLINTH.x + 24 + i * 168, PLINTH.y + 33, t, { size: 9, alpha: T_FAINT, maxW: 150 });
         if (i > 0) {
@@ -1884,6 +1905,11 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
     const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
     last = now;
     applyResize();          // must precede the draw: it clears the bitmap
+    /* On the finale the inset is zero the moment the stage is chosen, not
+       when the DOM gets around to collapsing: one target step, taken from
+       rest, S-curved. The panel fades out over the drawing as it grows into
+       the space, which is the crossfade the overlay architecture buys. */
+    inset = active === BEATS - 1 ? 0 : (panel ? panel.clientWidth : 0);
 
     /* A chase that lands. The exponential approach never actually arrives,
        which reads as sub-pixel alpha and position drift long after a
@@ -1908,15 +1934,28 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       layerLight[i] = glide(layerLight[i], sel === null ? 1 : (sel === i ? 1 : DIM), 0.001);
     }
 
+    /* The camera is DOUBLE-smoothed: the fit target glides into camT, and the
+       camera glides toward camT. A single exponential starts at full velocity,
+       which is the jerk felt on every stage click and on the panel's width
+       snap; cascading two turns any step into an S-curve, eased in and out,
+       and retargets mid-flight without a kick. */
     const f = fitView(VIEWS[active]);
-    cam.zoom = glide(cam.zoom, f.zoom, 0.0004);
-    cam.cx = glide(cam.cx, f.cx, 0.05);
-    cam.cy = glide(cam.cy, f.cy, 0.05);
+    const chaseT = 1 - Math.pow(0.0006, dt);
+    const glideT = (cur: number, target: number, eps: number) => {
+      const next = cur + (target - cur) * chaseT;
+      return Math.abs(next - target) < eps ? target : next;
+    };
+    camT.zoom = glideT(camT.zoom, f.zoom, 0.0004);
+    camT.cx = glideT(camT.cx, f.cx, 0.05);
+    camT.cy = glideT(camT.cy, f.cy, 0.05);
+    cam.zoom = glide(cam.zoom, camT.zoom, 0.0004);
+    cam.cx = glide(cam.cx, camT.cx, 0.05);
+    cam.cy = glide(cam.cy, camT.cy, 0.05);
 
     /* a read-only window for the verification tooling: the live camera and
        region, so probes derive world-to-device mapping instead of mirroring it */
     (window as unknown as Record<string, unknown>).__ds = {
-      W, H, dpr, active,
+      W, H, dpr, active, inset,
       s: Math.min(W / 2060, H / 1210) * cam.zoom,
       cam: { zoom: cam.zoom, cx: cam.cx, cy: cam.cy },
       target: f,

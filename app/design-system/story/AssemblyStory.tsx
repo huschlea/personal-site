@@ -204,6 +204,7 @@ function PanelFor({ stage }: { stage: number }) {
 
 export function AssemblyStory() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const apiRef = useRef<{ destroy: () => void; setStage: (i: number) => void } | null>(null);
   const [stage, setStage] = useState(0);
   /* the rail's titles unfold only once the column has actually gone; unfolding
@@ -213,7 +214,7 @@ export function AssemblyStory() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const api = mountAssembly({ canvas });
+    const api = mountAssembly({ canvas, panel: panelRef.current });
     apiRef.current = api;
     return () => api.destroy();
   }, []);
@@ -303,7 +304,7 @@ export function AssemblyStory() {
           </nav>
         </div>
 
-        <aside className="ds-panel-col" aria-hidden={full} inert={full}>
+        <aside ref={panelRef} className="ds-panel-col" aria-hidden={full} inert={full}>
           {/* focusable so a keyboard user can scroll a tall tree (Safari) */}
           <div className="ds-panel-scroll" tabIndex={0} role="region" aria-label={`${stageName} details`}>
             <PanelFor stage={stage} />
