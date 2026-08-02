@@ -35,18 +35,25 @@
 
 /* ─── the reserved column ─── */
 
+/* The column never animates its width: tweening it relayouts the flex region
+   and resizes the canvas on every frame of the transition, which reads as a
+   stutter. Instead the panel FADES, the width snaps in one step (hidden
+   behind the fade), and the camera's own sweep carries all visible motion.
+   Entering the finale: fade 0.3s, then collapse. Leaving: restore width at
+   once and fade the content back in over the camera's return. */
 .site-ds .ds-panel-col {
   width: clamp(400px, 29vw, 560px);
   border-left: 1px solid rgba(20, 18, 16, 0.14);
   background: #fefefd;
   overflow: hidden;
-  transition: width 0.55s cubic-bezier(0.2, 0, 0, 1), opacity 0.4s cubic-bezier(0.2, 0, 0, 1);
+  transition: opacity 0.35s cubic-bezier(0.2, 0, 0, 1) 0.05s, width 0s, border-left-color 0s;
 }
 
 .site-ds .ds-shell-full .ds-panel-col {
   width: 0;
   opacity: 0;
   border-left-color: transparent;
+  transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1), width 0s 0.32s, border-left-color 0s 0.32s;
 }
 
 .site-ds .ds-panel-scroll {

@@ -13,6 +13,9 @@ type Camera = { zoom: number; cx: number; cy: number };
 
 export const LAYER_COUNT = 6;
 const BEATS = 8; // 0 the whole system, small · 1-6 layers · 7 the whole system, full
+/* every idle motion on the board (the bus ticks today, the run choreography
+   when it returns) sits behind this one switch; see ANIMATION-HANDOFF.md */
+const RUN_MOTION = false;
 const INK = (o: number) => `rgba(20, 18, 16, ${o})`;
 const PAPER = "#FEFEFD";
 const RUST = (o: number) => `rgba(156, 63, 33, ${o})`;
@@ -59,13 +62,14 @@ const DIM = 0.38; // spotlight: everything not selected drops to this
 type View = { x: number; y: number; w: number; h: number; pad?: number; maxZoom?: number; anchor?: "bottom" };
 const VIEWS: View[] = [
   /* 0 and 7 share one rect: the whole system. The intro shows it small beside
-     the title; the finale shows it full-bleed. One persistent system, and the
-     stages between are a camera moving around it. */
-  { x: 60, y: 60, w: 1950, h: 1120, pad: 0.02 },               // 0 the whole system, small
-  { x: 120, y: 128, w: 360, h: 515, pad: 0.06, maxZoom: 1.45 },// 1 brand intelligence
-  { x: 120, y: 578, w: 360, h: 435, pad: 0.06, maxZoom: 1.45 },// 2 design language
-  { x: 505, y: 128, w: 890, h: 855, pad: 0.04 },               // 3 production
-  { x: 1360, y: 130, w: 650, h: 1060, pad: 0.05 },             // 4 interface, foot included
+     the title, with generous margin so the whole reads as an object at rest;
+     the finale shows it full-bleed. One persistent system, and the stages
+     between are a camera moving around it. */
+  { x: 60, y: 60, w: 1950, h: 1120, pad: 0.11 },               // 0 the whole system, small
+  { x: 120, y: 128, w: 360, h: 515, pad: 0.06, maxZoom: 2.1 }, // 1 brand intelligence
+  { x: 120, y: 578, w: 360, h: 435, pad: 0.06, maxZoom: 2.1 }, // 2 design language
+  { x: 505, y: 128, w: 890, h: 855, pad: 0.04, maxZoom: 1.65 },// 3 production
+  { x: 1370, y: 140, w: 640, h: 1030, pad: 0.05, maxZoom: 1.7 }, // 4 interface, foot included
   /* governance frames its whole domain: the boundary and the release chain it
      signs, out to the notes card's right edge, so no card is cut mid-face */
   { x: 430, y: 80, w: 1560, h: 970, pad: 0.03 },               // 5 governance
@@ -1564,8 +1568,8 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
         text(ln, MCP.x + 20, MCP.y + 48 + i * 22, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
       });
       text("authenticated · scoped · recorded", MCP.x + 180, MCP.y + 92, t, { size: 8.5, alpha: T_FAINT });
-      // the caret rests on the finale: a blueprint does not blink
-      if (active !== BEATS - 1 && Math.floor(idleClock * 2.2) % 2 === 0) {
+      // the caret blinks only when the board is allowed to move at all
+      if (RUN_MOTION && active !== BEATS - 1 && Math.floor(idleClock * 2.2) % 2 === 0) {
         const caret = toScreen(MCP.x + 20, MCP.y + 132);
         ctx!.fillStyle = INK(0.6 * t * inkMul);
         ctx!.fillRect(caret.x, caret.y - 5 * caret.s, 1.5 * caret.s, 10 * caret.s);
@@ -1741,10 +1745,12 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement }) {
       // evidence riser into the hall, in the clear stretch past the shelf,
       // stopping on the bus's near rail so the tee reads clean
       route([[900, BUS_Y], [900, HALL.y + HALL.h]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
-      /* Ticks traveling backward, drawn before the meters so a passing tick
-         submerges behind a fitting rather than sitting as debris inside its
-         break. On the finale they are absent entirely: a blueprint is still. */
-      if (active !== BEATS - 1) {
+      /* Ticks traveling backward along the bus: TABLED with the rest of the
+         run motion until the full animation is built. RUN_MOTION is the one
+         switch; see ANIMATION-HANDOFF.md. Drawn before the meters so a
+         passing tick submerges behind a fitting rather than sitting as
+         debris inside its break. */
+      if (RUN_MOTION) {
         for (let i = 0; i < 5; i++) {
           const u = ((idleClock * 0.14 + i / 5) % 1);
           const tx = BUS_X1 - u * (BUS_X1 - REVIEW.x);

@@ -224,7 +224,8 @@ export function AssemblyStory() {
 
   useEffect(() => {
     if (stage !== FINAL) { setWide(false); return; }
-    const t = window.setTimeout(() => setWide(true), 580);
+    // after the panel's fade (0.3s) and width snap (0.32s), never during
+    const t = window.setTimeout(() => setWide(true), 420);
     return () => window.clearTimeout(t);
   }, [stage]);
 

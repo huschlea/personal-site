@@ -19,6 +19,10 @@ Everything lives in `assembly.ts` inside `mountAssembly`.
 - `runClock` (still declared) was the clock: it advanced `dt / 14` while the
   run stage was active, so one pass took 14s. `frame()` now pins
   `const runK = -1`, which disables every run-conditional in one place.
+- `RUN_MOTION` (top of the file, `false`) gates every idle motion on the
+  board: the bus tick slugs and the MCP caret today, and any motion the
+  future animation adds. Flip it to bring the dormant motion back; keep the
+  finale (`active === BEATS - 1`) still regardless.
 - `drawHall(t, runK)` and `drawGov(t, runK)` accept runK and contain the
   belt boosts (`inBoost`/`outBoost`), the traveler chip (`tokX`, "blog
   campaign"), checkpoint pulses (`CHECK_PULSE`), and the rust moment. All are
