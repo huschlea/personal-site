@@ -257,12 +257,6 @@ export function AssemblyStory() {
             aria-label="A brand operating system, one persistent blueprint explored stage by stage: brand intelligence and design language feed a production hall of components, recipes, workflows, interpreters, and renderers; work passes governance into the interfaces; evidence returns through observability."
           />
 
-          {/* the final view keeps its name without reclaiming the column */}
-          <div className="ds-full-title" aria-hidden={!full}>
-            <p className="ds-cap-kicker">{FINALE_CAP.kicker}</p>
-            <p className="ds-cap-title">{FINALE_CAP.title}</p>
-          </div>
-
           {/* stage changes are otherwise silent to screen readers */}
           <p className="ds-sr-only" aria-live="polite">{`Stage ${stage + 1} of ${STAGES.length}: ${stageName}`}</p>
 
