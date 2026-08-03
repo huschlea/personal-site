@@ -888,5 +888,6 @@
   "[build] Every technical hierarchy now fits its box in both axes. Measured first: trees overflowed horizontally at nearly every stage (governance worst, 65 chars over a ~37-char box), and the only vertical overflow was production at 1440x900, 200px, caused by the concepts paragraph exactly as he guessed. All six trees rewritten under the character budget; production's paragraph rewritten to trace the engine left to right instead of defining each part; tree leading, section margins and panel padding tightened. Verified zero overflow on every stage at 1280x800, 1440x900, 1680x1050, 1728x1117, 1920x1080 and 2560x1440.",
   "get rid of the title on the final slide, the \"the whole system: one system operating\"",
   "On the interface layer, \"DESIGN OS\" , \"APPLICATIONS API\" and \"AGENTS MCP\" need to have the same text styling as \"BRAND INTELLIGENCE\" and \"DESIGN LANGUAGE\"",
-  "I want to label the runtime substrate and put the items within the card in pills, similar to the compile card underneath brand intelligence"
+  "I want to label the runtime substrate and put the items within the card in pills, similar to the compile card underneath brand intelligence",
+  "we need to make both of these cards more visually enticing, add pills, mock terminals or anything visual that would make them look less sparse"
 ]

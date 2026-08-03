@@ -1587,56 +1587,89 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
         text(nm, WIN.x + dx + 10, WIN.y + dy + 152, t, { size: 8.5, alpha: T_FAINT });
       });
 
-      /* applications: names on the left, a strip of live traffic on the
-         right, in the register's own mono ledger idiom so the card carries
-         the same visual weight as the rest of the board */
+      /* a small framed terminal: a faint fill, a hairline border, a header
+         rule with three dots and a title. The caller fills it with mono lines.
+         Gives the live surfaces the density of a running console with no
+         motion, which the static blueprint requires. */
+      const term = (bx: number, by: number, bw: number, bh: number, title: string) => {
+        const a = toScreen(bx, by), b2 = toScreen(bx + bw, by + bh);
+        ctx!.fillStyle = INK(0.022 * t * inkMul);
+        ctx!.fillRect(a.x, a.y, b2.x - a.x, b2.y - a.y);
+        ctx!.strokeStyle = INK(0.14 * t * inkMul); ctx!.lineWidth = 1;
+        ctx!.strokeRect(a.x, a.y, b2.x - a.x, b2.y - a.y);
+        [0, 1, 2].forEach((i) => {
+          const d = toScreen(bx + 11 + i * 7, by + 9);
+          ctx!.beginPath(); ctx!.arc(d.x, d.y, 1.5 * d.s, 0, Math.PI * 2);
+          ctx!.fillStyle = INK(0.18 * t * inkMul); ctx!.fill();
+        });
+        text(title, bx + 36, by + 9, t, { size: 6.5, alpha: T_FAINT, mono: true, track: true });
+        const hy = toScreen(bx, by + 18);
+        ctx!.strokeStyle = INK(0.08 * t * inkMul); ctx!.lineWidth = 1;
+        ctx!.beginPath(); ctx!.moveTo(a.x, hy.y); ctx!.lineTo(b2.x, hy.y); ctx!.stroke();
+      };
+      // a prompt cursor at rest: a filled block, the console still
+      const cursor = (cx: number, cy: number) => {
+        const p = toScreen(cx, cy);
+        ctx!.fillStyle = INK(0.4 * t * inkMul);
+        ctx!.fillRect(p.x, p.y - 4 * p.s, 4 * p.s, 8 * p.s);
+      };
+
+      /* applications: the endpoints as pills, and a live request console */
       card(APIS.x, APIS.y, APIS.w, APIS.h, t, { strong: true });
       text("applications · APIs", APIS.x + 16, APIS.y + 24, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
       ["brand API", "search API", "render API", "workflow API"].forEach((nm, i) => {
-        const ey = APIS.y + 50 + i * 24;
-        const p = toScreen(APIS.x + 19, ey);
+        const col = i % 2, row = Math.floor(i / 2);
+        const bx = APIS.x + 18 + col * 112, by = APIS.y + 58 + row * 32;
+        const p = toScreen(bx, by);
+        const size = 8.5 * p.s;
+        ctx!.font = `400 ${size}px 'SF Mono', ui-monospace, Menlo, monospace`;
+        const w = ctx!.measureText(nm).width / p.s;
         ctx!.beginPath();
-        ctx!.arc(p.x, p.y, 2 * p.s, 0, Math.PI * 2);
-        ctx!.fillStyle = INK(0.5 * t * inkMul);
-        ctx!.fill();
-        text(nm, APIS.x + 30, ey, t, { size: 10, alpha: T_BODY, mono: true });
+        ctx!.roundRect(p.x, p.y - 9 * p.s, (w + 28) * p.s, 18 * p.s, 0);
+        stroke(0.18 * t);
+        ctx!.beginPath(); ctx!.arc(p.x + 11 * p.s, p.y, 2 * p.s, 0, Math.PI * 2);
+        ctx!.fillStyle = INK(0.5 * t * inkMul); ctx!.fill();
+        text(nm, bx + 20, by, t, { size: 8.5, alpha: T_BODY, mono: true });
       });
       {
-        const dv3 = toScreen(APIS.x + 250, APIS.y + 42);
-        const dv4 = toScreen(APIS.x + 250, APIS.y + APIS.h - 16);
-        ctx!.strokeStyle = INK(0.1 * t * inkMul);
-        ctx!.beginPath(); ctx!.moveTo(dv3.x, dv3.y); ctx!.lineTo(dv4.x, dv4.y); ctx!.stroke();
+        const bx = APIS.x + 256, by = APIS.y + 40, bw = APIS.w - 256 - 16, bh = APIS.h - 40 - 14;
+        term(bx, by, bw, bh, "requests");
+        ([["GET /claims", "200"], ["POST /render", "202"], ["GET /search", "200"]] as const).forEach(([ln, code], i) => {
+          const ey = by + 34 + i * 16;
+          text(ln, bx + 12, ey, t, { size: 8, alpha: i === 0 ? 0.55 : 0.38, mono: true });
+          text(code, bx + bw - 12, ey, t, { size: 8, alpha: T_FAINT, mono: true, anchor: "right" as CanvasTextAlign });
+        });
+        cursor(bx + 12, by + 34 + 3 * 16);
       }
-      [["GET /claims", "200"], ["POST /render", "202"], ["GET /search", "200"]].forEach(([ln, code], i) => {
-        const ey = APIS.y + 52 + i * 22;
-        text(ln, APIS.x + 268, ey, t, { size: 8.5, alpha: i === 0 ? 0.52 : 0.36, mono: true });
-        text(code, APIS.x + APIS.w - 18, ey, t, { size: 8.5, alpha: T_FAINT, mono: true, anchor: "right" as CanvasTextAlign });
-      });
-      text("versioned · typed", APIS.x + 268, APIS.y + 122, t, { size: 8.5, alpha: T_FAINT });
 
-      /* agents: the tree on the left, the session's record on the right */
+      /* agents: the tree, trust pills at its foot, and a live session console */
       card(MCP.x, MCP.y, MCP.w, MCP.h, t, { strong: true });
       text("agents · MCP", MCP.x + 16, MCP.y + 24, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
       ["mcp", "├ resources", "├ tools", "└ prompts"].forEach((ln, i) => {
-        text(ln, MCP.x + 20, MCP.y + 48 + i * 22, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
+        text(ln, MCP.x + 20, MCP.y + 50 + i * 20, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
       });
       {
-        const dv3 = toScreen(MCP.x + 250, MCP.y + 40);
-        const dv4 = toScreen(MCP.x + 250, MCP.y + MCP.h - 16);
-        ctx!.strokeStyle = INK(0.1 * t * inkMul);
-        ctx!.beginPath(); ctx!.moveTo(dv3.x, dv3.y); ctx!.lineTo(dv4.x, dv4.y); ctx!.stroke();
+        let px2 = MCP.x + 18;
+        (["authenticated", "scoped", "recorded"] as const).forEach((nm) => {
+          const p = toScreen(px2, MCP.y + 138);
+          const size = 7 * p.s;
+          ctx!.font = `400 ${size}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif`;
+          const w = ctx!.measureText(nm).width / p.s;
+          ctx!.beginPath();
+          ctx!.roundRect(p.x - 5 * p.s, p.y - 7 * p.s, (w + 10) * p.s, 14 * p.s, 0);
+          stroke(0.16 * t);
+          text(nm, px2, MCP.y + 138, t, { size: 7, alpha: T_FAINT });
+          px2 += w + 14;
+        });
       }
-      text("authenticated · scoped · recorded", MCP.x + 268, MCP.y + 52, t, { size: 8.5, alpha: T_FAINT });
-      [["brand.claims.list", "ok"], ["render.preview", "ok"]].forEach(([ln, code], i) => {
-        const ey = MCP.y + 78 + i * 22;
-        text(ln, MCP.x + 268, ey, t, { size: 8.5, alpha: 0.42, mono: true });
-        text(code, MCP.x + MCP.w - 18, ey, t, { size: 8.5, alpha: T_FAINT, mono: true, anchor: "right" as CanvasTextAlign });
-      });
-      // the caret blinks only when the board is allowed to move at all
-      if (RUN_MOTION && active !== BEATS - 1 && Math.floor(idleClock * 2.2) % 2 === 0) {
-        const caret = toScreen(MCP.x + 20, MCP.y + 132);
-        ctx!.fillStyle = INK(0.6 * t * inkMul);
-        ctx!.fillRect(caret.x, caret.y - 5 * caret.s, 1.5 * caret.s, 10 * caret.s);
+      {
+        const bx = MCP.x + 256, by = MCP.y + 40, bw = MCP.w - 256 - 16, bh = MCP.h - 40 - 14;
+        term(bx, by, bw, bh, "session");
+        (["$ brand.claims.list", "  42 claims · ok", "$ render.preview", "  png · ok"] as const).forEach((ln, i) => {
+          const ey = by + 34 + i * 16;
+          text(ln, bx + 12, ey, t, { size: 8, alpha: ln.startsWith("$") ? 0.5 : 0.36, mono: true });
+        });
+        cursor(bx + 12, by + 34 + 4 * 16);
       }
 
       /* the substrate: a titled card like its siblings, its stores worn as
