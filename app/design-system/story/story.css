@@ -66,7 +66,9 @@
   height: 100%;
   width: var(--ds-panel-w);
   overflow-y: auto;
-  padding: clamp(4.5rem, 9vh, 7rem) clamp(1.6rem, 2.4vw, 2.6rem) 7rem;
+  /* the rail is centred in the canvas region and never crosses this column,
+     so the foot only needs breathing room, not clearance for the buttons */
+  padding: clamp(3.5rem, 7vh, 6rem) clamp(1.6rem, 2.4vw, 2.6rem) 3rem;
 }
 
 .site-ds .ds-panel-inner {
@@ -119,7 +121,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ds-faded);
-  margin: 1rem 0 0.45rem;
+  margin: 0.85rem 0 0.45rem;
 }
 
 .site-ds .ds-chips {
@@ -138,15 +140,16 @@
 }
 
 .site-ds .ds-cap-concepts {
-  margin-top: 0.7rem;
+  margin-top: 0.5rem;
   font-size: 0.85rem;
+  line-height: 1.5;
   color: var(--ds-faded);
 }
 
 .site-ds .ds-tree {
   font-family: 'SF Mono', ui-monospace, Menlo, monospace;
   font-size: 0.72rem;
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--ds-mid);
   background: rgba(20, 18, 16, 0.025);
   border: 1px solid rgba(20, 18, 16, 0.08);

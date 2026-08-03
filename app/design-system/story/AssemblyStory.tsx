@@ -25,18 +25,18 @@ export const LAYER_PANELS: LayerPanel[] = [
     chips: ["positioning", "company narrative", "audience profiles", "message hierarchy", "approved claims", "voice and tone", "channel behavior", "creative principles", "examples"],
     tree: `brand intelligence
   authoring
-    - YAML for human-authored structured records
-    - markdown for nuance and examples
+    - YAML for structured records
+    - markdown for nuance
   contracts
-    - JSON Schema for required fields
+    - JSON Schema per record
   versioning
-    - dated snapshots, sources sealed by hash
-    - open questions recorded, never inferred
+    - dated snapshots, sealed by hash
+    - open questions recorded
   distribution
     - compiled JSON bundles
     - search indexes
     - type definitions
-    - channel-specific subsets
+    - channel subsets
     - agent-readable context`,
   },
   {
@@ -48,13 +48,13 @@ export const LAYER_PANELS: LayerPanel[] = [
   token levels
     - primitive tokens
     - semantic tokens
-    - component tokens where necessary
+    - component tokens
   authoring
-    - Figma for exploration and application
-    - versioned token files for releases
+    - Figma for exploration
+    - versioned token files
   distribution
     - CSS variables
-    - JavaScript and TypeScript values
+    - JavaScript and TypeScript
     - JSON bundles
     - Figma synchronization`,
   },
@@ -63,21 +63,19 @@ export const LAYER_PANELS: LayerPanel[] = [
     title: "Production",
     what: "Turn intelligence, design language, content, assets, and intent into finished artifacts.",
     chips: ["components", "recipes", "workflows", "interpreters", "renderers", "exporters", "input schemas", "production tests"],
-    concepts: "Components are reusable parts. Recipes are approved assembly logic for recurring jobs. Workflows run from request to completion. Interpreters read the source material and draft the language for the work: headlines, subcopy, which quotes to pull, which directions to propose. They never decide how anything looks. Renderers produce the actual files; where a renderer carries no mark, the system renders that file itself. Input schemas check what comes in, exporters package what goes out, and production tests re-run every renderer against the files a release froze, so when a token or a renderer shifts underneath approved work you find out before anyone ships against it.",
+    concepts: "The engine runs left to right: a request enters through the input schemas, context assembly gathers what the brand knows, interpreters draft the language, render builds the files, validate and review check every claim before anything ships, and release hands the set to the exporters. Production tests sit beneath the line, re-running every renderer against the files a release froze.",
     tree: `production
   runtime
     - runs, with explicit state
-    - artifact sets: coordinated families
+    - coordinated artifact sets
     - provenance on every artifact
   the model boundary
     - interpretation proposes words
-      and selections only
     - interpreter seats are pluggable
     - deterministic code decides
-      everything visual
   outputs
-    - standardized renderer contracts
-    - versioned production releases`,
+    - renderer contracts
+    - versioned releases`,
   },
   {
     kicker: "04",
@@ -88,14 +86,14 @@ export const LAYER_PANELS: LayerPanel[] = [
   human surfaces
     - design os, the brand center
   application surfaces
-    - brand, search, render, workflow APIs
+    - brand, search, render APIs
+    - workflow API
   agent surface
-    - MCP resources, tools, and prompts
-    - authenticated, scoped, recorded
+    - MCP resources and tools
+    - authenticated, scoped
   substrate
-    - runtime database: projects, drafts,
-      approvals
-    - object storage: generated output`,
+    - runtime database
+    - object storage`,
   },
   {
     kicker: "05",
@@ -104,18 +102,18 @@ export const LAYER_PANELS: LayerPanel[] = [
     chips: ["ownership", "lifecycle states", "automated validation", "human review", "approvals", "exceptions", "release history"],
     tree: `governance and validation
   lifecycle
-    - draft, experimental, approved,
-      deprecated, retired
+    - draft, experimental, approved
+    - deprecated, retired
   automated checks
     - claims, rights, accessibility
     - voice, verbatim quotes, fit
   human judgment
     - creative review and approval
-    - intentional, documented exceptions
+    - documented exceptions
   release history
-    - approved files frozen and hashed
-    - drift under a release stops the line
-    - every release announced, in the channels people already use`,
+    - approved files frozen, hashed
+    - drift stops the line
+    - every release announced`,
   },
   {
     kicker: "06",
@@ -124,12 +122,13 @@ export const LAYER_PANELS: LayerPanel[] = [
     chips: ["adoption", "time to output", "overrides", "search failures", "rework", "render errors", "agent activity", "feedback"],
     tree: `observability and learning
   signals
-    - usage, overrides, failures, rework
+    - usage and overrides
+    - failures and rework
   records
     - every run records itself
-    - every failure keeps its evidence
+    - every failure keeps evidence
   learning
-    - evidence returns to the people
+    - evidence returns to people
     - findings feed the roadmap`,
   },
 ];
