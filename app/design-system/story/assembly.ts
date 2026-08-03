@@ -150,7 +150,7 @@ const PART_DEFS = ["headline", "body", "quote", "credit", "lockup", "image", "gr
 const WIN = { x: 1490, y: 160, w: 500, h: 290 };
 const APIS = { x: 1490, y: 488, w: 500, h: 146 };
 const MCP = { x: 1490, y: 672, w: 500, h: 154 };
-const PLINTH = { x: 1490, y: 862, w: 500, h: 60 };
+const PLINTH = { x: 1490, y: 852, w: 500, h: 74 };
 /* the outputs card is gone from the board, its room given to the release
    chain; the constant stays only because the dormant drawRun references it */
 const OUTPUTS = { x: 1490, y: 938, w: 500, h: 88 };
@@ -1639,16 +1639,24 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
         ctx!.fillRect(caret.x, caret.y - 5 * caret.s, 1.5 * caret.s, 10 * caret.s);
       }
 
-      // the substrate plinth
+      /* the substrate: a titled card like its siblings, its stores worn as
+         pills the way the compile card wears its products */
       card(PLINTH.x, PLINTH.y, PLINTH.w, PLINTH.h, t, { radius: 3, strong: true });
-      ["runtime database", "object storage", "event log"].forEach((nm, i) => {
-        text(nm, PLINTH.x + 24 + i * 168, PLINTH.y + 33, t, { size: 9, alpha: T_FAINT, maxW: 150 });
-        if (i > 0) {
-          const d = toScreen(PLINTH.x + 12 + i * 168, PLINTH.y + 33);
-          ctx!.strokeStyle = INK(0.14 * t * inkMul);
-          ctx!.beginPath(); ctx!.moveTo(d.x, d.y - 10 * d.s); ctx!.lineTo(d.x, d.y + 10 * d.s); ctx!.stroke();
-        }
-      });
+      text("runtime substrate", PLINTH.x + 18, PLINTH.y + 22, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
+      {
+        let px2 = PLINTH.x + 18;
+        (["runtime database", "object storage", "event log"] as const).forEach((nm) => {
+          const p = toScreen(px2, PLINTH.y + 50);
+          const size = 7.5 * p.s;
+          ctx!.font = `400 ${size}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif`;
+          const w = ctx!.measureText(nm).width / p.s;
+          ctx!.beginPath();
+          ctx!.roundRect(p.x - 5 * p.s, p.y - 7 * p.s, (w + 10) * p.s, 14 * p.s, 0);
+          stroke(0.16 * t);
+          text(nm, px2, PLINTH.y + 50, t, { size: 7.5, alpha: T_FAINT });
+          px2 += w + 15;
+        });
+      }
 
     });
   }
