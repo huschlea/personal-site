@@ -243,7 +243,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   const reveal = new Array(BEATS).fill(1);
   const focus = new Array(BEATS).fill(0);
   let booted = false;
-  let still = false;
   const layerLight = new Array(LAYER_COUNT).fill(1); // spotlight currents
   let active = 0;
   let runClock = 0;
@@ -355,13 +354,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const tt = t * inkMul;
     if (tt <= 0.02) return;
     const p = toScreen(wx, wy);
-    /* At rest, glyphs land on the device-pixel grid for crispness. In motion
-       they ride sub-pixel: rounding per frame makes neighbouring rows step on
-       different frames, which reads as vertical jitter. */
-    if (still) {
-      p.x = Math.round(p.x * dpr) / dpr;
-      p.y = Math.round(p.y * dpr) / dpr;
-    }
     const size = (o?.size ?? 10.5) * p.s;
     if (size < 2.5) return;
     const family = o?.mono
@@ -391,6 +383,20 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
      line something to stop against and gives the label an edge, so it reads
      as mounted rather than as damage. The border sits under the weight of the
      rule it interrupts, so a plate never competes with its own line. */
+  /* A tee: a branch meeting a trunk reads as one merged pipe. The trunk's
+     near rail opens strictly between the branch's rails, so the two channels
+     connect; square miters, the same grammar as every junction on the board.
+     Runs AFTER both the trunk and the branch are stroked. */
+  function teeJoint(wx: number, wy: number, branch: "up" | "right", t: number) {
+    const p = toScreen(wx, wy);
+    const g = RULE_GAP, w = ruleW();
+    const inner = g - w / 2 - 0.2;
+    if (inner <= 0 || t <= 0.02) return;
+    ctx!.fillStyle = PAPER;
+    if (branch === "up") ctx!.fillRect(p.x - inner, p.y - g - w, inner * 2, w * 2);
+    else ctx!.fillRect(p.x + g - w, p.y - inner, w * 2, inner * 2);
+  }
+
   /* Where two double rules cross, they must not simply overprint: four
      separate crossings read as two systems laid over each other. The joint
      opens both channels into one another, so what reads is a single continuous
@@ -1187,7 +1193,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
           px2 += w + 15;
         });
       }
-      route([[BI.x + BI.w / 2, BI.y + BI.h], [BI.x + BI.w / 2, COMPILE.y]], t, { alpha: 0.2 });
+      route([[BI.x + BI.w / 2, BI.y + BI.h], [BI.x + BI.w / 2, COMPILE.y]], t, { alpha: 0.2, dash: true });
       // Google Workspace: where the knowledge is written
       {
         const fa = toScreen(BI.x + 18, BI.y + BI.h - 30);
@@ -1548,9 +1554,12 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     withLayer(3, () => {
       if (t <= 0.02) return;
       // connectors from the hall, one per surface, at each card's centre
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 305], [WIN.x, 305]], t, { alpha: 0.2, dash: true });
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 561], [APIS.x, 561]], t, { alpha: 0.2, dash: true });
-      route([[BELT_X1, 585], [FAN_X, 585], [FAN_X, 749], [MCP.x, 749]], t, { alpha: 0.2, dash: true });
+      /* the shared trunk once, then a branch per surface: stroking it three
+         times composited the dashes darker than every other dotted line */
+      route([[BELT_X1, 585], [FAN_X, 585]], t, { alpha: 0.2, dash: true });
+      route([[FAN_X, 585], [FAN_X, 305], [WIN.x, 305]], t, { alpha: 0.2, dash: true });
+      route([[FAN_X, 585], [FAN_X, 561], [APIS.x, 561]], t, { alpha: 0.2, dash: true });
+      route([[FAN_X, 585], [FAN_X, 749], [MCP.x, 749]], t, { alpha: 0.2, dash: true });
 
       // design os: the window where people run the system
       card(WIN.x, WIN.y, WIN.w, WIN.h, t, { strong: true });
@@ -1654,14 +1663,14 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
         let px2 = MCP.x + 18;
         (["authenticated", "scoped", "recorded"] as const).forEach((nm) => {
           const p = toScreen(px2, MCP.y + 138);
-          const size = 7 * p.s;
+          const size = 8.5 * p.s;
           ctx!.font = `400 ${size}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif`;
           const w = ctx!.measureText(nm).width / p.s;
           ctx!.beginPath();
-          ctx!.roundRect(p.x - 5 * p.s, p.y - 7 * p.s, (w + 10) * p.s, 14 * p.s, 0);
+          ctx!.roundRect(p.x - 6 * p.s, p.y - 9 * p.s, (w + 12) * p.s, 18 * p.s, 0);
           stroke(0.16 * t);
-          text(nm, px2, MCP.y + 138, t, { size: 7, alpha: T_FAINT });
-          px2 += w + 14;
+          text(nm, px2, MCP.y + 138, t, { size: 8.5, alpha: T_FAINT });
+          px2 += w + 18;
         });
       }
       {
@@ -1861,7 +1870,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
         ctx!.fillStyle = PAPER;
         ctx!.fill();
         stroke(S_MAIN * t);
-        text(nm, mx2, BUS_Y + 27, t, { size: 9.5, alpha: 0.55, anchor: "center" as CanvasTextAlign });
+        text(nm, mx2, BUS_Y + 21, t, { size: 9.5, alpha: 0.55, anchor: "center" as CanvasTextAlign });
       });
       /* The card the bus terminates in, and the only one on the row that
          belongs to this layer. The one line that leaves it carries findings,
@@ -1872,11 +1881,19 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       text("signals become decisions, not dashboards", SEAT.x + 16, SEAT.y + 44, t, { size: 8.5, alpha: T_FAINT, maxW: SEAT.w - 32 });
       route([[SEAT.x + 70, SEAT.y], [SEAT.x + 70, 1010], [80, 1010], [80, 400], [BI.x, 400]], t, { alpha: S_RULE, double: true });
       route([[80, DL.y + 160], [DL.x, DL.y + 160]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
-      /* The one place a governance run and an observability run cross: the
-         evidence riser through the governed line's bottom rule. The joint
-         belongs to both layers, so it takes whichever is the more lit. */
+      /* ── the junction audit: no two double rules ever simply cross ──
+         Crossings get crossJoint (both channels open into each other); tees
+         get teeJoint (the trunk's near rail opens between the branch's
+         rails). Square miters, one grammar for every junction. */
       const bothLit = Math.max(layerLight[4], layerLight[5]);
+      // the riser through the governed line's bottom rule
       crossJoint(RISER_X, GOV.y + GOV.h, t, bothLit);
+      // the signing tie through the substrate feed's vertical
+      crossJoint(BUS_X1, REL_LINE, t, bothLit);
+      // the riser tees onto the bus
+      teeJoint(RISER_X, BUS_Y, "up", t);
+      // the design-language tap tees onto the return artery
+      teeJoint(80, DL.y + 160, "right", t);
     });
   }
 
@@ -2003,9 +2020,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     cam.zoom = 1 / glide(wOf(cam.zoom), wOf(camT.zoom), 0.0001);
     cam.cx = glide(cam.cx, camT.cx, 0.05);
     cam.cy = glide(cam.cy, camT.cy, 0.05);
-    /* pixel-snapping text during motion makes rows step on different frames,
-       which reads as vertical jitter; snap only at rest, glide while moving */
-    still = cam.zoom === f.zoom && cam.cx === f.cx && cam.cy === f.cy;
 
     /* a read-only window for the verification tooling: the live camera and
        region, so probes derive world-to-device mapping instead of mirroring it */

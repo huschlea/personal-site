@@ -240,10 +240,10 @@
   font-size: 0.7rem;
 }
 
-/* numbered chips carry their number; the title SLIDES open when the chip is
-   current, or on the final view once the column has gone (ds-shell-wide, set
-   a beat after the collapse). A slide, never a display toggle: the old pop
-   was half the finale's glitch. */
+/* numbered chips carry only their number during navigation: opening the
+   active title resized the rail on every stage change, and re-centring a
+   translateX(-50%) row relayouts every button mid-slide - that was the
+   roughness. Titles unfold only on the finale, all together. */
 .site-ds .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
   display: inline-block;
   max-width: 0;
@@ -259,7 +259,6 @@
   margin-right: 0;
 }
 
-.site-ds .ds-nav-chip-on:has(.ds-explorer-num) .ds-nav-label,
 .site-ds .ds-shell-wide .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
   max-width: 240px;
   opacity: 1;
