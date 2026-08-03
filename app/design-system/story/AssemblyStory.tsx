@@ -174,7 +174,7 @@ function PanelFor({ stage }: { stage: number }) {
           A living system that codifies what the brand knows, how it speaks, the
           machinery it employs, and the laws that keep it uniform and distinct.
         </p>
-        <p className="ds-nav-hint" aria-hidden="true">Use the stages below, or the arrow keys</p>
+        <p className="ds-nav-hint" aria-hidden="true">Use the stages below, or the arrow keys.</p>
       </div>
     );
   }

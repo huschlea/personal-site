@@ -891,5 +891,7 @@
   "I want to label the runtime substrate and put the items within the card in pills, similar to the compile card underneath brand intelligence",
   "we need to make both of these cards more visually enticing, add pills, mock terminals or anything visual that would make them look less sparse",
   "we don't need the bullet points or the blinking cursor in the terminal",
-  "Let's make the PILs in runtime substrate, such as runtime database, object storage, and event log, the same size as the ones in applications APIs, so the same size as brand API, search API, etc."
+  "Let's make the PILs in runtime substrate, such as runtime database, object storage, and event log, the same size as the ones in applications APIs, so the same size as brand API, search API, etc.",
+  "I don't like the text we're using for the first slide where it says \"Use the stages below or the arrow keys.\" Let's find a different font style for that.",
+  "Quiet caption"
 ]
