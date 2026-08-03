@@ -890,5 +890,6 @@
   "On the interface layer, \"DESIGN OS\" , \"APPLICATIONS API\" and \"AGENTS MCP\" need to have the same text styling as \"BRAND INTELLIGENCE\" and \"DESIGN LANGUAGE\"",
   "I want to label the runtime substrate and put the items within the card in pills, similar to the compile card underneath brand intelligence",
   "we need to make both of these cards more visually enticing, add pills, mock terminals or anything visual that would make them look less sparse",
-  "we don't need the bullet points or the blinking cursor in the terminal"
+  "we don't need the bullet points or the blinking cursor in the terminal",
+  "Let's make the PILs in runtime substrate, such as runtime database, object storage, and event log, the same size as the ones in applications APIs, so the same size as brand API, search API, etc."
 ]

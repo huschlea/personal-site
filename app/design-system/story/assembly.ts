@@ -1662,21 +1662,21 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       }
 
       /* the substrate: a titled card like its siblings, its stores worn as
-         pills the way the compile card wears its products */
+         pills at the same size and treatment as the application endpoints */
       card(PLINTH.x, PLINTH.y, PLINTH.w, PLINTH.h, t, { radius: 3, strong: true });
       text("runtime substrate", PLINTH.x + 18, PLINTH.y + 22, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
       {
         let px2 = PLINTH.x + 18;
         (["runtime database", "object storage", "event log"] as const).forEach((nm) => {
           const p = toScreen(px2, PLINTH.y + 50);
-          const size = 7.5 * p.s;
-          ctx!.font = `400 ${size}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif`;
+          const size = 8.5 * p.s;
+          ctx!.font = `400 ${size}px 'SF Mono', ui-monospace, Menlo, monospace`;
           const w = ctx!.measureText(nm).width / p.s;
           ctx!.beginPath();
-          ctx!.roundRect(p.x - 5 * p.s, p.y - 7 * p.s, (w + 10) * p.s, 14 * p.s, 0);
-          stroke(0.16 * t);
-          text(nm, px2, PLINTH.y + 50, t, { size: 7.5, alpha: T_FAINT });
-          px2 += w + 15;
+          ctx!.roundRect(p.x, p.y - 9 * p.s, (w + 22) * p.s, 18 * p.s, 0);
+          stroke(0.18 * t);
+          text(nm, px2 + 11, PLINTH.y + 50, t, { size: 8.5, alpha: T_BODY, mono: true });
+          px2 += w + 32;
         });
       }
 
