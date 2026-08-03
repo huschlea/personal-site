@@ -54,7 +54,7 @@
   border-left: 1px solid rgba(20, 18, 16, 0.14);
   background: #fefefd;
   overflow: hidden;
-  transition: opacity 0.35s cubic-bezier(0.2, 0, 0, 1) 0.05s, width 0s, border-left-color 0s;
+  transition: opacity 0.35s cubic-bezier(0.2, 0, 0, 1) 0.2s, width 0s 0.18s, border-left-color 0s 0.18s;
 }
 
 .site-ds .ds-shell-full .ds-panel-col {
@@ -229,8 +229,10 @@
   color: var(--ds-ink);
 }
 
-/* keyboard focus is the same single ring the current chip wears: the border.
-   The browser outline never stacks on top of it. */
+/* One ring, never two: the browser outline never stacks on the current chip's
+   border. Focus says so in a different channel instead, a light wash, so that
+   focus stays legible on the chip that is already current, where a border
+   darkening would have said nothing at all. */
 .site-ds .ds-nav-chip:focus,
 .site-ds .ds-nav-step:focus {
   outline: none;
@@ -240,6 +242,17 @@
 .site-ds .ds-nav-step:focus-visible {
   border-color: rgba(20, 18, 16, 0.65);
   color: var(--ds-ink);
+  background: rgba(20, 18, 16, 0.09);
+}
+
+/* A wash carries no colour of its own in forced-colours mode, so there the
+   ring comes back as a real outline. */
+@media (forced-colors: active) {
+  .site-ds .ds-nav-chip:focus-visible,
+  .site-ds .ds-nav-step:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
 }
 
 /* aria-disabled rather than disabled, so a step never drops keyboard focus to
@@ -267,17 +280,29 @@
   overflow: hidden;
   white-space: nowrap;
   vertical-align: bottom;
-  transition: max-width var(--ds-t) var(--ds-ease), opacity var(--ds-t) var(--ds-ease), margin-left var(--ds-t) var(--ds-ease);
+  /* The fold is the fast direction. Unfolded, the rail is wider than the
+     region the panel leaves it, so on the way out the titles have to be gone
+     before the column comes back: the panel's width restore waits behind this
+     same 0.18s. The unfold, which happens with the whole screen to itself,
+     keeps the generous duration. */
+  transition: max-width 0.18s var(--ds-ease), opacity 0.18s var(--ds-ease), margin-left 0.18s var(--ds-ease);
 }
 
 .site-ds .ds-nav-chip:has(.ds-explorer-num) .ds-explorer-num {
   margin-right: 0;
 }
 
-.site-ds .ds-shell-wide .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
-  max-width: 240px;
-  opacity: 1;
-  margin-left: 0.4rem;
+/* Unfolded, the six titles carry the rail past 1150px. The desktop gate opens
+   at 1080, so between those two the row would outgrow the screen and take both
+   arrows off the edge with it. Below the width that fits, the finale keeps the
+   compact rail it navigates with everywhere else. */
+@media (min-width: 1220px) {
+  .site-ds .ds-shell-wide .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
+    max-width: 240px;
+    opacity: 1;
+    margin-left: 0.4rem;
+    transition: max-width var(--ds-t) var(--ds-ease), opacity var(--ds-t) var(--ds-ease), margin-left var(--ds-t) var(--ds-ease);
+  }
 }
 
 /* the intro heading matches the stage titles on every other slide: same
@@ -361,6 +386,18 @@
 
   .site-ds .ds-panel-col,
   .site-ds .ds-shell-full .ds-panel-col {
+    transition-duration: 0.001s;
+    transition-delay: 0s;
+  }
+
+  /* the panel body replays a 10px rise on every stage change, which a
+     transition override cannot reach: it is a keyframe animation */
+  .site-ds .ds-panel-inner {
+    animation: none;
+  }
+
+  .site-ds .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label,
+  .site-ds .ds-shell-wide .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
     transition-duration: 0.001s;
   }
 }

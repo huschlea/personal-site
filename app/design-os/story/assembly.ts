@@ -244,6 +244,12 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
      the frame loop forces a synchronous layout on exactly the frames a
      transition can least afford one */
   let panelW = panel ? panel.clientWidth : 0;
+  /* The observer reports a width only after the frame that follows the change,
+     so the frame that leaves the finale would otherwise compose against the
+     collapsed column and land half a panel off before correcting itself. The
+     column is never legitimately zero except on the finale, where the inset is
+     forced to zero anyway, so the last real width is always the right answer. */
+  let lastPanelW = panelW;
   /* a reader who has asked for less motion gets the same system and the same
      stages, arriving at each one rather than traveling to it */
   const stillMq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -298,6 +304,10 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   const marks = new Map<string, HTMLImageElement>();
   for (const name of MARK_NAMES) {
     const im = new Image();
+    /* the scene can settle long before a mark arrives on a cold load, and a
+       settled scene stops drawing: without this the favicon would never be
+       painted at all */
+    im.onload = () => { dirty = true; };
     im.src = `/design-system/marks/${name}.png`;
     marks.set(name, im);
   }
@@ -1987,7 +1997,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
        rest, S-curved. The panel fades out over the drawing as it grows into
        the space, which is the crossfade the overlay architecture buys. */
     const wasInset = inset;
-    inset = active === BEATS - 1 ? 0 : panelW;
+    inset = active === BEATS - 1 ? 0 : (panelW || lastPanelW);
     if (inset !== wasInset) dirty = true;
 
     /* A chase that lands. The exponential approach never actually arrives,
@@ -2096,6 +2106,9 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   function start() {
     if (running) return;
     running = true;
+    /* whatever stopped us may have cost us the bitmap, and a settled scene
+       would otherwise never repaint it: always draw once on the way back in */
+    dirty = true;
     last = performance.now();
     raf = requestAnimationFrame(frame);
   }
@@ -2112,16 +2125,40 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   document.addEventListener("visibilitychange", onVis);
   const onResize = () => { needsResize = true; };
   window.addEventListener("resize", onResize);
+  /* Dragging the window to a display of a different density changes the pixel
+     ratio without changing a single CSS dimension, so neither the resize event
+     nor the observer fires and the backing store keeps the old density for the
+     rest of the session. A resolution query is the only thing that reports it,
+     and it has to be re-armed against each new ratio. */
+  let dprMq: MediaQueryList | null = null;
+  const onDpr = () => { needsResize = true; dirty = true; armDpr(); };
+  function armDpr() {
+    if (dprMq) dprMq.removeEventListener("change", onDpr);
+    dprMq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    dprMq.addEventListener("change", onDpr);
+  }
+  armDpr();
   const onStill = () => { still = stillMq.matches; dirty = true; };
   stillMq.addEventListener("change", onStill);
+  /* The bitmap is now the only copy of the picture, so anything that can
+     discard it has to ask for a repaint: a browser reclaiming the backing
+     store under memory pressure, or a restore from the back/forward cache. */
+  const onContextRestored = () => { needsResize = true; dirty = true; };
+  canvas.addEventListener("contextrestored", onContextRestored);
+  const onPageShow = (e: PageTransitionEvent) => {
+    if (e.persisted) { needsResize = true; dirty = true; }
+  };
+  window.addEventListener("pageshow", onPageShow);
   /* the canvas region changes size without the window doing so when the panel
      column collapses on the final stage; observe the element, not the window.
      The panel rides the same observer: a layout read inside the callback is
      already post-layout, so the width costs nothing there. */
   const ro = new ResizeObserver((entries) => {
     for (const e of entries) {
-      if (e.target === panel) panelW = (e.target as HTMLElement).clientWidth;
-      else needsResize = true;
+      if (e.target === panel) {
+        panelW = (e.target as HTMLElement).clientWidth;
+        if (panelW > 0) lastPanelW = panelW;
+      } else needsResize = true;
     }
   });
   ro.observe(canvas);
@@ -2137,6 +2174,9 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("resize", onResize);
       stillMq.removeEventListener("change", onStill);
+      canvas.removeEventListener("contextrestored", onContextRestored);
+      window.removeEventListener("pageshow", onPageShow);
+      if (dprMq) dprMq.removeEventListener("change", onDpr);
     },
     setStage(i: number) {
       active = Math.max(0, Math.min(BEATS - 1, i));

@@ -171,8 +171,9 @@ function PanelFor({ stage }: { stage: number }) {
       <div className="ds-panel-inner" key="intro">
         <h1 className="ds-title">Design OS</h1>
         <p className="ds-lead">
-          A living system that codifies what the brand knows, how it speaks, the
-          machinery it employs, and the laws that keep it uniform and distinct.
+          A living design system that codifies what a brand knows, how it
+          speaks, the machinery it employs, and the laws that keep it uniform
+          and distinct.
         </p>
         <p className="ds-nav-hint" aria-hidden="true">Use the stages below, or the arrow keys.</p>
       </div>
