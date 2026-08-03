@@ -238,6 +238,12 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
 
   let W = 0, H = 0, dpr = 1;
   let raf = 0, running = false, last = 0;
+  /* the scene redraws only when something in it has moved */
+  let dirty = true;
+  /* the panel's width, kept by its own observer: reading clientWidth inside
+     the frame loop forces a synchronous layout on exactly the frames a
+     transition can least afford one */
+  let panelW = panel ? panel.clientWidth : 0;
 
   /* everything renders in final position on load: no entrance choreography */
   const reveal = new Array(BEATS).fill(1);
@@ -320,14 +326,22 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
      Observers therefore only raise a flag; the resize is applied at the top of
      the next frame, in the same tick as the draw that follows it. */
   let needsResize = true;
+  /* A hi-dpi ultrawide asks for a backing store past twenty million pixels,
+     which costs real milliseconds on integrated graphics for every frame a
+     transition draws. Both acceptance viewports sit under this, so they back
+     at a full dpr 2 and only the very largest displays soften at all. */
+  const MAX_BACKING_PX = 16e6;
   function applyResize() {
-    if (!needsResize) return;
+    if (!needsResize) return false;
     needsResize = false;
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const want = Math.min(2, window.devicePixelRatio || 1);
     W = canvas.clientWidth;
     H = canvas.clientHeight;
+    const px = W * H * want * want;
+    dpr = px > MAX_BACKING_PX ? Math.max(1.25, want * Math.sqrt(MAX_BACKING_PX / px)) : want;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
+    return true;
   }
 
   /* dead centre: the camera fit assumes it, and the old 2% optical drop would
@@ -1963,21 +1977,30 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   function frame(now: number) {
     const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
     last = now;
-    applyResize();          // must precede the draw: it clears the bitmap
+    if (applyResize()) dirty = true;   // must precede the draw: it clears the bitmap
     /* On the finale the inset is zero the moment the stage is chosen, not
        when the DOM gets around to collapsing: one target step, taken from
        rest, S-curved. The panel fades out over the drawing as it grows into
        the space, which is the crossfade the overlay architecture buys. */
-    inset = active === BEATS - 1 ? 0 : (panel ? panel.clientWidth : 0);
+    const wasInset = inset;
+    inset = active === BEATS - 1 ? 0 : panelW;
+    if (inset !== wasInset) dirty = true;
 
     /* A chase that lands. The exponential approach never actually arrives,
        which reads as sub-pixel alpha and position drift long after a
        transition looks finished; snapping inside a hair's width makes every
        settled frame byte-identical to the last. */
     const chase = 1 - Math.pow(0.0018, dt);
+    /* Every current snaps onto its target inside a hair's width, so once a
+       stage has landed nothing in the scene changes and the frame can be
+       skipped outright: the bitmap already holds the picture. Any current
+       that moves marks the scene dirty. (Reviving the run motion means
+       marking dirty on the clock too; see ANIMATION-HANDOFF.md.) */
     const glide = (cur: number, target: number, eps: number) => {
       const next = cur + (target - cur) * chase;
-      return Math.abs(next - target) < eps ? target : next;
+      const out = Math.abs(next - target) < eps ? target : next;
+      if (out !== cur) dirty = true;
+      return out;
     };
     for (let b = 0; b < BEATS; b++) {
       /* one persistent system: everything is always drawn, and the currents
@@ -2004,6 +2027,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const f = fitView(VIEWS[active]);
     if (!booted && W > 0) {
       booted = true;
+      dirty = true;
       cam.zoom = camT.zoom = f.zoom;
       cam.cx = camT.cx = f.cx;
       cam.cy = camT.cy = f.cy;
@@ -2011,7 +2035,9 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const chaseT = 1 - Math.pow(0.0006, dt);
     const glideT = (cur: number, target: number, eps: number) => {
       const next = cur + (target - cur) * chaseT;
-      return Math.abs(next - target) < eps ? target : next;
+      const out = Math.abs(next - target) < eps ? target : next;
+      if (out !== cur) dirty = true;
+      return out;
     };
     const wOf = (z: number) => 1 / Math.max(0.0001, z);
     camT.zoom = 1 / glideT(wOf(camT.zoom), wOf(f.zoom), 0.0001);
@@ -2037,6 +2063,13 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
        See ANIMATION-HANDOFF.md. */
     idleClock += dt * 0.08;
     const runK = -1;
+
+    /* nothing moved: the last draw is still on screen and still correct */
+    if (!dirty) {
+      if (running) raf = requestAnimationFrame(frame);
+      return;
+    }
+    dirty = false;
 
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx!.fillStyle = PAPER;
@@ -2076,9 +2109,17 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   const onResize = () => { needsResize = true; };
   window.addEventListener("resize", onResize);
   /* the canvas region changes size without the window doing so when the panel
-     column collapses on the final stage; observe the element, not the window */
-  const ro = new ResizeObserver(() => { needsResize = true; });
+     column collapses on the final stage; observe the element, not the window.
+     The panel rides the same observer: a layout read inside the callback is
+     already post-layout, so the width costs nothing there. */
+  const ro = new ResizeObserver((entries) => {
+    for (const e of entries) {
+      if (e.target === panel) panelW = (e.target as HTMLElement).clientWidth;
+      else needsResize = true;
+    }
+  });
   ro.observe(canvas);
+  if (panel) ro.observe(panel);
 
   start();
 
@@ -2092,6 +2133,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     },
     setStage(i: number) {
       active = Math.max(0, Math.min(BEATS - 1, i));
+      dirty = true;
     },
   };
 }
