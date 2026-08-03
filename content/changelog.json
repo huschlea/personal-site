@@ -886,5 +886,6 @@
   "On slide 01 after into, remove \"CMS where contributors edit after) and scrap the MDX part",
   "for all of the technical hierarchy sections, we need to make it so the text fits within the box wihtout needs to scroll vertically or horizontally.\n\nin order to achieve this on all pages, we will need to shorten the description on the production page, which warrants shortening anyways\n\nFor that page, instead fo explaining each part, explain the workflow and how the production engine moves as linearly as possible",
   "[build] Every technical hierarchy now fits its box in both axes. Measured first: trees overflowed horizontally at nearly every stage (governance worst, 65 chars over a ~37-char box), and the only vertical overflow was production at 1440x900, 200px, caused by the concepts paragraph exactly as he guessed. All six trees rewritten under the character budget; production's paragraph rewritten to trace the engine left to right instead of defining each part; tree leading, section margins and panel padding tightened. Verified zero overflow on every stage at 1280x800, 1440x900, 1680x1050, 1728x1117, 1920x1080 and 2560x1440.",
-  "get rid of the title on the final slide, the \"the whole system: one system operating\""
+  "get rid of the title on the final slide, the \"the whole system: one system operating\"",
+  "On the interface layer, \"DESIGN OS\" , \"APPLICATIONS API\" and \"AGENTS MCP\" need to have the same text styling as \"BRAND INTELLIGENCE\" and \"DESIGN LANGUAGE\""
 ]

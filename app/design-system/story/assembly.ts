@@ -1556,7 +1556,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
         ctx!.fillStyle = INK(0.18 * t * inkMul);
         ctx!.fill();
       });
-      text("design os", WIN.x + 16, WIN.y + 50, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
+      text("design os", WIN.x + 16, WIN.y + 50, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
       ["create", "library", "guidelines", "campaigns"].forEach((nm, i) => {
         text(nm, WIN.x + 16, WIN.y + 80 + i * 26, t, { size: 10, alpha: T_BODY });
       });
@@ -1591,7 +1591,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
          right, in the register's own mono ledger idiom so the card carries
          the same visual weight as the rest of the board */
       card(APIS.x, APIS.y, APIS.w, APIS.h, t, { strong: true });
-      text("applications · APIs", APIS.x + 16, APIS.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
+      text("applications · APIs", APIS.x + 16, APIS.y + 24, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
       ["brand API", "search API", "render API", "workflow API"].forEach((nm, i) => {
         const ey = APIS.y + 50 + i * 24;
         const p = toScreen(APIS.x + 19, ey);
@@ -1616,7 +1616,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
 
       /* agents: the tree on the left, the session's record on the right */
       card(MCP.x, MCP.y, MCP.w, MCP.h, t, { strong: true });
-      text("agents · MCP", MCP.x + 16, MCP.y + 24, t, { size: 9, caps: true, alpha: 0.66, weight: "500", track: true });
+      text("agents · MCP", MCP.x + 16, MCP.y + 24, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
       ["mcp", "├ resources", "├ tools", "└ prompts"].forEach((ln, i) => {
         text(ln, MCP.x + 20, MCP.y + 48 + i * 22, t, { size: 10, alpha: i === 0 ? 0.7 : T_BODY, mono: true });
       });
