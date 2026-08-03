@@ -26,8 +26,7 @@ export const LAYER_PANELS: LayerPanel[] = [
     tree: `brand intelligence
   authoring
     - YAML for human-authored structured records
-    - markdown or MDX for nuance and examples
-    - CMS where contributors edit often
+    - markdown for nuance and examples
   contracts
     - JSON Schema for required fields
   versioning
@@ -172,11 +171,9 @@ function PanelFor({ stage }: { stage: number }) {
     return (
       <div className="ds-panel-inner" key="intro">
         <h1 className="ds-title">Design OS</h1>
-        <p className="ds-lead">A traditional brand system describes the brand. This one operates it.</p>
-        <p className="ds-body">
-          An operating system for creative work: what the brand knows, how it
-          speaks, the machinery that produces the work, and the law that keeps
-          it safe. No brand baked in. One system, explored a layer at a time.
+        <p className="ds-lead">
+          A living system that codifies what the brand knows, how it speaks, the
+          machinery it employs, and the laws that keep it uniform and distinct.
         </p>
         <p className="ds-nav-hint" aria-hidden="true">Use the stages below, or the arrow keys</p>
       </div>

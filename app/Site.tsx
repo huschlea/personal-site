@@ -300,7 +300,7 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
             <h2 className="v2-section-title">Design OS</h2>
             <p className="v2-section-kicker">Concept</p>
             <p className="v2-section-body">
-              A production system for brands, built to test one claim: a brand can be operated in code, not just described in guidelines. One bounded AI step interprets the source, deterministic code makes every visual decision, and every choice lands in a ledger the system carries with it.
+              An operating system for production-ready brands, built to amplify nuanced design judgment through code, not static guidelines. One bounded AI step interprets the source, deterministic code makes every visual decision, and every choice lands in a ledger the system carries with it.
             </p>
             <p className="v2-section-body v2-release-links">
               <a href="/design-system" className="v2-link">Explore the system <UpRightArrow /></a>
