@@ -889,5 +889,6 @@
   "get rid of the title on the final slide, the \"the whole system: one system operating\"",
   "On the interface layer, \"DESIGN OS\" , \"APPLICATIONS API\" and \"AGENTS MCP\" need to have the same text styling as \"BRAND INTELLIGENCE\" and \"DESIGN LANGUAGE\"",
   "I want to label the runtime substrate and put the items within the card in pills, similar to the compile card underneath brand intelligence",
-  "we need to make both of these cards more visually enticing, add pills, mock terminals or anything visual that would make them look less sparse"
+  "we need to make both of these cards more visually enticing, add pills, mock terminals or anything visual that would make them look less sparse",
+  "we don't need the bullet points or the blinking cursor in the terminal"
 ]

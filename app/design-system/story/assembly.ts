@@ -1607,13 +1607,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
         ctx!.strokeStyle = INK(0.08 * t * inkMul); ctx!.lineWidth = 1;
         ctx!.beginPath(); ctx!.moveTo(a.x, hy.y); ctx!.lineTo(b2.x, hy.y); ctx!.stroke();
       };
-      // a prompt cursor at rest: a filled block, the console still
-      const cursor = (cx: number, cy: number) => {
-        const p = toScreen(cx, cy);
-        ctx!.fillStyle = INK(0.4 * t * inkMul);
-        ctx!.fillRect(p.x, p.y - 4 * p.s, 4 * p.s, 8 * p.s);
-      };
-
       /* applications: the endpoints as pills, and a live request console */
       card(APIS.x, APIS.y, APIS.w, APIS.h, t, { strong: true });
       text("applications · APIs", APIS.x + 16, APIS.y + 24, t, { size: 10.5, caps: true, alpha: T_TITLE, weight: "500", track: true });
@@ -1625,11 +1618,9 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
         ctx!.font = `400 ${size}px 'SF Mono', ui-monospace, Menlo, monospace`;
         const w = ctx!.measureText(nm).width / p.s;
         ctx!.beginPath();
-        ctx!.roundRect(p.x, p.y - 9 * p.s, (w + 28) * p.s, 18 * p.s, 0);
+        ctx!.roundRect(p.x, p.y - 9 * p.s, (w + 22) * p.s, 18 * p.s, 0);
         stroke(0.18 * t);
-        ctx!.beginPath(); ctx!.arc(p.x + 11 * p.s, p.y, 2 * p.s, 0, Math.PI * 2);
-        ctx!.fillStyle = INK(0.5 * t * inkMul); ctx!.fill();
-        text(nm, bx + 20, by, t, { size: 8.5, alpha: T_BODY, mono: true });
+        text(nm, bx + 11, by, t, { size: 8.5, alpha: T_BODY, mono: true });
       });
       {
         const bx = APIS.x + 256, by = APIS.y + 40, bw = APIS.w - 256 - 16, bh = APIS.h - 40 - 14;
@@ -1639,7 +1630,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
           text(ln, bx + 12, ey, t, { size: 8, alpha: i === 0 ? 0.55 : 0.38, mono: true });
           text(code, bx + bw - 12, ey, t, { size: 8, alpha: T_FAINT, mono: true, anchor: "right" as CanvasTextAlign });
         });
-        cursor(bx + 12, by + 34 + 3 * 16);
       }
 
       /* agents: the tree, trust pills at its foot, and a live session console */
@@ -1669,7 +1659,6 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
           const ey = by + 34 + i * 16;
           text(ln, bx + 12, ey, t, { size: 8, alpha: ln.startsWith("$") ? 0.5 : 0.36, mono: true });
         });
-        cursor(bx + 12, by + 34 + 4 * 16);
       }
 
       /* the substrate: a titled card like its siblings, its stores worn as
