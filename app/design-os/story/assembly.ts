@@ -244,6 +244,10 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
      the frame loop forces a synchronous layout on exactly the frames a
      transition can least afford one */
   let panelW = panel ? panel.clientWidth : 0;
+  /* a reader who has asked for less motion gets the same system and the same
+     stages, arriving at each one rather than traveling to it */
+  const stillMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let still = stillMq.matches;
 
   /* everything renders in final position on load: no entrance choreography */
   const reveal = new Array(BEATS).fill(1);
@@ -1990,7 +1994,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
        which reads as sub-pixel alpha and position drift long after a
        transition looks finished; snapping inside a hair's width makes every
        settled frame byte-identical to the last. */
-    const chase = 1 - Math.pow(0.0018, dt);
+    const chase = still ? 1 : 1 - Math.pow(0.0018, dt);
     /* Every current snaps onto its target inside a hair's width, so once a
        stage has landed nothing in the scene changes and the frame can be
        skipped outright: the bitmap already holds the picture. Any current
@@ -2032,7 +2036,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       cam.cx = camT.cx = f.cx;
       cam.cy = camT.cy = f.cy;
     }
-    const chaseT = 1 - Math.pow(0.0006, dt);
+    const chaseT = still ? 1 : 1 - Math.pow(0.0006, dt);
     const glideT = (cur: number, target: number, eps: number) => {
       const next = cur + (target - cur) * chaseT;
       const out = Math.abs(next - target) < eps ? target : next;
@@ -2108,6 +2112,8 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   document.addEventListener("visibilitychange", onVis);
   const onResize = () => { needsResize = true; };
   window.addEventListener("resize", onResize);
+  const onStill = () => { still = stillMq.matches; dirty = true; };
+  stillMq.addEventListener("change", onStill);
   /* the canvas region changes size without the window doing so when the panel
      column collapses on the final stage; observe the element, not the window.
      The panel rides the same observer: a layout read inside the callback is
@@ -2130,6 +2136,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       ro.disconnect();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("resize", onResize);
+      stillMq.removeEventListener("change", onStill);
     },
     setStage(i: number) {
       active = Math.max(0, Math.min(BEATS - 1, i));

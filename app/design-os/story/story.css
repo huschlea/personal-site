@@ -349,3 +349,18 @@
   min-height: 100svh;
   background: #fefefd;
 }
+
+/* Asked for less motion: the stages still change, they just arrive. The
+   panel's width is already stepped rather than animated, so only its fade
+   and the rail's travel need collapsing; the canvas camera snaps in the
+   engine, on the same preference. */
+@media (prefers-reduced-motion: reduce) {
+  .site-ds .ds-shell {
+    --ds-t: 0.001s;
+  }
+
+  .site-ds .ds-panel-col,
+  .site-ds .ds-shell-full .ds-panel-col {
+    transition-duration: 0.001s;
+  }
+}
