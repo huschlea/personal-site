@@ -175,8 +175,11 @@ const NOTES = { x: 1750, y: REL_Y, w: 240, h: REL_H };
 /* the bus runs from the substrate's event log to the feedback loop, and stops
    short of the interface lane so the column is never crossed */
 const BUS_X1 = 1460;
+/* the evidence riser: placed in the seam between evenly spread meters, so
+   the middle meter (x920) never collides with its tee */
+const RISER_X = 837;
 // the only card on the evidence line, and the only thing the bus touches
-const SEAT = { x: 150, y: BUS_Y - 46, w: 200, h: 92 };
+const SEAT = { x: 150, y: BUS_Y - 32, w: 200, h: 64 };
 // the bus terminates in the feedback loop; there is no run past it
 const REVIEW = { x: SEAT.x + SEAT.w, y: BUS_Y };
 
@@ -236,8 +239,11 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   let W = 0, H = 0, dpr = 1;
   let raf = 0, running = false, last = 0;
 
-  const reveal = new Array(BEATS).fill(0);
+  /* everything renders in final position on load: no entrance choreography */
+  const reveal = new Array(BEATS).fill(1);
   const focus = new Array(BEATS).fill(0);
+  let booted = false;
+  let still = false;
   const layerLight = new Array(LAYER_COUNT).fill(1); // spotlight currents
   let active = 0;
   let runClock = 0;
@@ -349,12 +355,15 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const tt = t * inkMul;
     if (tt <= 0.02) return;
     const p = toScreen(wx, wy);
-    /* glyphs land on the device-pixel grid: sub-pixel vertical drift under a
-       moving camera is the quiver, so a row steps whole pixels or holds still */
-    p.x = Math.round(p.x * dpr) / dpr;
-    p.y = Math.round(p.y * dpr) / dpr;
+    /* At rest, glyphs land on the device-pixel grid for crispness. In motion
+       they ride sub-pixel: rounding per frame makes neighbouring rows step on
+       different frames, which reads as vertical jitter. */
+    if (still) {
+      p.x = Math.round(p.x * dpr) / dpr;
+      p.y = Math.round(p.y * dpr) / dpr;
+    }
     const size = (o?.size ?? 10.5) * p.s;
-    if (size < 4) return;
+    if (size < 2.5) return;
     const family = o?.mono
       ? "'SF Mono', ui-monospace, Menlo, monospace"
       : "-apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif";
@@ -373,7 +382,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
      anything that would render under 4px, so every element that clears paper
      for a label has to ask first, or it leaves a gap where the label was. */
   function willRender(size: number) {
-    return size * toScreen(0, 0).s >= 4;
+    return size * toScreen(0, 0).s >= 2.5;
   }
 
   /* A label set into a line sits on a small plate, not on bare paper. Cleared
@@ -1564,27 +1573,30 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       const dv2 = toScreen(WIN.x + 120, WIN.y + WIN.h - 16);
       ctx!.strokeStyle = INK(0.1 * t * inkMul);
       ctx!.beginPath(); ctx!.moveTo(dv.x, dv.y); ctx!.lineTo(dv2.x, dv2.y); ctx!.stroke();
-      ([[140, 48, "campaign"], [320, 48, "document"]] as const).forEach(([dx, dy, nm]) => {
+      /* the create module: six kinds of work, each a small page. Two tiles
+         read as a demo; six read as a platform. */
+      (["campaign", "document", "social", "deck", "email", "video"] as const).forEach((nm, i) => {
+        const col = i % 3, row = Math.floor(i / 3);
+        const dx = 140 + col * 116, dy = 48 + row * 100;
         const pa = toScreen(WIN.x + dx, WIN.y + dy);
-        const pb = toScreen(WIN.x + dx + 160, WIN.y + dy + 168);
+        const pb = toScreen(WIN.x + dx + 104, WIN.y + dy + 88);
         ctx!.beginPath();
         ctx!.roundRect(pa.x, pa.y, pb.x - pa.x, pb.y - pa.y, 0);
         ctx!.fillStyle = INK(0.035 * t * inkMul);
         ctx!.fill();
         stroke(0.14 * t);
-        // a page lives in each pane: image, then copy, in the printed idiom
-        const bx = WIN.x + dx + 10, by = WIN.y + dy + 10;
+        const bx = WIN.x + dx + 8, by = WIN.y + dy + 8;
         const ia = toScreen(bx, by);
-        const ib = toScreen(bx + 140, by + 62);
+        const ib = toScreen(bx + 88, by + 34);
         ctx!.fillStyle = INK(0.05 * t * inkMul);
         ctx!.fillRect(ia.x, ia.y, ib.x - ia.x, ib.y - ia.y);
-        [92, 128, 108, 72].forEach((bw, bi) => {
-          const ba = toScreen(bx, by + 76 + bi * 14);
-          const bb = toScreen(bx + bw, by + 81 + bi * 14);
-          ctx!.fillStyle = INK((bi === 0 ? 0.16 : 0.09) * t * inkMul);
+        [64, 44].forEach((bw, bi) => {
+          const ba = toScreen(bx, by + 42 + bi * 9);
+          const bb = toScreen(bx + bw, by + 46 + bi * 9);
+          ctx!.fillStyle = INK((bi === 0 ? 0.14 : 0.09) * t * inkMul);
           ctx!.fillRect(ba.x, ba.y, bb.x - ba.x, bb.y - ba.y);
         });
-        text(nm, WIN.x + dx + 10, WIN.y + dy + 152, t, { size: 8.5, alpha: T_FAINT });
+        text(nm, WIN.x + dx + 8, WIN.y + dy + 74, t, { size: 8, alpha: T_FAINT });
       });
 
       /* a small framed terminal: a faint fill, a hairline border, a header
@@ -1820,10 +1832,10 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
          It ends in the feedback loop: the line arrives at the people who read
          it rather than running past them. */
       route([[PLINTH.x, PLINTH.y + PLINTH.h / 2], [BUS_X1, PLINTH.y + PLINTH.h / 2], [BUS_X1, BUS_Y], [REVIEW.x, BUS_Y]], t, { alpha: S_RULE, double: true });
-      text("usage recorded", BUS_X1 - 10, 1046, t, { size: 8, alpha: T_FAINT, anchor: "right" as CanvasTextAlign });
+      text("usage recorded", BUS_X1 - 10, 1046, t, { size: 9.5, alpha: 0.55, anchor: "right" as CanvasTextAlign });
       // evidence riser into the hall, in the clear stretch past the shelf,
       // stopping on the bus's near rail so the tee reads clean
-      route([[900, BUS_Y], [900, HALL.y + HALL.h]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
+      route([[RISER_X, BUS_Y], [RISER_X, HALL.y + HALL.h]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
       /* Ticks traveling backward along the bus: TABLED with the rest of the
          run motion until the full animation is built. RUN_MOTION is the one
          switch; see ANIMATION-HANDOFF.md. Drawn before the meters so a
@@ -1842,29 +1854,29 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       // meters along the bus
       METERS.forEach((nm, i) => {
         // an even run between the shelf and the interface the bus collects from
-        const mx2 = 945 + i * 80;
+        const mx2 = 420 + i * (1000 / 6);
         const p = toScreen(mx2, BUS_Y);
         ctx!.beginPath();
-        ctx!.arc(p.x, p.y, Math.max(3.4 * p.s, FIT_MIN), 0, Math.PI * 2);
+        ctx!.arc(p.x, p.y, Math.max(5 * p.s, FIT_MIN), 0, Math.PI * 2);
         ctx!.fillStyle = PAPER;
         ctx!.fill();
         stroke(S_MAIN * t);
-        text(nm, mx2, BUS_Y + 24, t, { size: 8, alpha: T_FAINT, anchor: "center" as CanvasTextAlign });
+        text(nm, mx2, BUS_Y + 27, t, { size: 9.5, alpha: 0.55, anchor: "center" as CanvasTextAlign });
       });
       /* The card the bus terminates in, and the only one on the row that
          belongs to this layer. The one line that leaves it carries findings,
          never announcements: if a token keeps getting overridden the design
          language is wrong, and that is what has to travel back. */
       card(SEAT.x, SEAT.y, SEAT.w, SEAT.h, t);
-      text("feedback loop", SEAT.x + 16, SEAT.y + 22, t, { size: 9.5, alpha: T_TITLE, weight: "500" });
-      text("signals become decisions, not dashboards", SEAT.x + 16, SEAT.y + 42, t, { size: 8.5, alpha: T_FAINT, maxW: SEAT.w - 32 });
+      text("feedback loop", SEAT.x + 16, SEAT.y + 24, t, { size: 9.5, alpha: T_TITLE, weight: "500" });
+      text("signals become decisions, not dashboards", SEAT.x + 16, SEAT.y + 44, t, { size: 8.5, alpha: T_FAINT, maxW: SEAT.w - 32 });
       route([[SEAT.x + 70, SEAT.y], [SEAT.x + 70, 1010], [80, 1010], [80, 400], [BI.x, 400]], t, { alpha: S_RULE, double: true });
       route([[80, DL.y + 160], [DL.x, DL.y + 160]], t, { alpha: S_RULE, double: true, trimStart: RULE_GAP });
       /* The one place a governance run and an observability run cross: the
          evidence riser through the governed line's bottom rule. The joint
          belongs to both layers, so it takes whichever is the more lit. */
       const bothLit = Math.max(layerLight[4], layerLight[5]);
-      crossJoint(900, GOV.y + GOV.h, t, bothLit);
+      crossJoint(RISER_X, GOV.y + GOV.h, t, bothLit);
     });
   }
 
@@ -1964,23 +1976,36 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       layerLight[i] = glide(layerLight[i], sel === null ? 1 : (sel === i ? 1 : DIM), 0.001);
     }
 
-    /* The camera is DOUBLE-smoothed: the fit target glides into camT, and the
-       camera glides toward camT. A single exponential starts at full velocity,
-       which is the jerk felt on every stage click and on the panel's width
-       snap; cascading two turns any step into an S-curve, eased in and out,
-       and retargets mid-flight without a kick. */
+    /* The camera is DOUBLE-smoothed (target glides into camT, camera glides
+       toward camT), so any step becomes an S-curve, eased both ways. And it
+       interpolates in VISIBLE-WIDTH space, not zoom: lerping zoom directly
+       makes a combined pan-and-zoom read as a collapse that then re-expands,
+       because screen paths under a zoom lerp are not monotonic. Gliding the
+       viewport's world-width keeps every landmark on a single continuous
+       path. On the first sized frame the camera snaps to its fit: the page
+       loads composed, with no entrance sweep. */
     const f = fitView(VIEWS[active]);
+    if (!booted && W > 0) {
+      booted = true;
+      cam.zoom = camT.zoom = f.zoom;
+      cam.cx = camT.cx = f.cx;
+      cam.cy = camT.cy = f.cy;
+    }
     const chaseT = 1 - Math.pow(0.0006, dt);
     const glideT = (cur: number, target: number, eps: number) => {
       const next = cur + (target - cur) * chaseT;
       return Math.abs(next - target) < eps ? target : next;
     };
-    camT.zoom = glideT(camT.zoom, f.zoom, 0.0004);
+    const wOf = (z: number) => 1 / Math.max(0.0001, z);
+    camT.zoom = 1 / glideT(wOf(camT.zoom), wOf(f.zoom), 0.0001);
     camT.cx = glideT(camT.cx, f.cx, 0.05);
     camT.cy = glideT(camT.cy, f.cy, 0.05);
-    cam.zoom = glide(cam.zoom, camT.zoom, 0.0004);
+    cam.zoom = 1 / glide(wOf(cam.zoom), wOf(camT.zoom), 0.0001);
     cam.cx = glide(cam.cx, camT.cx, 0.05);
     cam.cy = glide(cam.cy, camT.cy, 0.05);
+    /* pixel-snapping text during motion makes rows step on different frames,
+       which reads as vertical jitter; snap only at rest, glide while moving */
+    still = cam.zoom === f.zoom && cam.cx === f.cx && cam.cy === f.cy;
 
     /* a read-only window for the verification tooling: the live camera and
        region, so probes derive world-to-device mapping instead of mirroring it */
