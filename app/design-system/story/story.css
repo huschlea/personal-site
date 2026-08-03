@@ -263,9 +263,14 @@
   margin-left: 0.4rem;
 }
 
-/* the intro's type, a size down: the panel is a caption, not a poster */
-.site-ds .ds-panel-inner .ds-title { font-size: 1.55rem; }
-.site-ds .ds-panel-inner .ds-lead { font-size: 1rem; }
+/* the intro heading matches the stage titles on every other slide: same
+   size, same weight, so the panel reads as one family, not a poster */
+.site-ds .ds-panel-inner .ds-title {
+  font-size: 1.02rem;
+  font-weight: 500;
+  margin-bottom: 0.55rem;
+}
+.site-ds .ds-panel-inner .ds-lead { font-size: 0.92rem; }
 
 /* visible to screen readers, out of the visual layout */
 .site-ds .ds-sr-only {

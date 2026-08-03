@@ -4,7 +4,7 @@ import "./design-system.css";
 import "./story/story.css";
 
 export const metadata: Metadata = {
-  title: "Design system · Alden Huschle",
+  title: "Design OS · Alden Huschle",
   description: "brand-os: a brand, operated in code.",
 };
 

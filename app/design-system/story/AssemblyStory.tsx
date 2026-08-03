@@ -171,7 +171,7 @@ function PanelFor({ stage }: { stage: number }) {
   if (stage === 0) {
     return (
       <div className="ds-panel-inner" key="intro">
-        <h1 className="ds-title">Design system</h1>
+        <h1 className="ds-title">Design OS</h1>
         <p className="ds-lead">A traditional brand system describes the brand. This one operates it.</p>
         <p className="ds-body">
           An operating system for creative work: what the brand knows, how it

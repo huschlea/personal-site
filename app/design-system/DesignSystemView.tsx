@@ -21,7 +21,7 @@ export function DesignSystemView() {
       </header>
 
       <section className="ds-col ds-arrival">
-        <h1 className="ds-title">Design system</h1>
+        <h1 className="ds-title">Design OS</h1>
         <p className="ds-lead">
           A traditional brand system describes the brand. This one operates it.
         </p>
