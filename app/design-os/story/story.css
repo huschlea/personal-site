@@ -16,6 +16,8 @@
 
 .site-ds .ds-shell {
   --ds-panel-w: clamp(360px, 24vw, 440px);
+  --ds-t: 0.55s;
+  --ds-ease: cubic-bezier(0.2, 0, 0, 1);
   position: fixed;
   inset: 0;
   background: #fefefd;
@@ -187,18 +189,18 @@
    the panel's width snap never makes it jump: it owns its own motion. */
 .site-ds .ds-stage-nav {
   position: fixed;
-  left: calc((100vw - var(--ds-panel-w)) / 2);
+  left: 50vw;
   bottom: clamp(1.4rem, 3vh, 2.2rem);
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% - var(--ds-panel-w) / 2));
   display: flex;
   align-items: stretch;
   gap: 0.4rem;
   z-index: 20;
-  transition: left 0.55s cubic-bezier(0.2, 0, 0, 1);
+  transition: transform var(--ds-t) var(--ds-ease);
 }
 
 .site-ds .ds-shell-full .ds-stage-nav {
-  left: 50vw;
+  transform: translateX(-50%);
 }
 
 .site-ds .ds-nav-chip,
@@ -223,6 +225,19 @@
 }
 
 .site-ds .ds-nav-chip-on {
+  border-color: rgba(20, 18, 16, 0.65);
+  color: var(--ds-ink);
+}
+
+/* keyboard focus is the same single ring the current chip wears: the border.
+   The browser outline never stacks on top of it. */
+.site-ds .ds-nav-chip:focus,
+.site-ds .ds-nav-step:focus {
+  outline: none;
+}
+
+.site-ds .ds-nav-chip:focus-visible,
+.site-ds .ds-nav-step:focus-visible {
   border-color: rgba(20, 18, 16, 0.65);
   color: var(--ds-ink);
 }
@@ -252,7 +267,7 @@
   overflow: hidden;
   white-space: nowrap;
   vertical-align: bottom;
-  transition: max-width 0.5s cubic-bezier(0.2, 0, 0, 1), opacity 0.3s cubic-bezier(0.2, 0, 0, 1), margin-left 0.5s cubic-bezier(0.2, 0, 0, 1);
+  transition: max-width var(--ds-t) var(--ds-ease), opacity var(--ds-t) var(--ds-ease), margin-left var(--ds-t) var(--ds-ease);
 }
 
 .site-ds .ds-nav-chip:has(.ds-explorer-num) .ds-explorer-num {
@@ -285,6 +300,22 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* the desktop-only gate: the whole experience below the breakpoint */
+.site-ds.ds-gate {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #fefefd;
+  padding: 2rem;
+}
+
+.site-ds.ds-gate p {
+  font-size: 0.95rem;
+  color: var(--ds-mid);
+  text-align: center;
 }
 
 /* the boot frame while the chooser decides */

@@ -206,14 +206,24 @@ export function AssemblyStory() {
   /* the rail's titles unfold only once the column has actually gone; unfolding
      them while it is still collapsing overflows the region and clips the rail */
   const [wide, setWide] = useState(false);
+  /* desktop-only: below the breakpoint nothing mounts but the gate; live on
+     resize and rotation via matchMedia */
+  const [desktop, setDesktop] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const api = mountAssembly({ canvas, panel: panelRef.current });
     apiRef.current = api;
-    return () => api.destroy();
-  }, []);
+    return () => { api.destroy(); apiRef.current = null; };
+  }, [desktop]);
 
   useEffect(() => {
     apiRef.current?.setStage(stage);
@@ -231,9 +241,6 @@ export function AssemblyStory() {
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       // Cmd/Alt+Arrow is browser history; Shift+Arrow is selection
       if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey || e.defaultPrevented) return;
-      // inside the panel the arrows belong to whatever is being read
-      const el = e.target as HTMLElement | null;
-      if (el && el.closest && el.closest(".ds-panel-col")) return;
       e.preventDefault();
       setStage((s) => (e.key === "ArrowRight" ? Math.min(FINAL, s + 1) : Math.max(0, s - 1)));
     };
@@ -243,6 +250,15 @@ export function AssemblyStory() {
 
   const full = stage === FINAL;
   const stageName = stage === 0 ? "Intro" : STAGES[stage].label;
+
+  if (desktop === null) return <div className="ds-boot" />;
+  if (!desktop) {
+    return (
+      <div className="site-ds ds-gate">
+        <p>This page is intended for desktop view only.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="site-ds ds-story-mode">
