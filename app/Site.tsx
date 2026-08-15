@@ -476,7 +476,10 @@ export default function Site({ changelog, initialTab = "home" }: { changelog: st
         <section className="v2-panel v2-panel-music">
           <div className="v2-section v2-music-release">
             <a href="https://untitled.stream/library/project/vb44xdBFQh4WQ15UdPJmX" target="_blank" rel="noopener" className="v2-cover" aria-label="album-01_wip-unmixed">
-              <img className="v2-img" src="/cover-unmixed.png" alt="album-01_wip-unmixed cover" width={1254} height={1254} loading="lazy" decoding="async" />
+              <picture>
+                <source type="image/webp" srcSet="/optimized/cover-unmixed.webp" />
+                <img className="v2-img" src="/cover-unmixed.png" alt="album-01_wip-unmixed cover" width={884} height={884} loading="lazy" decoding="async" />
+              </picture>
             </a>
             <div className="v2-music-info">
               <h2 className="v2-section-title">album-01_wip-unmixed</h2>
