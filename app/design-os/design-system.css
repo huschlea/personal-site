@@ -29,12 +29,16 @@ body:has(.site-ds) {
      reset it here the same way .site-v2 does. */
   text-transform: none;
   padding: clamp(2.25rem, 5vw, 3.5rem) var(--ds-pad) clamp(4rem, 8vw, 6rem);
-  animation: ds-fade 0.35s cubic-bezier(0.2, 0, 0, 1);
+  animation: ds-fade 0.16s ease-out;
 }
 
 @keyframes ds-fade {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-ds { animation: none; }
 }
 
 .site-ds .ds-col { max-width: var(--ds-col); margin: 0 auto; }

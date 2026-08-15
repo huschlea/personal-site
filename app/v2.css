@@ -101,15 +101,19 @@ body:has(.site-v2) {
   max-width: var(--v2-col);
   margin: 0 auto;
   text-align: left;
-  /* Let the entrance transform fall back to `none` after it finishes. Keeping
-     the final keyframe filled leaves the entire (very tall) panel on a GPU
-     layer, which can flash when its separately composited images scroll. */
-  animation: v2-fade 0.35s cubic-bezier(0.2, 0, 0, 1);
+  /* Hold the panel in its final position from the first frame. A short
+     opacity-only settle keeps route changes soft without promoting the full,
+     potentially very tall panel to a moving composited layer. */
+  animation: v2-fade 0.16s ease-out;
 }
 
 @keyframes v2-fade {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-v2 .v2-panel { animation: none; }
 }
 
 .site-v2 .v2-prose {
