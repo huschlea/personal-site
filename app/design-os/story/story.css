@@ -74,12 +74,12 @@
 }
 
 .site-ds .ds-panel-inner {
-  animation: ds-stage-panel-in 0.45s cubic-bezier(0.2, 0, 0, 1);
+  animation: ds-stage-panel-in 0.16s ease-out;
 }
 
 @keyframes ds-stage-panel-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .site-ds .ds-panel-inner .ds-body { margin-top: 0.4rem; }
@@ -171,14 +171,12 @@
   text-align: right;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-6px);
-  transition: opacity 0.5s cubic-bezier(0.2, 0, 0, 1) 0.25s, transform 0.5s cubic-bezier(0.2, 0, 0, 1) 0.25s;
+  transition: opacity 0.3s ease-out 0.25s;
   z-index: 20;
 }
 
 .site-ds .ds-shell-full .ds-full-title {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .site-ds .ds-full-title .ds-cap-title { margin-bottom: 0; }
