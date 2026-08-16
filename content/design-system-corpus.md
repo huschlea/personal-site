@@ -818,11 +818,11 @@ Speed is no longer scarce. A machine can lay down a hundred possible versions be
 
 ### Shared excitement
 
-Excitement is honest signal because it's challenging to fake convincingly. When someone else shares your excitement, not politely but genuinely, something shifts. There is a recognition that goes deeper than agreement. It's the relief of being understood without having to explain yourself first.
+Excitement is honest signal because it's challenging to fake convincingly. When someone else shares your excitement, not politely but genuinely, something between you shifts. There is a recognition that goes deeper than agreement. It's the relief of being understood without having to explain yourself first.
 
-### What it isn't
+### Following no's
 
-Most people are searching for what it is, which confines the search to whatever they can already conceive. An alternative approach is to search for what it isn't. Every no is a positive narrowing of the space of possibilities. Follow the eliminations long enough and something meaningful starts to remain.
+Every no is a positive narrowing of the space of possibilities. Follow the eliminations long enough and something meaningful starts to remain
 
 ### Prisms
 
