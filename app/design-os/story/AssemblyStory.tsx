@@ -201,32 +201,27 @@ function PanelFor({ stage }: { stage: number }) {
 
 export function AssemblyStory() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mapRef = useRef<HTMLCanvasElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const apiRef = useRef<{ destroy: () => void; setStage: (i: number) => void } | null>(null);
   const [stage, setStage] = useState(0);
-  /* the rail's titles unfold only once the column has actually gone; unfolding
-     them while it is still collapsing overflows the region and clips the rail */
-  const [wide, setWide] = useState(false);
   /* the desktop breakpoint is the Chooser's: below it this component never
      mounts at all, so there is nothing to guard here */
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const api = mountAssembly({ canvas, panel: panelRef.current });
+    const api = mountAssembly({
+      canvas,
+      destinationCanvas: mapRef.current,
+      panel: panelRef.current,
+    });
     apiRef.current = api;
     return () => { api.destroy(); apiRef.current = null; };
   }, []);
 
   useEffect(() => {
     apiRef.current?.setStage(stage);
-  }, [stage]);
-
-  useEffect(() => {
-    if (stage !== FINAL) { setWide(false); return; }
-    // after the panel's fade (0.3s) and width snap (0.32s), never during
-    const t = window.setTimeout(() => setWide(true), 420);
-    return () => window.clearTimeout(t);
   }, [stage]);
 
   useEffect(() => {
@@ -242,6 +237,10 @@ export function AssemblyStory() {
   }, []);
 
   const full = stage === FINAL;
+  /* The rail expands and moves to the viewport centre as one gesture. Keeping
+     this derived from the same state as `full` also makes the reverse motion
+     perfectly symmetrical, with no delayed second phase. */
+  const wide = full;
   const stageName = stage === 0 ? "Intro" : STAGES[stage].label;
 
   return (
@@ -255,6 +254,11 @@ export function AssemblyStory() {
             className="ds-stage-canvas"
             role="img"
             aria-label="A brand operating system, one persistent blueprint explored stage by stage: brand intelligence and design language feed a production hall of components, recipes, workflows, interpreters, and renderers; work passes governance into the interfaces; evidence returns through observability."
+          />
+          <canvas
+            ref={mapRef}
+            className="ds-stage-map"
+            aria-hidden="true"
           />
 
           {/* stage changes are otherwise silent to screen readers */}

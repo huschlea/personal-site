@@ -28,12 +28,32 @@
 .site-ds .ds-stage-region {
   position: absolute;
   inset: 0;
+  overflow: hidden;
 }
 
 .site-ds .ds-stage-canvas {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* One full-system world map stays visible before, during, and after every
+   camera move. The closest card stages use it at 1:1 scale, so the browser can
+   move through one crisp place without overlaps, blur, or an arrival swap. */
+.site-ds .ds-stage-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  contain: strict;
 }
 
 /* ─── the reserved column ─── */
@@ -195,6 +215,8 @@
   gap: 0.4rem;
   z-index: 20;
   transition: transform var(--ds-t) var(--ds-ease);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .site-ds .ds-shell-full .ds-stage-nav {
@@ -269,7 +291,8 @@
 /* numbered chips carry only their number during navigation: opening the
    active title resized the rail on every stage change, and re-centring a
    translateX(-50%) row relayouts every button mid-slide - that was the
-   roughness. Titles unfold only on the finale, all together. */
+   roughness. Titles unfold only on the finale, all together, while the rail
+   moves toward the viewport centre on the same timing curve. */
 .site-ds .ds-nav-chip:has(.ds-explorer-num) .ds-nav-label {
   display: inline-block;
   max-width: 0;
@@ -278,11 +301,9 @@
   overflow: hidden;
   white-space: nowrap;
   vertical-align: bottom;
-  /* The fold is the fast direction. Unfolded, the rail is wider than the
-     region the panel leaves it, so on the way out the titles have to be gone
-     before the column comes back: the panel's width restore waits behind this
-     same 0.18s. The unfold, which happens with the whole screen to itself,
-     keeps the generous duration. */
+  /* The fold remains the fast direction so the returning panel has immediate
+     clearance. The unfold is applied in the same render as the rail's centre
+     shift, turning the two changes into one continuous gesture. */
   transition: max-width 0.18s var(--ds-ease), opacity 0.18s var(--ds-ease), margin-left 0.18s var(--ds-ease);
 }
 

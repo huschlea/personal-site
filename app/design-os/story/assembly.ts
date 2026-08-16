@@ -20,6 +20,7 @@ const INK = (o: number) => `rgba(20, 18, 16, ${o})`;
 const PAPER = "#FEFEFD";
 const RUST = (o: number) => `rgba(156, 63, 33, ${o})`;
 const EASE = (t: number) => 1 - Math.pow(1 - t, 3);
+const TRAVEL_MS = 600;
 
 const S_MAIN = 0.52, S_MID = 0.3, S_SOFT = 0.16;
 const T_TITLE = 0.85, T_BODY = 0.6, T_FAINT = 0.42;
@@ -231,8 +232,12 @@ const FRAGS: Frag[] = [
 const BI_ROWS = FRAGS.filter((f) => f.layer === 0);
 const DL_ROWS = FRAGS.filter((f) => f.layer === 1);
 
-export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLElement | null }) {
-  const { canvas, panel } = opts;
+export function mountAssembly(opts: {
+  canvas: HTMLCanvasElement;
+  destinationCanvas?: HTMLCanvasElement | null;
+  panel?: HTMLElement | null;
+}) {
+  const { canvas, destinationCanvas, panel } = opts;
   let ctx = canvas.getContext("2d");
   if (!ctx) return { destroy: () => {}, setStage: (_: number) => {} };
 
@@ -240,6 +245,10 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   let raf = 0, running = false, last = 0;
   /* the scene redraws only when something in it has moved */
   let dirty = true;
+  function invalidate() {
+    dirty = true;
+    if (running && raf === 0) raf = requestAnimationFrame(frame);
+  }
   /* the panel's width, kept by its own observer: reading clientWidth inside
      the frame loop forces a synchronous layout on exactly the frames a
      transition can least afford one */
@@ -257,11 +266,9 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
 
   /* everything renders in final position on load: no entrance choreography */
   const reveal = new Array(BEATS).fill(1);
-  const focus = new Array(BEATS).fill(0);
   let booted = false;
   const layerLight = new Array(LAYER_COUNT).fill(1); // spotlight currents
   let active = 0;
-  let runClock = 0;
   let idleClock = 0;
 
   /* ── the partition is the camera's, not the canvas's ──
@@ -293,7 +300,182 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     return { zoom, cx: v.x + v.w / 2 + inset / (2 * s), cy };
   }
   const cam: Camera = { zoom: 0.8, cx: 1080, cy: 560 };
-  const camT: Camera = { zoom: 0.8, cx: 1080, cy: 560 }; // the smoothed target
+  let transitionPending = false;
+
+  /* One full-system, world-space map owns every visible camera move. Earlier
+     versions cross-faded departure and destination canvases; even with
+     matching geometry, two opaque page-sized bitmaps read as screenshots
+     sliding across one another. A later handoff to the native viewport canvas
+     restored sharpness but flashed when the camera landed. This larger atlas
+     is authored at the closest stage's CSS scale, making stages 1 and 2 a
+     crisp 1:1 transform with no handoff at all. */
+  const ATLAS_PAD = 72;
+  const WORLD_W = 2060;
+  const WORLD_H = 1210;
+  let atlasScale = 0;
+  let atlasReady = false;
+  let atlasDirty = false;
+  let travelTimer: number | null = null;
+  let travelRaf = 0;
+  let travelToken = 0;
+  let traveling = false;
+
+  function stopTravel(hideAtlas = false) {
+    if (travelTimer !== null) window.clearTimeout(travelTimer);
+    if (travelRaf !== 0) cancelAnimationFrame(travelRaf);
+    travelTimer = null;
+    travelRaf = 0;
+    travelToken += 1;
+    traveling = false;
+    if (destinationCanvas) {
+      destinationCanvas.style.transition = "none";
+      destinationCanvas.style.opacity = hideAtlas ? "0" : "1";
+    }
+    if (hideAtlas) atlasReady = false;
+    canvas.style.transition = "none";
+    canvas.style.transform = "none";
+    canvas.style.opacity = hideAtlas ? "1" : "0";
+    if (atlasDirty && !hideAtlas) invalidate();
+  }
+
+  function lightsForStage(stage: number) {
+    const selected = stage >= 1 && stage <= 6 ? stage - 1 : null;
+    return layerLight.map((_, i) => selected === null ? 1 : (selected === i ? 1 : DIM));
+  }
+
+  function cameraForStage(stage: number) {
+    const savedInset = inset;
+    inset = stage === BEATS - 1 ? 0 : (panelW || lastPanelW);
+    const target = fitView(VIEWS[stage]);
+    inset = savedInset;
+    return target;
+  }
+
+  function matrixFor(camera: Camera) {
+    const base = Math.min(W / 2060, H / 1210);
+    const desiredScale = base * camera.zoom;
+    const scale = desiredScale / atlasScale;
+    const snapDpr = Math.max(1, window.devicePixelRatio || 1);
+    const tx = Math.round((W * 0.5 - (camera.cx + ATLAS_PAD) * desiredScale) * snapDpr) / snapDpr;
+    const ty = Math.round((H * 0.5 - (camera.cy + ATLAS_PAD) * desiredScale) * snapDpr) / snapDpr;
+    return `matrix(${scale}, 0, 0, ${scale}, ${tx}, ${ty})`;
+  }
+
+  function cameraAtMatrix(matrix: string) {
+    if (matrix === "none" || atlasScale <= 0) return { ...cam };
+    const transform = new DOMMatrixReadOnly(matrix);
+    const base = Math.min(W / 2060, H / 1210);
+    const desiredScale = transform.a * atlasScale;
+    if (desiredScale <= 0) return { ...cam };
+    return {
+      zoom: desiredScale / base,
+      cx: (W * 0.5 - transform.e) / desiredScale - ATLAS_PAD,
+      cy: (H * 0.5 - transform.f) / desiredScale - ATLAS_PAD,
+    };
+  }
+
+  function renderAtlas(lights: number[]) {
+    if (!destinationCanvas || W <= 0 || H <= 0) return false;
+    const atlasCtx = destinationCanvas.getContext("2d");
+    if (!atlasCtx) return false;
+
+    const viewportW = W;
+    const viewportH = H;
+    const viewportDpr = dpr;
+    const viewportInset = inset;
+    const viewportBase = Math.min(viewportW / WORLD_W, viewportH / WORLD_H);
+    const closestZoom = Math.max(...VIEWS.map((_, stage) => cameraForStage(stage).zoom));
+    atlasScale = viewportBase * closestZoom;
+    const atlasCssW = (WORLD_W + ATLAS_PAD * 2) * atlasScale;
+    const atlasCssH = (WORLD_H + ATLAS_PAD * 2) * atlasScale;
+
+    /* The closest stages use this world canvas at exactly 1:1. Its backing
+       density therefore only needs to match the native canvas; farther stages
+       downscale the same source and gain effective density. */
+    const wantedDpr = viewportDpr;
+    const maxAtlasPixels = 32e6;
+    const wantedPixels = atlasCssW * atlasCssH * wantedDpr * wantedDpr;
+    const atlasDpr = wantedPixels > maxAtlasPixels
+      ? Math.max(1.25, wantedDpr * Math.sqrt(maxAtlasPixels / wantedPixels))
+      : wantedDpr;
+
+    const nextWidth = Math.round(atlasCssW * atlasDpr);
+    const nextHeight = Math.round(atlasCssH * atlasDpr);
+    if (destinationCanvas.width !== nextWidth) destinationCanvas.width = nextWidth;
+    if (destinationCanvas.height !== nextHeight) destinationCanvas.height = nextHeight;
+    destinationCanvas.style.width = `${atlasCssW}px`;
+    destinationCanvas.style.height = `${atlasCssH}px`;
+
+    const savedCtx = ctx;
+    const savedCam = { ...cam };
+    const savedLights = [...layerLight];
+    ctx = atlasCtx;
+    W = atlasCssW;
+    H = atlasCssH;
+    dpr = atlasDpr;
+    inset = 0;
+    const atlasBase = Math.min(W / WORLD_W, H / WORLD_H);
+    Object.assign(cam, {
+      zoom: atlasScale / atlasBase,
+      cx: WORLD_W / 2,
+      cy: WORLD_H / 2,
+    });
+    layerLight.splice(0, layerLight.length, ...lights);
+    paintScene(-1);
+    Object.assign(cam, savedCam);
+    layerLight.splice(0, layerLight.length, ...savedLights);
+    W = viewportW;
+    H = viewportH;
+    inset = viewportInset;
+    dpr = viewportDpr;
+    ctx = savedCtx;
+    atlasReady = true;
+    atlasDirty = false;
+    return true;
+  }
+
+  function beginTravel(target: Camera, targetLights: number[]) {
+    if (!destinationCanvas || still) {
+      stopTravel(true);
+      return;
+    }
+
+    let startCamera = { ...cam };
+    if (atlasReady && atlasScale > 0) {
+      const liveMatrix = getComputedStyle(destinationCanvas).transform;
+      startCamera = cameraAtMatrix(liveMatrix);
+    }
+    if (travelTimer !== null) window.clearTimeout(travelTimer);
+    if (travelRaf !== 0) cancelAnimationFrame(travelRaf);
+
+    if (!renderAtlas(targetLights) || atlasScale <= 0) return;
+
+    traveling = true;
+    const token = ++travelToken;
+    destinationCanvas.style.transition = "none";
+    destinationCanvas.style.transformOrigin = "0 0";
+    destinationCanvas.style.transform = matrixFor(startCamera);
+    destinationCanvas.style.opacity = "1";
+
+    /* The native target remains only as a fallback underneath. The same
+       opaque world map is visible before, during, and after travel. */
+    canvas.style.transition = "none";
+    canvas.style.transform = "none";
+    canvas.style.opacity = "0";
+
+    /* Two paint boundaries let the new pixels reach the compositor before its
+       transform starts. This replaces the old synchronous layout flush, which
+       could stall the first motion frame while the atlas texture uploaded. */
+    travelRaf = requestAnimationFrame(() => {
+      travelRaf = requestAnimationFrame(() => {
+        travelRaf = 0;
+        if (token !== travelToken || !destinationCanvas) return;
+        destinationCanvas.style.transition = `transform ${TRAVEL_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        destinationCanvas.style.transform = matrixFor(target);
+        travelTimer = window.setTimeout(stopTravel, TRAVEL_MS + 34);
+      });
+    });
+  }
 
   const iconPaths = new Map<string, Path2D>();
   for (const [k, d] of Object.entries(ICONS)) iconPaths.set(k, new Path2D(d));
@@ -307,7 +489,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     /* the scene can settle long before a mark arrives on a cold load, and a
        settled scene stops drawing: without this the favicon would never be
        painted at all */
-    im.onload = () => { dirty = true; };
+    im.onload = () => { atlasDirty = true; invalidate(); };
     im.src = `/design-system/marks/${name}.png`;
     marks.set(name, im);
   }
@@ -320,9 +502,10 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const im = marks.get(name);
     if (!im || !im.complete || im.naturalWidth <= 0) return;
     const p = toScreen(cx2, cy2);
+    const g = size * 0.62 * p.s;
+    if (!screenBoxVisible(p.x - g / 2, p.y - g / 2, p.x + g / 2, p.y + g / 2)) return;
     ctx!.save();
     ctx!.globalAlpha = Math.min(1, tt);
-    const g = size * 0.62 * p.s;
     ctx!.drawImage(im, p.x - g / 2, p.y - g / 2, g, g);
     ctx!.restore();
     ctx!.beginPath();
@@ -346,13 +529,16 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
      at a full dpr 2 and only the very largest displays soften at all. */
   const MAX_BACKING_PX = 16e6;
   function applyResize() {
-    if (!needsResize) return false;
-    needsResize = false;
+    const nextW = canvas.clientWidth;
+    const nextH = canvas.clientHeight;
     const want = Math.min(2, window.devicePixelRatio || 1);
-    W = canvas.clientWidth;
-    H = canvas.clientHeight;
-    const px = W * H * want * want;
-    dpr = px > MAX_BACKING_PX ? Math.max(1.25, want * Math.sqrt(MAX_BACKING_PX / px)) : want;
+    const px = nextW * nextH * want * want;
+    const nextDpr = px > MAX_BACKING_PX ? Math.max(1.25, want * Math.sqrt(MAX_BACKING_PX / px)) : want;
+    if (!needsResize && W === nextW && H === nextH && dpr === nextDpr) return false;
+    needsResize = false;
+    W = nextW;
+    H = nextH;
+    dpr = nextDpr;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     return true;
@@ -364,6 +550,11 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const base = Math.min(W / 2060, H / 1210);
     const s = base * cam.zoom;
     return { x: W * 0.5 + (wx - cam.cx) * s, y: H * 0.5 + (wy - cam.cy) * s, s };
+  }
+
+  function screenBoxVisible(x0: number, y0: number, x1: number, y1: number, pad = 12) {
+    return Math.max(x0, x1) >= -pad && Math.min(x0, x1) <= W + pad
+      && Math.max(y0, y1) >= -pad && Math.min(y0, y1) <= H + pad;
   }
 
   /* every drawn element belongs to a layer; its ink rides the spotlight */
@@ -384,6 +575,13 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const p = toScreen(wx, wy);
     const size = (o?.size ?? 10.5) * p.s;
     if (size < 2.5) return;
+    /* Most close-up stages leave large parts of the full system outside the
+       viewport. Reject text before setting a font or asking the browser to
+       rasterize it; the generous horizontal extent keeps long and anchored
+       labels safe at the edge. */
+    const extent = Math.max(size * 2, (o?.maxW ?? 600) * p.s);
+    const yPad = Math.max(16, size * 2);
+    if (p.y < -yPad || p.y > H + yPad || p.x < -extent || p.x > W + extent) return;
     const family = o?.mono
       ? "'SF Mono', ui-monospace, Menlo, monospace"
       : "-apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif";
@@ -452,6 +650,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   function plate(x0: number, y0: number, x1: number, y1: number, t: number) {
     const a = toScreen(x0, y0);
     const b = toScreen(x1, y1);
+    if (!screenBoxVisible(a.x, a.y, b.x, b.y)) return;
     ctx!.fillStyle = `rgba(254, 254, 253, ${0.99 * t})`;
     ctx!.fillRect(a.x, a.y, b.x - a.x, b.y - a.y);
     ctx!.strokeStyle = INK(PLATE_INK * t * inkMul);
@@ -708,14 +907,20 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     }
   }
 
+  const capsWidthCache = new Map<string, number>();
   function capsWidth(str: string, size: number) {
+    const key = `${size}\u0000${str}`;
+    const cached = capsWidthCache.get(key);
+    if (cached !== undefined) return cached;
     const p0 = toScreen(0, 0);
     const px = size * p0.s;
     ctx!.font = `500 ${px}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, Arial, sans-serif`;
     ctx!.letterSpacing = `${0.08 * px}px`;
     const w = ctx!.measureText(str.toUpperCase()).width;
     ctx!.letterSpacing = "0px";
-    return w / p0.s;
+    const worldWidth = w / p0.s;
+    capsWidthCache.set(key, worldWidth);
+    return worldWidth;
   }
 
   /* One line of a double rule, never thinner than the screen can actually draw:
@@ -737,6 +942,8 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     if (!p2 || tt <= 0.02) return;
     const p = toScreen(wx, wy);
     const s = (sizeWorld * p.s) / 24;
+    const half = sizeWorld * p.s / 2;
+    if (!screenBoxVisible(p.x - half, p.y - half, p.x + half, p.y + half)) return;
     ctx!.save();
     ctx!.translate(p.x - (sizeWorld * p.s) / 2, p.y - (sizeWorld * p.s) / 2);
     ctx!.scale(s, s);
@@ -752,6 +959,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const p = toScreen(wx, wy);
     const size = 8 * p.s;
     if (size < 4) return;
+    if (!screenBoxVisible(p.x - 80 * p.s, p.y - 12 * p.s, p.x + 80 * p.s, p.y + 12 * p.s)) return;
     ctx!.font = `600 ${size}px -apple-system, BlinkMacSystemFont, sans-serif`;
     const tw = ctx!.measureText(label.toUpperCase()).width;
     ctx!.beginPath();
@@ -776,6 +984,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const lift = o?.rise === false ? 0 : (1 - EASE(t)) * 14;
     const a = toScreen(x, y + lift);
     const b = toScreen(x + w, y + h + lift);
+    if (!screenBoxVisible(a.x, a.y, b.x, b.y, 24)) return;
     ctx!.beginPath();
     ctx!.roundRect(a.x, a.y, b.x - a.x, b.y - a.y, 0);
     ctx!.save();
@@ -825,6 +1034,8 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const tt = t * inkMul;
     if (tt <= 0.02 || pts.length < 2) return;
     const sp = pts.map(([x, y]) => toScreen(x, y));
+    const xs = sp.map((p) => p.x), ys = sp.map((p) => p.y);
+    if (!screenBoxVisible(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), 24)) return;
     /* Pull an end back along its own segment by a screen distance. A branch
        meeting a double rule has to stop on the trunk's near hairline: the
        centreline is the one place it must not stop, since both of its rails
@@ -899,6 +1110,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     const p = toScreen(wx, wy);
     const size = 9 * p.s;
     if (size < 4) return;
+    if (!screenBoxVisible(p.x - 24 * p.s, p.y - 14 * p.s, p.x + 320 * p.s, p.y + 14 * p.s)) return;
     ctx!.font = `500 ${size}px -apple-system, BlinkMacSystemFont, sans-serif`;
     const tw = (ctx!.measureText(str.toUpperCase()).width + 0.08 * size * str.length) / p.s;
     if (o?.bare) {
@@ -942,13 +1154,15 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   function fragSketch(kind: string, px: number, py: number, s: number, t: number, rot: number, compact = false) {
     const tt = t * inkMul;
     if (tt <= 0.02) return;
+    const tw = compact ? 34 : FRAG_W;
+    const th = compact ? 24 : FRAG_H;
+    const radius = Math.hypot(tw, th) * s / 2;
+    if (!screenBoxVisible(px - radius, py - radius, px + radius, py + radius, 18)) return;
     ctx!.save();
     ctx!.translate(px, py);
     ctx!.rotate((rot * Math.PI) / 180);
 
     /* the enclosure: one size for every fragment */
-    const tw = compact ? 34 : FRAG_W;
-    const th = compact ? 24 : FRAG_H;
     ctx!.beginPath();
     ctx!.roundRect((-tw / 2) * s, (-th / 2) * s, tw * s, th * s, 0);
     ctx!.save();
@@ -1976,115 +2190,24 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     if (t <= 0.03) return;
     const p0 = toScreen(0, 0);
     if (p0.s < 0.25) return;
+    const left = cam.cx - (W * 0.5 + 4) / p0.s;
+    const right = cam.cx + (W * 0.5 + 4) / p0.s;
+    const top = cam.cy - (H * 0.5 + 4) / p0.s;
+    const bottom = cam.cy + (H * 0.5 + 4) / p0.s;
+    const gx0 = Math.max(80, Math.ceil(left / 40) * 40);
+    const gx1 = Math.min(2000, Math.floor(right / 40) * 40);
+    const gy0 = Math.max(80, Math.ceil(top / 40) * 40);
+    const gy1 = Math.min(1150, Math.floor(bottom / 40) * 40);
     ctx!.fillStyle = INK(0.045 * t);
-    for (let gx = 80; gx <= 2000; gx += 40) {
-      for (let gy = 80; gy <= 1150; gy += 40) {
+    for (let gx = gx0; gx <= gx1; gx += 40) {
+      for (let gy = gy0; gy <= gy1; gy += 40) {
         const p = toScreen(gx, gy);
-        if (p.x < -4 || p.x > W + 4 || p.y < -4 || p.y > H + 4) continue;
         ctx!.fillRect(p.x - 0.5, p.y - 0.5, 1, 1);
       }
     }
   }
 
-  /* ── frame ── */
-
-  function frame(now: number) {
-    const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
-    last = now;
-    if (applyResize()) dirty = true;   // must precede the draw: it clears the bitmap
-    /* On the finale the inset is zero the moment the stage is chosen, not
-       when the DOM gets around to collapsing: one target step, taken from
-       rest, S-curved. The panel fades out over the drawing as it grows into
-       the space, which is the crossfade the overlay architecture buys. */
-    const wasInset = inset;
-    inset = active === BEATS - 1 ? 0 : (panelW || lastPanelW);
-    if (inset !== wasInset) dirty = true;
-
-    /* A chase that lands. The exponential approach never actually arrives,
-       which reads as sub-pixel alpha and position drift long after a
-       transition looks finished; snapping inside a hair's width makes every
-       settled frame byte-identical to the last. */
-    const chase = still ? 1 : 1 - Math.pow(0.0018, dt);
-    /* Every current snaps onto its target inside a hair's width, so once a
-       stage has landed nothing in the scene changes and the frame can be
-       skipped outright: the bitmap already holds the picture. Any current
-       that moves marks the scene dirty. (Reviving the run motion means
-       marking dirty on the clock too; see ANIMATION-HANDOFF.md.) */
-    const glide = (cur: number, target: number, eps: number) => {
-      const next = cur + (target - cur) * chase;
-      const out = Math.abs(next - target) < eps ? target : next;
-      if (out !== cur) dirty = true;
-      return out;
-    };
-    for (let b = 0; b < BEATS; b++) {
-      /* one persistent system: everything is always drawn, and the currents
-         only carry the load-in fade. The stages are a camera and a spotlight
-         moving around a system that is already whole. */
-      reveal[b] = glide(reveal[b], 1, 0.001);
-      focus[b] = glide(focus[b], active === b ? 1 : 0, 0.001);
-    }
-
-    /* the spotlight: stages 1..6 select layers 0..5 */
-    const sel = active >= 1 && active <= 6 ? active - 1 : null;
-    for (let i = 0; i < LAYER_COUNT; i++) {
-      layerLight[i] = glide(layerLight[i], sel === null ? 1 : (sel === i ? 1 : DIM), 0.001);
-    }
-
-    /* The camera is DOUBLE-smoothed (target glides into camT, camera glides
-       toward camT), so any step becomes an S-curve, eased both ways. And it
-       interpolates in VISIBLE-WIDTH space, not zoom: lerping zoom directly
-       makes a combined pan-and-zoom read as a collapse that then re-expands,
-       because screen paths under a zoom lerp are not monotonic. Gliding the
-       viewport's world-width keeps every landmark on a single continuous
-       path. On the first sized frame the camera snaps to its fit: the page
-       loads composed, with no entrance sweep. */
-    const f = fitView(VIEWS[active]);
-    if (!booted && W > 0) {
-      booted = true;
-      dirty = true;
-      cam.zoom = camT.zoom = f.zoom;
-      cam.cx = camT.cx = f.cx;
-      cam.cy = camT.cy = f.cy;
-    }
-    const chaseT = still ? 1 : 1 - Math.pow(0.0006, dt);
-    const glideT = (cur: number, target: number, eps: number) => {
-      const next = cur + (target - cur) * chaseT;
-      const out = Math.abs(next - target) < eps ? target : next;
-      if (out !== cur) dirty = true;
-      return out;
-    };
-    const wOf = (z: number) => 1 / Math.max(0.0001, z);
-    camT.zoom = 1 / glideT(wOf(camT.zoom), wOf(f.zoom), 0.0001);
-    camT.cx = glideT(camT.cx, f.cx, 0.05);
-    camT.cy = glideT(camT.cy, f.cy, 0.05);
-    cam.zoom = 1 / glide(wOf(cam.zoom), wOf(camT.zoom), 0.0001);
-    cam.cx = glide(cam.cx, camT.cx, 0.05);
-    cam.cy = glide(cam.cy, camT.cy, 0.05);
-
-    /* a read-only window for the verification tooling: the live camera and
-       region, so probes derive world-to-device mapping instead of mirroring it */
-    (window as unknown as Record<string, unknown>).__ds = {
-      W, H, dpr, active, inset,
-      s: Math.min(W / 2060, H / 1210) * cam.zoom,
-      cam: { zoom: cam.zoom, cx: cam.cx, cy: cam.cy },
-      target: f,
-      view: VIEWS[active],
-      settled: Math.abs(cam.zoom - f.zoom) < 0.002 && Math.abs(cam.cx - f.cx) < 0.5 && Math.abs(cam.cy - f.cy) < 0.5,
-    };
-
-    /* The run choreography is tabled and lives behind runK = -1; the finale
-       is a static blueprint (its idle draws gate on `active` at their sites).
-       See ANIMATION-HANDOFF.md. */
-    idleClock += dt * 0.08;
-    const runK = -1;
-
-    /* nothing moved: the last draw is still on screen and still correct */
-    if (!dirty) {
-      if (running) raf = requestAnimationFrame(frame);
-      return;
-    }
-    dirty = false;
-
+  function paintScene(runK = -1) {
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx!.fillStyle = PAPER;
     ctx!.fillRect(0, 0, W, H);
@@ -2099,8 +2222,83 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
     if (reveal[3] > 0.01) drawHall(reveal[3], runK);
     if (reveal[4] > 0.01) drawInterface(reveal[4]);
     if (reveal[6] > 0.01) drawObs(reveal[6]);
+  }
 
-    if (running) raf = requestAnimationFrame(frame);
+  /* ── frame ── */
+
+  function sameCamera(a: Camera, b: Camera) {
+    return a.zoom === b.zoom && a.cx === b.cx && a.cy === b.cy;
+  }
+
+  function frame(now: number) {
+    raf = 0;
+    const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+    last = now;
+    if (applyResize()) dirty = true;
+    /* On the finale the inset is zero the moment the stage is chosen, not
+       when the DOM gets around to collapsing. The traveling atlas covers the
+       canvas while this target lands underneath in one exact step. */
+    const wasInset = inset;
+    inset = active === BEATS - 1 ? 0 : (panelW || lastPanelW);
+    if (inset !== wasInset) dirty = true;
+
+    const stageChanged = transitionPending;
+    transitionPending = false;
+    const f = fitView(VIEWS[active]);
+    const nextLights = lightsForStage(active);
+
+    if (!booted && W > 0) {
+      booted = true;
+      dirty = true;
+      Object.assign(cam, f);
+      layerLight.splice(0, layerLight.length, ...nextLights);
+    } else if (booted) {
+      if (stageChanged || !sameCamera(cam, f)) {
+        Object.assign(cam, f);
+        dirty = true;
+      }
+      if (stageChanged) {
+        layerLight.splice(0, layerLight.length, ...nextLights);
+        dirty = true;
+      }
+    }
+
+    /* a read-only window for the verification tooling: the live camera and
+       region, so probes derive world-to-device mapping instead of mirroring it */
+    (window as unknown as Record<string, unknown>).__ds = {
+      W, H, dpr, active, inset,
+      s: Math.min(W / 2060, H / 1210) * cam.zoom,
+      cam: { zoom: cam.zoom, cx: cam.cx, cy: cam.cy },
+      target: f,
+      view: VIEWS[active],
+      settled: true,
+      traveling,
+    };
+
+    /* The run choreography is tabled and lives behind runK = -1; the finale
+       is a static blueprint (its idle draws gate on `active` at their sites).
+       See ANIMATION-HANDOFF.md. */
+    idleClock += dt * 0.08;
+    const runK = -1;
+
+    /* nothing moved: the last draw is still on screen and still correct */
+    if (!dirty) return;
+    dirty = false;
+    paintScene(runK);
+
+    /* Build the world map after the native fallback has painted, then keep
+       that same canvas visible at rest. Late-loading connector marks repaint
+       its bitmap without changing the current transform. */
+    if (!still && destinationCanvas && (!atlasReady || (atlasDirty && !traveling))) {
+      const wasReady = atlasReady;
+      if (renderAtlas(nextLights) && atlasScale > 0 && !wasReady) {
+        destinationCanvas.style.transition = "none";
+        destinationCanvas.style.transformOrigin = "0 0";
+        destinationCanvas.style.transform = matrixFor(cam);
+        destinationCanvas.style.opacity = "1";
+        canvas.style.opacity = "0";
+      }
+    }
   }
 
   function start() {
@@ -2110,11 +2308,12 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
        would otherwise never repaint it: always draw once on the way back in */
     dirty = true;
     last = performance.now();
-    raf = requestAnimationFrame(frame);
+    if (raf === 0) raf = requestAnimationFrame(frame);
   }
   function stop() {
     running = false;
-    cancelAnimationFrame(raf);
+    if (raf !== 0) cancelAnimationFrame(raf);
+    raf = 0;
   }
 
   const io = new IntersectionObserver((entries) => {
@@ -2123,7 +2322,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
   io.observe(canvas);
   const onVis = () => (document.hidden ? stop() : start());
   document.addEventListener("visibilitychange", onVis);
-  const onResize = () => { needsResize = true; };
+  const onResize = () => { stopTravel(true); atlasScale = 0; needsResize = true; invalidate(); };
   window.addEventListener("resize", onResize);
   /* Dragging the window to a display of a different density changes the pixel
      ratio without changing a single CSS dimension, so neither the resize event
@@ -2131,22 +2330,36 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
      rest of the session. A resolution query is the only thing that reports it,
      and it has to be re-armed against each new ratio. */
   let dprMq: MediaQueryList | null = null;
-  const onDpr = () => { needsResize = true; dirty = true; armDpr(); };
+  const onDpr = () => { stopTravel(true); atlasScale = 0; needsResize = true; invalidate(); armDpr(); };
   function armDpr() {
     if (dprMq) dprMq.removeEventListener("change", onDpr);
     dprMq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
     dprMq.addEventListener("change", onDpr);
   }
   armDpr();
-  const onStill = () => { still = stillMq.matches; dirty = true; };
+  const onStill = () => {
+    still = stillMq.matches;
+    if (still) stopTravel(true);
+    invalidate();
+  };
   stillMq.addEventListener("change", onStill);
-  /* The bitmap is now the only copy of the picture, so anything that can
-     discard it has to ask for a repaint: a browser reclaiming the backing
-     store under memory pressure, or a restore from the back/forward cache. */
-  const onContextRestored = () => { needsResize = true; dirty = true; };
+  /* Either backing store can be reclaimed under memory pressure. Fall back to
+     the native render while the world map is rebuilt. */
+  const onContextRestored = () => { needsResize = true; invalidate(); };
+  const onAtlasContextRestored = () => {
+    stopTravel(true);
+    atlasScale = 0;
+    invalidate();
+  };
   canvas.addEventListener("contextrestored", onContextRestored);
+  destinationCanvas?.addEventListener("contextrestored", onAtlasContextRestored);
   const onPageShow = (e: PageTransitionEvent) => {
-    if (e.persisted) { needsResize = true; dirty = true; }
+    if (e.persisted) {
+      stopTravel(true);
+      atlasScale = 0;
+      needsResize = true;
+      invalidate();
+    }
   };
   window.addEventListener("pageshow", onPageShow);
   /* the canvas region changes size without the window doing so when the panel
@@ -2158,8 +2371,13 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       if (e.target === panel) {
         panelW = (e.target as HTMLElement).clientWidth;
         if (panelW > 0) lastPanelW = panelW;
-      } else needsResize = true;
+      } else {
+        stopTravel(true);
+        atlasScale = 0;
+        needsResize = true;
+      }
     }
+    invalidate();
   });
   ro.observe(canvas);
   if (panel) ro.observe(panel);
@@ -2168,6 +2386,7 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
 
   return {
     destroy() {
+      stopTravel(true);
       stop();
       io.disconnect();
       ro.disconnect();
@@ -2175,12 +2394,17 @@ export function mountAssembly(opts: { canvas: HTMLCanvasElement; panel?: HTMLEle
       window.removeEventListener("resize", onResize);
       stillMq.removeEventListener("change", onStill);
       canvas.removeEventListener("contextrestored", onContextRestored);
+      destinationCanvas?.removeEventListener("contextrestored", onAtlasContextRestored);
       window.removeEventListener("pageshow", onPageShow);
       if (dprMq) dprMq.removeEventListener("change", onDpr);
     },
     setStage(i: number) {
-      active = Math.max(0, Math.min(BEATS - 1, i));
-      dirty = true;
+      const next = Math.max(0, Math.min(BEATS - 1, i));
+      if (next === active) return;
+      beginTravel(cameraForStage(next), lightsForStage(next));
+      active = next;
+      transitionPending = true;
+      invalidate();
     },
   };
 }
