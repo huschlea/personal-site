@@ -820,9 +820,9 @@ Speed is no longer scarce. A machine can lay down a hundred possible versions be
 
 Excitement is honest signal because it's challenging to fake convincingly. When someone else shares your excitement, not politely but genuinely, something between you shifts. There is a recognition that goes deeper than agreement. It's the relief of being understood without having to explain yourself first.
 
-### Following no's
+### Dead ends
 
-Every no is a positive narrowing of the space of possibilities. Follow the eliminations long enough and something meaningful starts to remain
+Every dead end is a positive narrowing of the space of possibilities.
 
 ### Prisms
 
@@ -842,4 +842,4 @@ There is magic that exists in this world. It reveals itself through relentless d
 
 ### The leap
 
-Some distances aren't about the miles. They're about the decision behind them, made on instinct rather than calculation, where the act of taking action proves what planning never could: that feeling can be trusted as much as logic. Not because the destination or the outcome is necessarily better, but because the leap itself reveals a capacity for self-trust that most people never test.
+Some distances aren't about the miles. They're about the decision behind them, made on instinct rather than calculation, where the act of taking action proves what planning never could: that feeling can be trusted as much as logic.
