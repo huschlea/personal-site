@@ -822,7 +822,7 @@ Excitement is honest signal because it's challenging to fake convincingly. When 
 
 ### Dead ends
 
-Every dead end is a positive narrowing of the space of possibilities.
+Every dead end is a positive narrowing of the space of possibilities. Follow the eliminations long enough and something meaningful starts to remain.
 
 ### Prisms
 
